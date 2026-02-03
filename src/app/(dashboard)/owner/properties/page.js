@@ -27,8 +27,16 @@ export default function PropertiesPage() {
 
   async function fetchProperties() {
     try {
-      const response = await fetch('/api/properties')
+      const response = await fetch('/api/properties', {
+        credentials: 'include'
+      })
       const data = await response.json()
+
+      if (!response.ok) {
+        console.error('API Error:', data.error)
+        return
+      }
+
       setProperties(data.properties || [])
     } catch (error) {
       console.error('Failed to fetch properties:', error)
@@ -99,13 +107,10 @@ export default function PropertiesPage() {
       {/* Page header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100">Properties</h1>
-          <p className="text-slate-400 mt-1">Manage your property portfolio</p>
+          <h1 className="text-2xl font-bold text-blue-950">Properties</h1>
+          <p className="text-slate-500 mt-1">Manage your property portfolio</p>
         </div>
-        <Button
-          onClick={handleAddNew}
-          className="bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white"
-        >
+        <Button onClick={handleAddNew}>
           <Plus className="mr-2 h-4 w-4" />
           Add Property
         </Button>
@@ -113,34 +118,31 @@ export default function PropertiesPage() {
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+        <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
         <Input
           placeholder="Search properties..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 bg-slate-900 border-slate-800 text-slate-100 placeholder:text-slate-500"
+          className="pl-10"
         />
       </div>
 
       {/* Properties grid */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-teal-500" />
+          <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
         </div>
       ) : filteredProperties.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-800">
-            <Building2 className="h-8 w-8 text-slate-600" />
+          <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-100">
+            <Building2 className="h-10 w-10 text-slate-400" />
           </div>
-          <h3 className="mt-4 text-lg font-medium text-slate-200">No properties found</h3>
+          <h3 className="mt-4 text-lg font-semibold text-blue-950">No properties found</h3>
           <p className="mt-1 text-sm text-slate-500">
             {searchQuery ? 'Try adjusting your search' : 'Get started by adding your first property'}
           </p>
           {!searchQuery && (
-            <Button
-              onClick={handleAddNew}
-              className="mt-4 bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white"
-            >
+            <Button onClick={handleAddNew} className="mt-4">
               <Plus className="mr-2 h-4 w-4" />
               Add Property
             </Button>
@@ -161,9 +163,9 @@ export default function PropertiesPage() {
 
       {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-2xl bg-slate-900 border-slate-800 text-slate-100 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-xl">
+            <DialogTitle>
               {editingProperty ? 'Edit Property' : 'Add New Property'}
             </DialogTitle>
           </DialogHeader>
@@ -181,25 +183,23 @@ export default function PropertiesPage() {
 
       {/* Delete confirmation dialog */}
       <Dialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
-        <DialogContent className="max-w-md bg-slate-900 border-slate-800 text-slate-100">
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Delete Property</DialogTitle>
           </DialogHeader>
-          <p className="text-slate-400">
+          <p className="text-slate-500">
             Are you sure you want to delete "{deleteConfirm?.name}"? This action cannot be undone.
           </p>
           <div className="flex justify-end gap-3 mt-4">
             <Button
               variant="outline"
               onClick={() => setDeleteConfirm(null)}
-              className="border-slate-700 text-slate-300 hover:bg-slate-800"
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={() => handleDelete(deleteConfirm)}
-              className="bg-red-600 hover:bg-red-700"
             >
               Delete
             </Button>
@@ -209,4 +209,3 @@ export default function PropertiesPage() {
     </div>
   )
 }
-

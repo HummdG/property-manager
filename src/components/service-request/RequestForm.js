@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -39,20 +39,20 @@ export function RequestForm({ properties, categories, onSubmit, onCancel, isLoad
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid gap-4">
         <div>
-          <Label htmlFor="title" className="text-slate-300">Title</Label>
+          <Label htmlFor="title">Title</Label>
           <Input
             id="title"
             name="title"
             value={formData.title}
             onChange={handleChange}
-            placeholder="e.g., Leaking faucet in bathroom"
-            className="mt-1.5 bg-slate-800/50 border-slate-700 text-slate-100"
+            placeholder="e.g., AC not cooling properly"
+            className="mt-1.5"
             required
           />
         </div>
 
         <div>
-          <Label htmlFor="description" className="text-slate-300">Description</Label>
+          <Label htmlFor="description">Description</Label>
           <textarea
             id="description"
             name="description"
@@ -60,20 +60,20 @@ export function RequestForm({ properties, categories, onSubmit, onCancel, isLoad
             onChange={handleChange}
             rows={4}
             placeholder="Describe the issue in detail..."
-            className="mt-1.5 flex w-full rounded-md border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+            className="mt-1.5 flex w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-200"
             required
           />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <Label htmlFor="propertyId" className="text-slate-300">Property</Label>
+            <Label htmlFor="propertyId">Property</Label>
             <select
               id="propertyId"
               name="propertyId"
               value={formData.propertyId}
               onChange={handleChange}
-              className="mt-1.5 flex h-10 w-full rounded-md border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+              className="mt-1.5 flex h-11 w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-200"
               required
             >
               <option value="">Select property</option>
@@ -86,13 +86,13 @@ export function RequestForm({ properties, categories, onSubmit, onCancel, isLoad
           </div>
 
           <div>
-            <Label htmlFor="categoryId" className="text-slate-300">Category</Label>
+            <Label htmlFor="categoryId">Category</Label>
             <select
               id="categoryId"
               name="categoryId"
               value={formData.categoryId}
               onChange={handleChange}
-              className="mt-1.5 flex h-10 w-full rounded-md border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+              className="mt-1.5 flex h-11 w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-200"
               required
             >
               <option value="">Select category</option>
@@ -106,13 +106,13 @@ export function RequestForm({ properties, categories, onSubmit, onCancel, isLoad
         </div>
 
         <div>
-          <Label htmlFor="priority" className="text-slate-300">Priority</Label>
+          <Label htmlFor="priority">Priority</Label>
           <select
             id="priority"
             name="priority"
             value={formData.priority}
             onChange={handleChange}
-            className="mt-1.5 flex h-10 w-full rounded-md border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+            className="mt-1.5 flex h-11 w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-200"
           >
             {priorities.map(priority => (
               <option key={priority.value} value={priority.value}>
@@ -123,19 +123,17 @@ export function RequestForm({ properties, categories, onSubmit, onCancel, isLoad
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 pt-4 border-t border-slate-800">
+      <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
         <Button
           type="button"
           variant="outline"
           onClick={onCancel}
-          className="border-slate-700 text-slate-300 hover:bg-slate-800"
         >
           Cancel
         </Button>
         <Button
           type="submit"
           disabled={isLoading}
-          className="bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white"
         >
           {isLoading ? (
             <>
@@ -148,4 +146,3 @@ export function RequestForm({ properties, categories, onSubmit, onCancel, isLoad
     </form>
   )
 }
-

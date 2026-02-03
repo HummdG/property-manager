@@ -37,60 +37,60 @@ export default async function OwnerPaymentsPage() {
 
   function getPaymentStatusColor(status) {
     const colors = {
-      PENDING: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-      PROCESSING: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-      COMPLETED: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-      FAILED: 'bg-red-500/10 text-red-400 border-red-500/20',
-      REFUNDED: 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+      PENDING: 'bg-amber-100 text-amber-700 border-amber-200',
+      PROCESSING: 'bg-blue-100 text-blue-700 border-blue-200',
+      COMPLETED: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+      FAILED: 'bg-red-100 text-red-700 border-red-200',
+      REFUNDED: 'bg-purple-100 text-purple-700 border-purple-200'
     }
-    return colors[status] || 'bg-slate-500/10 text-slate-400'
+    return colors[status] || 'bg-slate-100 text-slate-600'
   }
 
   return (
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-100">Payments</h1>
-        <p className="text-slate-400 mt-1">Track payments for service requests</p>
+        <h1 className="text-2xl font-bold text-blue-950">Payments</h1>
+        <p className="text-slate-500 mt-1">Track payments for service requests</p>
       </div>
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="bg-slate-900 border-slate-800">
+        <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-emerald-500/10">
-                <CreditCard className="h-6 w-6 text-emerald-400" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100">
+                <CreditCard className="h-6 w-6 text-emerald-600" />
               </div>
               <div>
-                <p className="text-sm text-slate-400">Total Paid</p>
-                <p className="text-2xl font-bold text-emerald-400">{formatCurrency(totalPaid)}</p>
+                <p className="text-sm text-slate-500">Total Paid</p>
+                <p className="text-2xl font-bold text-emerald-600">{formatCurrency(totalPaid)}</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-slate-900 border-slate-800">
+        <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-amber-500/10">
-                <CreditCard className="h-6 w-6 text-amber-400" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100">
+                <CreditCard className="h-6 w-6 text-amber-600" />
               </div>
               <div>
-                <p className="text-sm text-slate-400">Pending</p>
-                <p className="text-2xl font-bold text-amber-400">{formatCurrency(totalPending)}</p>
+                <p className="text-sm text-slate-500">Pending</p>
+                <p className="text-2xl font-bold text-amber-600">{formatCurrency(totalPending)}</p>
               </div>
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-slate-900 border-slate-800">
+        <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-teal-500/10">
-                <FileText className="h-6 w-6 text-teal-400" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100">
+                <FileText className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-slate-400">Total Transactions</p>
-                <p className="text-2xl font-bold text-slate-100">{payments.length}</p>
+                <p className="text-sm text-slate-500">Total Transactions</p>
+                <p className="text-2xl font-bold text-blue-950">{payments.length}</p>
               </div>
             </div>
           </CardContent>
@@ -98,25 +98,27 @@ export default async function OwnerPaymentsPage() {
       </div>
 
       {/* Payments list */}
-      <Card className="bg-slate-900 border-slate-800">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-lg text-slate-100">Payment History</CardTitle>
+          <CardTitle>Payment History</CardTitle>
         </CardHeader>
         <CardContent>
           {payments.length === 0 ? (
-            <div className="text-center py-8">
-              <CreditCard className="h-12 w-12 text-slate-700 mx-auto" />
-              <p className="text-slate-500 mt-4">No payments yet</p>
+            <div className="text-center py-12">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 mx-auto">
+                <CreditCard className="h-8 w-8 text-slate-400" />
+              </div>
+              <p className="text-slate-500 mt-4 font-medium">No payments yet</p>
             </div>
           ) : (
             <div className="space-y-3">
               {payments.map(payment => (
                 <div
                   key={payment.id}
-                  className="flex items-center justify-between gap-4 p-4 rounded-lg bg-slate-800/50"
+                  className="flex items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 border border-slate-100"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-slate-200 truncate">
+                    <p className="font-semibold text-blue-950 truncate">
                       {payment.description || payment.serviceRequest?.property?.name}
                     </p>
                     <p className="text-sm text-slate-500 mt-0.5">
@@ -127,7 +129,7 @@ export default async function OwnerPaymentsPage() {
                     <Badge className={getPaymentStatusColor(payment.status)}>
                       {payment.status}
                     </Badge>
-                    <p className="font-semibold text-slate-100">
+                    <p className="font-bold text-blue-950">
                       {formatCurrency(payment.amount)}
                     </p>
                   </div>
@@ -140,4 +142,3 @@ export default async function OwnerPaymentsPage() {
     </div>
   )
 }
-

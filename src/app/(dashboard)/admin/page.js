@@ -60,18 +60,18 @@ export default async function AdminDashboard() {
   const stats = await getAdminStats()
 
   const roleColors = {
-    OWNER: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-    TENANT: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-    TRADER: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-    ADMIN: 'bg-red-500/10 text-red-400 border-red-500/20'
+    OWNER: 'bg-blue-100 text-blue-700 border-blue-200',
+    TENANT: 'bg-purple-100 text-purple-700 border-purple-200',
+    TRADER: 'bg-amber-100 text-amber-700 border-amber-200',
+    ADMIN: 'bg-red-100 text-red-700 border-red-200'
   }
 
   return (
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-100">Admin Dashboard</h1>
-        <p className="text-slate-400 mt-1">Overview of the platform</p>
+        <h1 className="text-2xl font-bold text-blue-950">Admin Dashboard</h1>
+        <p className="text-slate-500 mt-1">Overview of the platform</p>
       </div>
 
       {/* Stats grid */}
@@ -81,41 +81,47 @@ export default async function AdminDashboard() {
           value={stats.totals.users}
           icon={Users}
           subtitle="Registered accounts"
+          iconColor="amber"
         />
         <StatsCard
           title="Properties"
           value={stats.totals.properties}
           icon={Building2}
           subtitle="In the system"
+          iconColor="blue"
         />
         <StatsCard
           title="Service Requests"
           value={stats.totals.requests}
           icon={ClipboardList}
           subtitle={`${stats.pendingRequests} pending`}
+          iconColor="purple"
         />
         <StatsCard
           title="Traders"
           value={stats.totals.traders}
           icon={Wrench}
           subtitle="Active contractors"
+          iconColor="emerald"
         />
       </div>
 
       {/* Alert for pending requests */}
       {stats.pendingRequests > 0 && (
-        <Card className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/20">
+        <Card className="bg-gradient-to-r from-amber-50 to-amber-100/50 border-amber-200">
           <CardContent className="p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-3">
-                <AlertCircle className="h-6 w-6 text-amber-400" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-200">
+                  <AlertCircle className="h-5 w-5 text-amber-700" />
+                </div>
                 <div>
-                  <h3 className="font-semibold text-slate-100">{stats.pendingRequests} pending requests</h3>
-                  <p className="text-slate-400 text-sm">Need to be assigned to traders</p>
+                  <h3 className="font-bold text-blue-950">{stats.pendingRequests} pending requests</h3>
+                  <p className="text-slate-600 text-sm">Need to be assigned to traders</p>
                 </div>
               </div>
               <Link href="/admin/requests?status=PENDING">
-                <Button className="bg-amber-500 hover:bg-amber-600 text-slate-900">
+                <Button>
                   Review Requests
                 </Button>
               </Link>
@@ -126,11 +132,11 @@ export default async function AdminDashboard() {
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Recent requests */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg text-slate-100">Recent Requests</CardTitle>
+            <CardTitle>Recent Requests</CardTitle>
             <Link href="/admin/requests">
-              <Button variant="outline" size="sm" className="border-slate-700 text-slate-300 hover:bg-slate-800">
+              <Button variant="outline" size="sm">
                 View All
               </Button>
             </Link>
@@ -143,14 +149,14 @@ export default async function AdminDashboard() {
                 {stats.recentRequests.map(request => (
                   <div
                     key={request.id}
-                    className="flex items-start justify-between gap-4 p-3 rounded-lg bg-slate-800/50"
+                    className="flex items-start justify-between gap-4 p-3 rounded-xl bg-slate-50 border border-slate-100"
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-slate-200 truncate">{request.title}</p>
+                      <p className="font-semibold text-blue-950 truncate">{request.title}</p>
                       <p className="text-sm text-slate-500">
                         {request.property?.name} • {request.category?.name}
                       </p>
-                      <p className="text-xs text-slate-600 mt-1">
+                      <p className="text-xs text-slate-400 mt-1">
                         by {request.requester?.name} • {formatDate(request.createdAt)}
                       </p>
                     </div>
@@ -165,11 +171,11 @@ export default async function AdminDashboard() {
         </Card>
 
         {/* Recent users */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg text-slate-100">Recent Users</CardTitle>
+            <CardTitle>Recent Users</CardTitle>
             <Link href="/admin/users">
-              <Button variant="outline" size="sm" className="border-slate-700 text-slate-300 hover:bg-slate-800">
+              <Button variant="outline" size="sm">
                 Manage Users
               </Button>
             </Link>
@@ -179,10 +185,10 @@ export default async function AdminDashboard() {
               {stats.recentUsers.map(user => (
                 <div
                   key={user.id}
-                  className="flex items-center justify-between gap-4 p-3 rounded-lg bg-slate-800/50"
+                  className="flex items-center justify-between gap-4 p-3 rounded-xl bg-slate-50 border border-slate-100"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-slate-200 truncate">{user.name}</p>
+                    <p className="font-semibold text-blue-950 truncate">{user.name}</p>
                     <p className="text-sm text-slate-500 truncate">{user.email}</p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -190,7 +196,7 @@ export default async function AdminDashboard() {
                       {user.role}
                     </Badge>
                     {!user.isActive && (
-                      <Badge variant="outline" className="text-red-400 border-red-500/30">
+                      <Badge variant="destructive">
                         Inactive
                       </Badge>
                     )}
@@ -203,21 +209,23 @@ export default async function AdminDashboard() {
       </div>
 
       {/* User distribution */}
-      <Card className="bg-slate-900 border-slate-800">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-lg text-slate-100 flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-teal-400" />
+          <CardTitle className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100">
+              <TrendingUp className="h-4 w-4 text-amber-600" />
+            </div>
             User Distribution
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 sm:grid-cols-4">
             {stats.usersByRole.map(item => (
-              <div key={item.role} className="p-4 rounded-lg bg-slate-800/50">
+              <div key={item.role} className="p-4 rounded-xl bg-slate-50 border border-slate-100">
                 <Badge className={roleColors[item.role]}>
                   {item.role}
                 </Badge>
-                <p className="text-3xl font-bold text-slate-100 mt-2">{item._count}</p>
+                <p className="text-3xl font-bold text-blue-950 mt-2">{item._count}</p>
                 <p className="text-sm text-slate-500">users</p>
               </div>
             ))}
@@ -227,4 +235,3 @@ export default async function AdminDashboard() {
     </div>
   )
 }
-

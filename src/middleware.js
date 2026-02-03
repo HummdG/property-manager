@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth/config'
 import { NextResponse } from 'next/server'
 
 const publicRoutes = ['/login', '/register', '/api/auth']
+const apiRoutes = ['/api/']  // API routes handle their own auth
 
 const roleRoutes = {
   OWNER: ['/owner'],
@@ -22,6 +23,12 @@ export default auth((req) => {
       const dashboardPath = getDashboardForRole(session.user.role)
       return NextResponse.redirect(new URL(dashboardPath, nextUrl))
     }
+    return NextResponse.next()
+  }
+
+  // Allow API routes through - they handle their own auth
+  const isApiRoute = apiRoutes.some(route => pathname.startsWith(route))
+  if (isApiRoute) {
     return NextResponse.next()
   }
 

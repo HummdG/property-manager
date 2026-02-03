@@ -6,7 +6,7 @@ import { StatsCard } from '@/components/dashboard'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { formatDate, getStatusColor, getPriorityColor } from '@/lib/utils'
+import { formatDate, getStatusColor } from '@/lib/utils'
 
 async function getTraderData(userId) {
   const traderProfile = await db.traderProfile.findUnique({
@@ -49,8 +49,8 @@ export default async function TraderDashboard() {
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-100">Dashboard</h1>
-        <p className="text-slate-400 mt-1">
+        <h1 className="text-2xl font-bold text-blue-950">Dashboard</h1>
+        <p className="text-slate-500 mt-1">
           Welcome back, {session.user.name?.split(' ')[0]}
           {traderProfile?.companyName && ` • ${traderProfile.companyName}`}
         </p>
@@ -63,34 +63,38 @@ export default async function TraderDashboard() {
           value={stats.total}
           icon={Briefcase}
           subtitle="All time"
+          iconColor="amber"
         />
         <StatsCard
           title="Pending"
           value={stats.pending}
           icon={Clock}
           subtitle="Awaiting acceptance"
+          iconColor="blue"
         />
         <StatsCard
           title="In Progress"
           value={stats.inProgress}
           icon={Wrench}
           subtitle="Currently working"
+          iconColor="purple"
         />
         <StatsCard
           title="Completed"
           value={stats.completed}
           icon={CheckCircle}
           subtitle="Finished jobs"
+          iconColor="emerald"
         />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Recent jobs */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg text-slate-100">Recent Jobs</CardTitle>
+            <CardTitle>Recent Jobs</CardTitle>
             <Link href="/trader/jobs">
-              <Button variant="outline" size="sm" className="border-slate-700 text-slate-300 hover:bg-slate-800">
+              <Button variant="outline" size="sm">
                 View All
               </Button>
             </Link>
@@ -98,25 +102,27 @@ export default async function TraderDashboard() {
           <CardContent>
             {recentJobs.length === 0 ? (
               <div className="text-center py-8">
-                <Briefcase className="h-12 w-12 text-slate-700 mx-auto" />
-                <p className="text-slate-500 mt-4">No jobs assigned yet</p>
-                <p className="text-slate-600 text-sm mt-1">You'll see jobs here when they're assigned to you</p>
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 mx-auto">
+                  <Briefcase className="h-8 w-8 text-slate-400" />
+                </div>
+                <p className="text-slate-500 mt-4 font-medium">No jobs assigned yet</p>
+                <p className="text-slate-400 text-sm mt-1">You'll see jobs here when they're assigned to you</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {recentJobs.map(job => (
                   <div
                     key={job.id}
-                    className="flex items-start justify-between gap-4 p-3 rounded-lg bg-slate-800/50"
+                    className="flex items-start justify-between gap-4 p-3 rounded-xl bg-slate-50 border border-slate-100"
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-slate-200 truncate">
+                      <p className="font-semibold text-blue-950 truncate">
                         {job.serviceRequest.title}
                       </p>
                       <p className="text-sm text-slate-500">
                         {job.serviceRequest.property.name} • {job.serviceRequest.category?.name}
                       </p>
-                      <p className="text-xs text-slate-600 mt-1">
+                      <p className="text-xs text-slate-400 mt-1">
                         {formatDate(job.assignedAt)}
                       </p>
                     </div>
@@ -131,39 +137,39 @@ export default async function TraderDashboard() {
         </Card>
 
         {/* Profile summary */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-lg text-slate-100">Profile</CardTitle>
+            <CardTitle>Profile</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {traderProfile ? (
               <>
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-slate-400">Completed Jobs</p>
-                    <p className="text-2xl font-bold text-teal-400">{traderProfile.completedJobs}</p>
+                  <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
+                    <p className="text-sm text-slate-500">Completed Jobs</p>
+                    <p className="text-2xl font-bold text-amber-600">{traderProfile.completedJobs}</p>
                   </div>
-                  <div>
-                    <p className="text-sm text-slate-400">Rating</p>
-                    <p className="text-2xl font-bold text-amber-400">
+                  <div className="p-4 rounded-xl bg-blue-50 border border-blue-100">
+                    <p className="text-sm text-slate-500">Rating</p>
+                    <p className="text-2xl font-bold text-blue-600">
                       {traderProfile.rating > 0 ? traderProfile.rating.toFixed(1) : 'N/A'}
                     </p>
                   </div>
                 </div>
 
                 {traderProfile.hourlyRate && (
-                  <div className="pt-4 border-t border-slate-800">
-                    <p className="text-sm text-slate-400">Hourly Rate</p>
-                    <p className="text-xl font-semibold text-slate-100">£{traderProfile.hourlyRate}/hr</p>
+                  <div className="pt-4 border-t border-slate-100">
+                    <p className="text-sm text-slate-500">Hourly Rate</p>
+                    <p className="text-xl font-bold text-blue-950">AED {traderProfile.hourlyRate}/hr</p>
                   </div>
                 )}
 
                 {traderProfile.categories.length > 0 && (
-                  <div className="pt-4 border-t border-slate-800">
-                    <p className="text-sm text-slate-400 mb-2">Specializations</p>
+                  <div className="pt-4 border-t border-slate-100">
+                    <p className="text-sm text-slate-500 mb-2">Specializations</p>
                     <div className="flex flex-wrap gap-2">
                       {traderProfile.categories.map(cat => (
-                        <Badge key={cat.id} variant="outline" className="text-slate-300 border-slate-700">
+                        <Badge key={cat.id} variant="outline">
                           {cat.name}
                         </Badge>
                       ))}
@@ -171,11 +177,11 @@ export default async function TraderDashboard() {
                   </div>
                 )}
 
-                <div className="pt-4 border-t border-slate-800">
-                  <p className="text-sm text-slate-400 mb-2">Status</p>
+                <div className="pt-4 border-t border-slate-100">
+                  <p className="text-sm text-slate-500 mb-2">Status</p>
                   <Badge className={traderProfile.isAvailable 
-                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
-                    : 'bg-red-500/10 text-red-400 border-red-500/20'
+                    ? 'bg-emerald-100 text-emerald-700 border-emerald-200' 
+                    : 'bg-red-100 text-red-700 border-red-200'
                   }>
                     {traderProfile.isAvailable ? 'Available' : 'Unavailable'}
                   </Badge>
@@ -192,18 +198,20 @@ export default async function TraderDashboard() {
 
       {/* Pending jobs alert */}
       {stats.pending > 0 && (
-        <Card className="bg-gradient-to-r from-amber-500/10 to-orange-500/10 border-amber-500/20">
+        <Card className="bg-gradient-to-r from-amber-50 to-amber-100/50 border-amber-200">
           <CardContent className="p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-3">
-                <AlertCircle className="h-6 w-6 text-amber-400" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-200">
+                  <AlertCircle className="h-5 w-5 text-amber-700" />
+                </div>
                 <div>
-                  <h3 className="font-semibold text-slate-100">You have {stats.pending} pending job{stats.pending > 1 ? 's' : ''}</h3>
-                  <p className="text-slate-400 text-sm">Review and accept to get started</p>
+                  <h3 className="font-bold text-blue-950">You have {stats.pending} pending job{stats.pending > 1 ? 's' : ''}</h3>
+                  <p className="text-slate-600 text-sm">Review and accept to get started</p>
                 </div>
               </div>
               <Link href="/trader/jobs?filter=pending">
-                <Button className="bg-amber-500 hover:bg-amber-600 text-slate-900">
+                <Button>
                   View Pending Jobs
                 </Button>
               </Link>
@@ -214,4 +222,3 @@ export default async function TraderDashboard() {
     </div>
   )
 }
-

@@ -87,12 +87,11 @@ export default function TenantIssuesPage() {
       {/* Page header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100">My Issues</h1>
-          <p className="text-slate-400 mt-1">Report and track maintenance requests</p>
+          <h1 className="text-2xl font-bold text-blue-950">My Issues</h1>
+          <p className="text-slate-500 mt-1">Report and track maintenance requests</p>
         </div>
         <Button
           onClick={() => setDialogOpen(true)}
-          className="bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white"
           disabled={properties.length === 0}
         >
           <Plus className="mr-2 h-4 w-4" />
@@ -102,34 +101,31 @@ export default function TenantIssuesPage() {
 
       {/* Search */}
       <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+        <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
         <Input
           placeholder="Search issues..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 bg-slate-900 border-slate-800 text-slate-100 placeholder:text-slate-500"
+          className="pl-10"
         />
       </div>
 
       {/* Requests list */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-teal-500" />
+          <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
         </div>
       ) : filteredRequests.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-800">
-            <AlertCircle className="h-8 w-8 text-slate-600" />
+          <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-100">
+            <AlertCircle className="h-10 w-10 text-slate-400" />
           </div>
-          <h3 className="mt-4 text-lg font-medium text-slate-200">No issues reported</h3>
+          <h3 className="mt-4 text-lg font-semibold text-blue-950">No issues reported</h3>
           <p className="mt-1 text-sm text-slate-500">
             {searchQuery ? 'Try adjusting your search' : 'Report an issue when something needs fixing'}
           </p>
           {!searchQuery && properties.length > 0 && (
-            <Button
-              onClick={() => setDialogOpen(true)}
-              className="mt-4 bg-gradient-to-r from-teal-500 to-emerald-600"
-            >
+            <Button onClick={() => setDialogOpen(true)} className="mt-4">
               <Plus className="mr-2 h-4 w-4" />
               Report Issue
             </Button>
@@ -149,9 +145,9 @@ export default function TenantIssuesPage() {
 
       {/* New request dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg bg-slate-900 border-slate-800 text-slate-100 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-xl">Report an Issue</DialogTitle>
+            <DialogTitle>Report an Issue</DialogTitle>
           </DialogHeader>
           <RequestForm
             properties={properties}
@@ -165,33 +161,33 @@ export default function TenantIssuesPage() {
 
       {/* Request details dialog */}
       <Dialog open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
-        <DialogContent className="max-w-md bg-slate-900 border-slate-800 text-slate-100">
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl">Issue Details</DialogTitle>
+            <DialogTitle>Issue Details</DialogTitle>
           </DialogHeader>
           {selectedRequest && (
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-slate-200">{selectedRequest.title}</h3>
-                <p className="text-sm text-slate-400 mt-2">{selectedRequest.description}</p>
+                <h3 className="font-bold text-blue-950">{selectedRequest.title}</h3>
+                <p className="text-sm text-slate-500 mt-2">{selectedRequest.description}</p>
               </div>
 
               <div className="flex gap-2">
                 <Badge className={getStatusColor(selectedRequest.status)}>
                   {selectedRequest.status.replace('_', ' ')}
                 </Badge>
-                <Badge variant="outline" className="text-slate-400 border-slate-700">
+                <Badge variant="outline">
                   {selectedRequest.priority}
                 </Badge>
               </div>
 
-              <div className="pt-4 border-t border-slate-800 space-y-2 text-sm">
-                <p className="text-slate-400">
-                  <strong className="text-slate-300">Category:</strong> {selectedRequest.category?.name}
+              <div className="pt-4 border-t border-slate-100 space-y-2 text-sm">
+                <p className="text-slate-500">
+                  <strong className="text-blue-950">Category:</strong> {selectedRequest.category?.name}
                 </p>
                 {selectedRequest.jobAssignment?.trader && (
-                  <p className="text-slate-400">
-                    <strong className="text-slate-300">Assigned to:</strong> {selectedRequest.jobAssignment.trader.name}
+                  <p className="text-slate-500">
+                    <strong className="text-blue-950">Assigned to:</strong> {selectedRequest.jobAssignment.trader.name}
                   </p>
                 )}
               </div>
@@ -202,4 +198,3 @@ export default function TenantIssuesPage() {
     </div>
   )
 }
-

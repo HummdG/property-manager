@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { ClipboardList, Search, Filter, Loader2, UserPlus } from 'lucide-react'
+import { ClipboardList, Search, Loader2, UserPlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -45,11 +45,18 @@ export default function AdminRequestsPage() {
 
       const [requestsRes, tradersRes] = await Promise.all([
         fetch(`/api/admin/requests?${params}`),
-        fetch('/api/traders')
+        fetch('/api/admin/traders')
       ])
 
       const requestsData = await requestsRes.json()
       const tradersData = await tradersRes.json()
+
+      if (!requestsRes.ok) {
+        console.error('Requests API Error:', requestsData.error)
+      }
+      if (!tradersRes.ok) {
+        console.error('Traders API Error:', tradersData.error)
+      }
 
       setRequests(requestsData.requests || [])
       setTraders(tradersData.traders || [])
@@ -98,19 +105,19 @@ export default function AdminRequestsPage() {
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-100">All Service Requests</h1>
-        <p className="text-slate-400 mt-1">Manage service requests across all properties</p>
+        <h1 className="text-2xl font-bold text-blue-950">All Service Requests</h1>
+        <p className="text-slate-500 mt-1">Manage service requests across all properties</p>
       </div>
 
       {/* Filters */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder="Search requests..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-slate-900 border-slate-800 text-slate-100 placeholder:text-slate-500"
+            className="pl-10"
           />
         </div>
         <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
@@ -120,10 +127,6 @@ export default function AdminRequestsPage() {
               variant={statusFilter === filter.value ? 'default' : 'outline'}
               size="sm"
               onClick={() => setStatusFilter(filter.value)}
-              className={statusFilter === filter.value
-                ? 'bg-teal-600 hover:bg-teal-700'
-                : 'border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-slate-100'
-              }
             >
               {filter.label}
             </Button>
@@ -134,14 +137,14 @@ export default function AdminRequestsPage() {
       {/* Requests list */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-teal-500" />
+          <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
         </div>
       ) : filteredRequests.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-800">
-            <ClipboardList className="h-8 w-8 text-slate-600" />
+          <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-100">
+            <ClipboardList className="h-10 w-10 text-slate-400" />
           </div>
-          <h3 className="mt-4 text-lg font-medium text-slate-200">No requests found</h3>
+          <h3 className="mt-4 text-lg font-semibold text-blue-950">No requests found</h3>
           <p className="mt-1 text-sm text-slate-500">
             {searchQuery || statusFilter ? 'Try adjusting your filters' : 'No service requests yet'}
           </p>
@@ -160,57 +163,57 @@ export default function AdminRequestsPage() {
 
       {/* Assign trader dialog */}
       <Dialog open={assignDialogOpen} onOpenChange={setAssignDialogOpen}>
-        <DialogContent className="max-w-md bg-slate-900 border-slate-800 text-slate-100">
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl">Request Details</DialogTitle>
+            <DialogTitle>Request Details</DialogTitle>
           </DialogHeader>
           {selectedRequest && (
             <div className="space-y-4">
               <div>
-                <h3 className="font-semibold text-slate-200">{selectedRequest.title}</h3>
-                <p className="text-sm text-slate-400 mt-1">{selectedRequest.description}</p>
+                <h3 className="font-bold text-blue-950">{selectedRequest.title}</h3>
+                <p className="text-sm text-slate-500 mt-1">{selectedRequest.description}</p>
               </div>
 
               <div className="flex gap-2">
                 <Badge className={getStatusColor(selectedRequest.status)}>
                   {selectedRequest.status.replace('_', ' ')}
                 </Badge>
-                <Badge variant="outline" className="text-slate-400 border-slate-700">
+                <Badge variant="outline">
                   {selectedRequest.priority}
                 </Badge>
               </div>
 
-              <div className="pt-4 border-t border-slate-800 space-y-2 text-sm">
-                <p className="text-slate-400">
-                  <strong className="text-slate-300">Property:</strong> {selectedRequest.property?.name}
+              <div className="pt-4 border-t border-slate-100 space-y-2 text-sm">
+                <p className="text-slate-500">
+                  <strong className="text-blue-950">Property:</strong> {selectedRequest.property?.name}
                 </p>
-                <p className="text-slate-400">
-                  <strong className="text-slate-300">Category:</strong> {selectedRequest.category?.name}
+                <p className="text-slate-500">
+                  <strong className="text-blue-950">Category:</strong> {selectedRequest.category?.name}
                 </p>
-                <p className="text-slate-400">
-                  <strong className="text-slate-300">Requested by:</strong> {selectedRequest.requester?.name}
+                <p className="text-slate-500">
+                  <strong className="text-blue-950">Requested by:</strong> {selectedRequest.requester?.name}
                 </p>
-                <p className="text-slate-400">
-                  <strong className="text-slate-300">Date:</strong> {formatDate(selectedRequest.createdAt)}
+                <p className="text-slate-500">
+                  <strong className="text-blue-950">Date:</strong> {formatDate(selectedRequest.createdAt)}
                 </p>
               </div>
 
               {selectedRequest.jobAssignment?.trader ? (
-                <div className="pt-4 border-t border-slate-800">
-                  <p className="text-sm text-slate-400">
-                    <strong className="text-slate-300">Assigned to:</strong> {selectedRequest.jobAssignment.trader.name}
+                <div className="pt-4 border-t border-slate-100">
+                  <p className="text-sm text-slate-500">
+                    <strong className="text-blue-950">Assigned to:</strong> {selectedRequest.jobAssignment.trader.name}
                   </p>
                 </div>
               ) : (
-                <div className="pt-4 border-t border-slate-800 space-y-3">
-                  <Label className="text-slate-300 flex items-center gap-2">
-                    <UserPlus className="h-4 w-4" />
+                <div className="pt-4 border-t border-slate-100 space-y-3">
+                  <Label className="flex items-center gap-2">
+                    <UserPlus className="h-4 w-4 text-amber-500" />
                     Assign Trader
                   </Label>
                   <select
                     value={selectedTrader}
                     onChange={(e) => setSelectedTrader(e.target.value)}
-                    className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-slate-100"
+                    className="flex h-11 w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500"
                   >
                     <option value="">Select a trader</option>
                     {traders.map(trader => (
@@ -222,7 +225,7 @@ export default function AdminRequestsPage() {
                   <Button
                     onClick={handleAssignTrader}
                     disabled={!selectedTrader || isAssigning}
-                    className="w-full bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700"
+                    className="w-full"
                   >
                     {isAssigning ? (
                       <>
@@ -240,4 +243,3 @@ export default function AdminRequestsPage() {
     </div>
   )
 }
-

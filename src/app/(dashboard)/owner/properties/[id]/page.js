@@ -52,21 +52,21 @@ export default async function PropertyDetailPage({ params }) {
       {/* Back button and header */}
       <div className="flex items-start gap-4">
         <Link href="/owner/properties">
-          <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-100">
+          <Button variant="ghost" size="icon" className="text-slate-500 hover:text-blue-950">
             <ArrowLeft className="h-5 w-5" />
           </Button>
         </Link>
         <div className="flex-1">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-100">{property.name}</h1>
+            <h1 className="text-2xl font-bold text-blue-950">{property.name}</h1>
             {property.isListed && (
-              <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30">
+              <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
                 Listed
               </Badge>
             )}
           </div>
-          <div className="flex items-center gap-1 mt-1 text-slate-400">
-            <MapPin className="h-4 w-4" />
+          <div className="flex items-center gap-1 mt-1 text-slate-500">
+            <MapPin className="h-4 w-4 text-amber-500" />
             <span>{property.address}, {property.city}, {property.postcode}</span>
           </div>
         </div>
@@ -76,71 +76,71 @@ export default async function PropertyDetailPage({ params }) {
         {/* Main content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Property details */}
-          <Card className="bg-slate-900 border-slate-800">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-lg text-slate-100">Property Details</CardTitle>
+              <CardTitle>Property Details</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid gap-6 sm:grid-cols-2">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800">
-                    <Building2 className="h-5 w-5 text-slate-400" />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100">
+                    <Building2 className="h-5 w-5 text-slate-500" />
                   </div>
                   <div>
                     <p className="text-sm text-slate-500">Type</p>
-                    <p className="font-medium text-slate-200">{property.type}</p>
+                    <p className="font-semibold text-blue-950">{property.type}</p>
                   </div>
                 </div>
                 {property.bedrooms && (
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800">
-                      <Bed className="h-5 w-5 text-slate-400" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100">
+                      <Bed className="h-5 w-5 text-slate-500" />
                     </div>
                     <div>
                       <p className="text-sm text-slate-500">Bedrooms</p>
-                      <p className="font-medium text-slate-200">{property.bedrooms}</p>
+                      <p className="font-semibold text-blue-950">{property.bedrooms}</p>
                     </div>
                   </div>
                 )}
                 {property.bathrooms && (
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800">
-                      <Bath className="h-5 w-5 text-slate-400" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100">
+                      <Bath className="h-5 w-5 text-slate-500" />
                     </div>
                     <div>
                       <p className="text-sm text-slate-500">Bathrooms</p>
-                      <p className="font-medium text-slate-200">{property.bathrooms}</p>
+                      <p className="font-semibold text-blue-950">{property.bathrooms}</p>
                     </div>
                   </div>
                 )}
                 {property.squareFeet && (
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-800">
-                      <Square className="h-5 w-5 text-slate-400" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100">
+                      <Square className="h-5 w-5 text-slate-500" />
                     </div>
                     <div>
                       <p className="text-sm text-slate-500">Area</p>
-                      <p className="font-medium text-slate-200">{property.squareFeet.toLocaleString()} sqft</p>
+                      <p className="font-semibold text-blue-950">{property.squareFeet.toLocaleString()} sqft</p>
                     </div>
                   </div>
                 )}
               </div>
 
               {property.description && (
-                <div className="mt-6 pt-6 border-t border-slate-800">
-                  <h3 className="text-sm font-medium text-slate-400 mb-2">Description</h3>
-                  <p className="text-slate-300">{property.description}</p>
+                <div className="mt-6 pt-6 border-t border-slate-100">
+                  <h3 className="text-sm font-semibold text-blue-950 mb-2">Description</h3>
+                  <p className="text-slate-500">{property.description}</p>
                 </div>
               )}
             </CardContent>
           </Card>
 
           {/* Service requests */}
-          <Card className="bg-slate-900 border-slate-800">
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg text-slate-100">Service Requests</CardTitle>
+              <CardTitle>Service Requests</CardTitle>
               <Link href={`/owner/requests?property=${property.id}`}>
-                <Button variant="outline" size="sm" className="border-slate-700 text-slate-300 hover:bg-slate-800">
+                <Button variant="outline" size="sm">
                   View All
                 </Button>
               </Link>
@@ -153,10 +153,10 @@ export default async function PropertyDetailPage({ params }) {
                   {property.serviceRequests.map(request => (
                     <div
                       key={request.id}
-                      className="flex items-center justify-between gap-4 p-3 rounded-lg bg-slate-800/50"
+                      className="flex items-center justify-between gap-4 p-3 rounded-xl bg-slate-50 border border-slate-100"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="font-medium text-slate-200 truncate">{request.title}</p>
+                        <p className="font-semibold text-blue-950 truncate">{request.title}</p>
                         <p className="text-sm text-slate-500">
                           {request.category?.name} • {formatDate(request.createdAt)}
                         </p>
@@ -176,10 +176,10 @@ export default async function PropertyDetailPage({ params }) {
         <div className="space-y-6">
           {/* Rent info */}
           {property.monthlyRent && (
-            <Card className="bg-slate-900 border-slate-800">
+            <Card>
               <CardContent className="pt-6">
                 <p className="text-sm text-slate-500">Monthly Rent</p>
-                <p className="text-3xl font-bold text-teal-400 mt-1">
+                <p className="text-3xl font-bold bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent mt-1">
                   {formatCurrency(property.monthlyRent * 100)}
                 </p>
               </CardContent>
@@ -187,10 +187,10 @@ export default async function PropertyDetailPage({ params }) {
           )}
 
           {/* Tenant info */}
-          <Card className="bg-slate-900 border-slate-800">
+          <Card>
             <CardHeader>
-              <CardTitle className="text-lg text-slate-100 flex items-center gap-2">
-                <Users className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-amber-500" />
                 Tenant
               </CardTitle>
             </CardHeader>
@@ -198,22 +198,22 @@ export default async function PropertyDetailPage({ params }) {
               {tenant ? (
                 <div className="space-y-4">
                   <div>
-                    <p className="font-medium text-slate-200">{tenant.name}</p>
-                    <div className="flex items-center gap-2 mt-2 text-sm text-slate-400">
+                    <p className="font-semibold text-blue-950">{tenant.name}</p>
+                    <div className="flex items-center gap-2 mt-2 text-sm text-slate-500">
                       <Mail className="h-4 w-4" />
                       <span>{tenant.email}</span>
                     </div>
                     {tenant.phone && (
-                      <div className="flex items-center gap-2 mt-1 text-sm text-slate-400">
+                      <div className="flex items-center gap-2 mt-1 text-sm text-slate-500">
                         <Phone className="h-4 w-4" />
                         <span>{tenant.phone}</span>
                       </div>
                     )}
                   </div>
                   {property.tenantProfiles[0]?.leaseStart && (
-                    <div className="pt-4 border-t border-slate-800">
-                      <div className="flex items-center gap-2 text-sm text-slate-400">
-                        <Calendar className="h-4 w-4" />
+                    <div className="pt-4 border-t border-slate-100">
+                      <div className="flex items-center gap-2 text-sm text-slate-500">
+                        <Calendar className="h-4 w-4 text-amber-500" />
                         <span>Lease: {formatDate(property.tenantProfiles[0].leaseStart)} - {property.tenantProfiles[0].leaseEnd ? formatDate(property.tenantProfiles[0].leaseEnd) : 'Ongoing'}</span>
                       </div>
                     </div>
@@ -222,7 +222,7 @@ export default async function PropertyDetailPage({ params }) {
               ) : (
                 <div className="text-center py-4">
                   <p className="text-slate-500 text-sm">No tenant assigned</p>
-                  <Badge variant="outline" className="mt-2 text-slate-400 border-slate-700">
+                  <Badge variant="outline" className="mt-2">
                     Vacant
                   </Badge>
                 </div>
@@ -231,15 +231,15 @@ export default async function PropertyDetailPage({ params }) {
           </Card>
 
           {/* Property info */}
-          <Card className="bg-slate-900 border-slate-800">
+          <Card>
             <CardContent className="pt-6 text-sm text-slate-500">
               <div className="flex justify-between">
                 <span>Added</span>
-                <span className="text-slate-400">{formatDate(property.createdAt)}</span>
+                <span className="font-medium text-blue-950">{formatDate(property.createdAt)}</span>
               </div>
               <div className="flex justify-between mt-2">
                 <span>Last updated</span>
-                <span className="text-slate-400">{formatDate(property.updatedAt)}</span>
+                <span className="font-medium text-blue-950">{formatDate(property.updatedAt)}</span>
               </div>
             </CardContent>
           </Card>
@@ -248,4 +248,3 @@ export default async function PropertyDetailPage({ params }) {
     </div>
   )
 }
-

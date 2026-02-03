@@ -2,7 +2,16 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 const Card = React.forwardRef(function Card({ className, ...props }, ref) {
-  return <div ref={ref} className={cn('rounded-lg border bg-card text-card-foreground shadow-sm', className)} {...props} />
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        'rounded-xl border border-slate-200 bg-white text-slate-900 shadow-sm transition-all duration-200 hover:shadow-md',
+        className
+      )}
+      {...props}
+    />
+  )
 })
 
 const CardHeader = React.forwardRef(function CardHeader({ className, ...props }, ref) {
@@ -10,11 +19,17 @@ const CardHeader = React.forwardRef(function CardHeader({ className, ...props },
 })
 
 const CardTitle = React.forwardRef(function CardTitle({ className, ...props }, ref) {
-  return <h3 ref={ref} className={cn('text-2xl font-semibold leading-none tracking-tight', className)} {...props} />
+  return (
+    <h3
+      ref={ref}
+      className={cn('text-xl font-bold leading-none tracking-tight text-blue-950', className)}
+      {...props}
+    />
+  )
 })
 
 const CardDescription = React.forwardRef(function CardDescription({ className, ...props }, ref) {
-  return <p ref={ref} className={cn('text-sm text-muted-foreground', className)} {...props} />
+  return <p ref={ref} className={cn('text-sm text-slate-500', className)} {...props} />
 })
 
 const CardContent = React.forwardRef(function CardContent({ className, ...props }, ref) {
@@ -26,4 +41,3 @@ const CardFooter = React.forwardRef(function CardFooter({ className, ...props },
 })
 
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
-

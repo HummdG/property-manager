@@ -29,10 +29,10 @@ const roleFilters = [
 ]
 
 const roleColors = {
-  OWNER: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-  TENANT: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-  TRADER: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-  ADMIN: 'bg-red-500/10 text-red-400 border-red-500/20'
+  OWNER: 'bg-blue-100 text-blue-700 border-blue-200',
+  TENANT: 'bg-purple-100 text-purple-700 border-purple-200',
+  TRADER: 'bg-amber-100 text-amber-700 border-amber-200',
+  ADMIN: 'bg-red-100 text-red-700 border-red-200'
 }
 
 export default function AdminUsersPage() {
@@ -53,6 +53,12 @@ export default function AdminUsersPage() {
 
       const response = await fetch(`/api/admin/users?${params}`)
       const data = await response.json()
+
+      if (!response.ok) {
+        console.error('API Error:', data.error)
+        return
+      }
+
       setUsers(data.users || [])
     } catch (error) {
       console.error('Failed to fetch users:', error)
@@ -93,35 +99,35 @@ export default function AdminUsersPage() {
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-100">User Management</h1>
-        <p className="text-slate-400 mt-1">Manage all platform users</p>
+        <h1 className="text-2xl font-bold text-blue-950">User Management</h1>
+        <p className="text-slate-500 mt-1">Manage all platform users</p>
       </div>
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
-          <p className="text-sm text-slate-400">Total Users</p>
-          <p className="text-2xl font-bold text-slate-100">{userCounts.total}</p>
+        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+          <p className="text-sm text-slate-500">Total Users</p>
+          <p className="text-2xl font-bold text-blue-950">{userCounts.total}</p>
         </div>
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
-          <p className="text-sm text-slate-400">Active</p>
-          <p className="text-2xl font-bold text-emerald-400">{userCounts.active}</p>
+        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+          <p className="text-sm text-slate-500">Active</p>
+          <p className="text-2xl font-bold text-emerald-600">{userCounts.active}</p>
         </div>
-        <div className="bg-slate-900 border border-slate-800 rounded-lg p-4">
-          <p className="text-sm text-slate-400">Inactive</p>
-          <p className="text-2xl font-bold text-red-400">{userCounts.inactive}</p>
+        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+          <p className="text-sm text-slate-500">Inactive</p>
+          <p className="text-2xl font-bold text-red-600">{userCounts.inactive}</p>
         </div>
       </div>
 
       {/* Filters */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <Input
             placeholder="Search users..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 bg-slate-900 border-slate-800 text-slate-100 placeholder:text-slate-500"
+            className="pl-10"
           />
         </div>
         <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
@@ -131,10 +137,6 @@ export default function AdminUsersPage() {
               variant={roleFilter === filter.value ? 'default' : 'outline'}
               size="sm"
               onClick={() => setRoleFilter(filter.value)}
-              className={roleFilter === filter.value
-                ? 'bg-teal-600 hover:bg-teal-700'
-                : 'border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-slate-100'
-              }
             >
               {filter.label}
             </Button>
@@ -145,14 +147,14 @@ export default function AdminUsersPage() {
       {/* Users list */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-teal-500" />
+          <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
         </div>
       ) : filteredUsers.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-slate-800">
-            <Users className="h-8 w-8 text-slate-600" />
+          <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-100">
+            <Users className="h-10 w-10 text-slate-400" />
           </div>
-          <h3 className="mt-4 text-lg font-medium text-slate-200">No users found</h3>
+          <h3 className="mt-4 text-lg font-semibold text-blue-950">No users found</h3>
           <p className="mt-1 text-sm text-slate-500">
             {searchQuery || roleFilter ? 'Try adjusting your filters' : 'No users registered yet'}
           </p>
@@ -160,15 +162,15 @@ export default function AdminUsersPage() {
       ) : (
         <div className="grid gap-3">
           {filteredUsers.map(user => (
-            <Card key={user.id} className="bg-slate-900 border-slate-800">
+            <Card key={user.id}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-4 min-w-0 flex-1">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 text-white font-semibold">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-500 text-white font-semibold">
                       {user.name?.charAt(0) || user.email.charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-slate-200 truncate">{user.name || 'No name'}</p>
+                      <p className="font-semibold text-blue-950 truncate">{user.name || 'No name'}</p>
                       <p className="text-sm text-slate-500 truncate">{user.email}</p>
                     </div>
                   </div>
@@ -177,22 +179,22 @@ export default function AdminUsersPage() {
                       {user.role}
                     </Badge>
                     {!user.isActive && (
-                      <Badge variant="outline" className="text-red-400 border-red-500/30">
+                      <Badge variant="destructive">
                         Inactive
                       </Badge>
                     )}
-                    <p className="text-sm text-slate-500 hidden sm:block">
+                    <p className="text-sm text-slate-400 hidden sm:block">
                       {formatDate(user.createdAt)}
                     </p>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-slate-100">
+                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-blue-950">
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-slate-900 border-slate-800">
+                      <DropdownMenuContent align="end">
                         <DropdownMenuItem
-                          className="text-slate-300 focus:bg-slate-800 cursor-pointer"
+                          className="cursor-pointer"
                           onClick={() => setSelectedUser(user)}
                         >
                           <Shield className="mr-2 h-4 w-4" />
@@ -200,8 +202,8 @@ export default function AdminUsersPage() {
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           className={user.isActive
-                            ? 'text-red-400 focus:bg-red-500/10 cursor-pointer'
-                            : 'text-emerald-400 focus:bg-emerald-500/10 cursor-pointer'
+                            ? 'text-red-600 focus:bg-red-50 cursor-pointer'
+                            : 'text-emerald-600 focus:bg-emerald-50 cursor-pointer'
                           }
                           onClick={() => toggleUserStatus(user.id, user.isActive)}
                         >
@@ -229,19 +231,19 @@ export default function AdminUsersPage() {
 
       {/* User details dialog */}
       <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
-        <DialogContent className="max-w-md bg-slate-900 border-slate-800 text-slate-100">
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl">User Details</DialogTitle>
+            <DialogTitle>User Details</DialogTitle>
           </DialogHeader>
           {selectedUser && (
             <div className="space-y-4">
               <div className="flex items-center gap-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 text-white text-2xl font-semibold">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-500 text-white text-2xl font-semibold">
                   {selectedUser.name?.charAt(0) || selectedUser.email.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-200 text-lg">{selectedUser.name || 'No name'}</h3>
-                  <p className="text-sm text-slate-400">{selectedUser.email}</p>
+                  <h3 className="font-bold text-blue-950 text-lg">{selectedUser.name || 'No name'}</h3>
+                  <p className="text-sm text-slate-500">{selectedUser.email}</p>
                 </div>
               </div>
 
@@ -250,30 +252,28 @@ export default function AdminUsersPage() {
                   {selectedUser.role}
                 </Badge>
                 <Badge className={selectedUser.isActive
-                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                  : 'bg-red-500/10 text-red-400 border-red-500/20'
+                  ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
+                  : 'bg-red-100 text-red-700 border-red-200'
                 }>
                   {selectedUser.isActive ? 'Active' : 'Inactive'}
                 </Badge>
               </div>
 
-              <div className="pt-4 border-t border-slate-800 space-y-2 text-sm">
+              <div className="pt-4 border-t border-slate-100 space-y-2 text-sm">
                 {selectedUser.phone && (
-                  <p className="text-slate-400">
-                    <strong className="text-slate-300">Phone:</strong> {selectedUser.phone}
+                  <p className="text-slate-500">
+                    <strong className="text-blue-950">Phone:</strong> {selectedUser.phone}
                   </p>
                 )}
-                <p className="text-slate-400">
-                  <strong className="text-slate-300">Joined:</strong> {formatDate(selectedUser.createdAt)}
+                <p className="text-slate-500">
+                  <strong className="text-blue-950">Joined:</strong> {formatDate(selectedUser.createdAt)}
                 </p>
               </div>
 
-              <div className="pt-4 border-t border-slate-800">
+              <div className="pt-4 border-t border-slate-100">
                 <Button
-                  className={selectedUser.isActive
-                    ? 'w-full bg-red-600 hover:bg-red-700'
-                    : 'w-full bg-emerald-600 hover:bg-emerald-700'
-                  }
+                  variant={selectedUser.isActive ? 'destructive' : 'default'}
+                  className="w-full"
                   onClick={() => toggleUserStatus(selectedUser.id, selectedUser.isActive)}
                 >
                   {selectedUser.isActive ? (
@@ -296,4 +296,3 @@ export default function AdminUsersPage() {
     </div>
   )
 }
-

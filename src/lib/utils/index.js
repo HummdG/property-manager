@@ -9,12 +9,14 @@ export function cn(...inputs) {
 }
 
 /**
- * Format currency amount
+ * Format currency amount - UAE market uses AED
  */
-export function formatCurrency(amount, currency = 'GBP') {
-  return new Intl.NumberFormat('en-GB', {
+export function formatCurrency(amount, currency = 'AED') {
+  return new Intl.NumberFormat('en-AE', {
     style: 'currency',
     currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
   }).format(amount / 100)
 }
 
@@ -28,7 +30,7 @@ export function formatDate(date, options = {}) {
     day: 'numeric',
     ...options,
   }
-  return new Intl.DateTimeFormat('en-GB', defaultOptions).format(new Date(date))
+  return new Intl.DateTimeFormat('en-AE', defaultOptions).format(new Date(date))
 }
 
 /**
@@ -45,34 +47,34 @@ export function getInitials(name) {
 }
 
 /**
- * Get status color class
+ * Get status color class - Updated for light theme
  */
 export function getStatusColor(status) {
   const statusColors = {
-    pending: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-    assigned: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-    accepted: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-    in_progress: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-    completed: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    cancelled: 'bg-slate-500/10 text-slate-400 border-slate-500/20',
-    rejected: 'bg-red-500/10 text-red-400 border-red-500/20',
-    paid: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    pending_payment: 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+    pending: 'bg-amber-100 text-amber-700 border-amber-200',
+    assigned: 'bg-blue-100 text-blue-700 border-blue-200',
+    accepted: 'bg-blue-100 text-blue-700 border-blue-200',
+    in_progress: 'bg-purple-100 text-purple-700 border-purple-200',
+    completed: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    cancelled: 'bg-slate-100 text-slate-600 border-slate-200',
+    rejected: 'bg-red-100 text-red-700 border-red-200',
+    paid: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    pending_payment: 'bg-amber-100 text-amber-700 border-amber-200'
   }
-  return statusColors[status?.toLowerCase()] || 'bg-slate-500/10 text-slate-400 border-slate-500/20'
+  return statusColors[status?.toLowerCase()] || 'bg-slate-100 text-slate-600 border-slate-200'
 }
 
 /**
- * Get priority color class
+ * Get priority color class - Updated for light theme
  */
 export function getPriorityColor(priority) {
   const priorityColors = {
-    low: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    medium: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-    high: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-    urgent: 'bg-red-500/10 text-red-400 border-red-500/20'
+    low: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    medium: 'bg-amber-100 text-amber-700 border-amber-200',
+    high: 'bg-orange-100 text-orange-700 border-orange-200',
+    urgent: 'bg-red-100 text-red-700 border-red-200'
   }
-  return priorityColors[priority?.toLowerCase()] || 'bg-slate-500/10 text-slate-400 border-slate-500/20'
+  return priorityColors[priority?.toLowerCase()] || 'bg-slate-100 text-slate-600 border-slate-200'
 }
 
 export function capitalize(str) {
@@ -84,4 +86,3 @@ export function truncate(str, length = 50) {
   if (!str || str.length <= length) return str
   return `${str.slice(0, length)}...`
 }
-

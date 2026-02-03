@@ -24,20 +24,20 @@ export function Header({ user, onMenuClick }) {
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm px-4 lg:px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-4 lg:px-6">
       {/* Left section */}
       <div className="flex items-center gap-4">
         <Button
           variant="ghost"
           size="icon"
-          className="lg:hidden text-slate-400 hover:text-slate-100"
+          className="lg:hidden text-slate-600 hover:text-amber-600 hover:bg-amber-50"
           onClick={onMenuClick}
         >
           <Menu className="h-5 w-5" />
         </Button>
         <div className="hidden lg:block">
-          <h1 className="text-lg font-semibold text-slate-100">
-            Welcome back, {user?.name?.split(' ')[0] || 'User'}
+          <h1 className="text-lg font-semibold text-blue-950">
+            Welcome back, <span className="text-amber-600">{user?.name?.split(' ')[0] || 'User'}</span>
           </h1>
           <p className="text-sm text-slate-500">
             {roleLabels[user?.role] || 'User'}
@@ -46,15 +46,15 @@ export function Header({ user, onMenuClick }) {
       </div>
 
       {/* Right section */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         {/* Notifications */}
         <Button
           variant="ghost"
           size="icon"
-          className="relative text-slate-400 hover:text-slate-100"
+          className="relative text-slate-500 hover:text-amber-600 hover:bg-amber-50 rounded-lg"
         >
           <Bell className="h-5 w-5" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-teal-500" />
+          <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-amber-500 ring-2 ring-white" />
         </Button>
 
         {/* User menu */}
@@ -62,45 +62,45 @@ export function Header({ user, onMenuClick }) {
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="relative h-10 gap-2 px-2 hover:bg-slate-800"
+              className="relative h-10 gap-2 px-2 hover:bg-amber-50 rounded-lg"
             >
-              <Avatar className="h-8 w-8">
+              <Avatar className="h-8 w-8 ring-2 ring-amber-400/30">
                 <AvatarImage src={user?.image} alt={user?.name} />
-                <AvatarFallback className="bg-gradient-to-br from-teal-500 to-emerald-600 text-white text-xs">
+                <AvatarFallback className="bg-gradient-to-br from-amber-400 to-amber-500 text-white text-xs font-semibold">
                   {getInitials(user?.name)}
                 </AvatarFallback>
               </Avatar>
               <div className="hidden md:block text-left">
-                <p className="text-sm font-medium text-slate-200">{user?.name}</p>
-                <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 text-slate-400 border-slate-700">
+                <p className="text-sm font-semibold text-blue-950">{user?.name}</p>
+                <Badge variant="gold" className="text-[10px] px-1.5 py-0 h-4">
                   {user?.role}
                 </Badge>
               </div>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
-            className="w-56 bg-slate-900 border-slate-800"
+            className="w-56 mt-1"
             align="end"
             forceMount
           >
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium text-slate-200">{user?.name}</p>
+                <p className="text-sm font-semibold text-blue-950">{user?.name}</p>
                 <p className="text-xs text-slate-500">{user?.email}</p>
               </div>
             </DropdownMenuLabel>
-            <DropdownMenuSeparator className="bg-slate-800" />
-            <DropdownMenuItem className="text-slate-300 focus:bg-slate-800 focus:text-slate-100 cursor-pointer">
-              <User className="mr-2 h-4 w-4" />
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="cursor-pointer">
+              <User className="mr-2 h-4 w-4 text-amber-600" />
               Profile
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-slate-300 focus:bg-slate-800 focus:text-slate-100 cursor-pointer">
-              <Settings className="mr-2 h-4 w-4" />
+            <DropdownMenuItem className="cursor-pointer">
+              <Settings className="mr-2 h-4 w-4 text-amber-600" />
               Settings
             </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-slate-800" />
+            <DropdownMenuSeparator />
             <DropdownMenuItem
-              className="text-red-400 focus:bg-red-500/10 focus:text-red-400 cursor-pointer"
+              className="text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer"
               onClick={() => signOut({ callbackUrl: '/login' })}
             >
               <LogOut className="mr-2 h-4 w-4" />

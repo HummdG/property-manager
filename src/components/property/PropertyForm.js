@@ -22,8 +22,8 @@ export function PropertyForm({ property, onSubmit, onCancel, isLoading }) {
     address: property?.address || '',
     city: property?.city || '',
     postcode: property?.postcode || '',
-    country: property?.country || 'United Kingdom',
-    type: property?.type || 'HOUSE',
+    country: property?.country || 'United Arab Emirates',
+    type: property?.type || 'APARTMENT',
     bedrooms: property?.bedrooms || '',
     bathrooms: property?.bathrooms || '',
     squareFeet: property?.squareFeet || '',
@@ -49,65 +49,65 @@ export function PropertyForm({ property, onSubmit, onCancel, isLoading }) {
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
-          <Label htmlFor="name" className="text-slate-300">Property Name</Label>
+          <Label htmlFor="name">Property Name</Label>
           <Input
             id="name"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            placeholder="e.g., Sunny Villa"
-            className="mt-1.5 bg-slate-800/50 border-slate-700 text-slate-100"
+            placeholder="e.g., Marina View Tower"
+            className="mt-1.5"
             required
           />
         </div>
 
         <div className="sm:col-span-2">
-          <Label htmlFor="address" className="text-slate-300">Street Address</Label>
+          <Label htmlFor="address">Street Address</Label>
           <Input
             id="address"
             name="address"
             value={formData.address}
             onChange={handleChange}
-            placeholder="123 Main Street"
-            className="mt-1.5 bg-slate-800/50 border-slate-700 text-slate-100"
+            placeholder="Dubai Marina Walk"
+            className="mt-1.5"
             required
           />
         </div>
 
         <div>
-          <Label htmlFor="city" className="text-slate-300">City</Label>
+          <Label htmlFor="city">City</Label>
           <Input
             id="city"
             name="city"
             value={formData.city}
             onChange={handleChange}
-            placeholder="London"
-            className="mt-1.5 bg-slate-800/50 border-slate-700 text-slate-100"
+            placeholder="Dubai"
+            className="mt-1.5"
             required
           />
         </div>
 
         <div>
-          <Label htmlFor="postcode" className="text-slate-300">Postcode</Label>
+          <Label htmlFor="postcode">Postcode</Label>
           <Input
             id="postcode"
             name="postcode"
             value={formData.postcode}
             onChange={handleChange}
-            placeholder="SW1A 1AA"
-            className="mt-1.5 bg-slate-800/50 border-slate-700 text-slate-100"
+            placeholder="00000"
+            className="mt-1.5"
             required
           />
         </div>
 
         <div>
-          <Label htmlFor="type" className="text-slate-300">Property Type</Label>
+          <Label htmlFor="type">Property Type</Label>
           <select
             id="type"
             name="type"
             value={formData.type}
             onChange={handleChange}
-            className="mt-1.5 flex h-10 w-full rounded-md border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+            className="mt-1.5 flex h-11 w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-200"
           >
             {propertyTypes.map(type => (
               <option key={type.value} value={type.value}>
@@ -118,20 +118,20 @@ export function PropertyForm({ property, onSubmit, onCancel, isLoading }) {
         </div>
 
         <div>
-          <Label htmlFor="monthlyRent" className="text-slate-300">Monthly Rent (£)</Label>
+          <Label htmlFor="monthlyRent">Monthly Rent (AED)</Label>
           <Input
             id="monthlyRent"
             name="monthlyRent"
             type="number"
             value={formData.monthlyRent}
             onChange={handleChange}
-            placeholder="1500"
-            className="mt-1.5 bg-slate-800/50 border-slate-700 text-slate-100"
+            placeholder="5000"
+            className="mt-1.5"
           />
         </div>
 
         <div>
-          <Label htmlFor="bedrooms" className="text-slate-300">Bedrooms</Label>
+          <Label htmlFor="bedrooms">Bedrooms</Label>
           <Input
             id="bedrooms"
             name="bedrooms"
@@ -139,12 +139,12 @@ export function PropertyForm({ property, onSubmit, onCancel, isLoading }) {
             value={formData.bedrooms}
             onChange={handleChange}
             placeholder="3"
-            className="mt-1.5 bg-slate-800/50 border-slate-700 text-slate-100"
+            className="mt-1.5"
           />
         </div>
 
         <div>
-          <Label htmlFor="bathrooms" className="text-slate-300">Bathrooms</Label>
+          <Label htmlFor="bathrooms">Bathrooms</Label>
           <Input
             id="bathrooms"
             name="bathrooms"
@@ -152,12 +152,12 @@ export function PropertyForm({ property, onSubmit, onCancel, isLoading }) {
             value={formData.bathrooms}
             onChange={handleChange}
             placeholder="2"
-            className="mt-1.5 bg-slate-800/50 border-slate-700 text-slate-100"
+            className="mt-1.5"
           />
         </div>
 
         <div>
-          <Label htmlFor="squareFeet" className="text-slate-300">Square Feet</Label>
+          <Label htmlFor="squareFeet">Square Feet</Label>
           <Input
             id="squareFeet"
             name="squareFeet"
@@ -165,12 +165,12 @@ export function PropertyForm({ property, onSubmit, onCancel, isLoading }) {
             value={formData.squareFeet}
             onChange={handleChange}
             placeholder="1200"
-            className="mt-1.5 bg-slate-800/50 border-slate-700 text-slate-100"
+            className="mt-1.5"
           />
         </div>
 
         <div className="sm:col-span-2">
-          <Label htmlFor="description" className="text-slate-300">Description</Label>
+          <Label htmlFor="description">Description</Label>
           <textarea
             id="description"
             name="description"
@@ -178,37 +178,35 @@ export function PropertyForm({ property, onSubmit, onCancel, isLoading }) {
             onChange={handleChange}
             rows={3}
             placeholder="Describe your property..."
-            className="mt-1.5 flex w-full rounded-md border border-slate-700 bg-slate-800/50 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500"
+            className="mt-1.5 flex w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-200"
           />
         </div>
 
         <div className="sm:col-span-2">
-          <label className="flex items-center gap-3 cursor-pointer">
+          <label className="flex items-center gap-3 cursor-pointer group">
             <input
               type="checkbox"
               name="isListed"
               checked={formData.isListed}
               onChange={handleChange}
-              className="h-4 w-4 rounded border-slate-700 bg-slate-800 text-teal-500 focus:ring-teal-500/20"
+              className="h-5 w-5 rounded border-slate-300 bg-white text-amber-500 focus:ring-amber-500/20 transition-colors"
             />
-            <span className="text-sm text-slate-300">List this property as available</span>
+            <span className="text-sm text-slate-600 group-hover:text-slate-900 transition-colors">List this property as available</span>
           </label>
         </div>
       </div>
 
-      <div className="flex justify-end gap-3 pt-4 border-t border-slate-800">
+      <div className="flex justify-end gap-3 pt-4 border-t border-slate-200">
         <Button
           type="button"
           variant="outline"
           onClick={onCancel}
-          className="border-slate-700 text-slate-300 hover:bg-slate-800"
         >
           Cancel
         </Button>
         <Button
           type="submit"
           disabled={isLoading}
-          className="bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white"
         >
           {isLoading ? (
             <>
@@ -221,4 +219,3 @@ export function PropertyForm({ property, onSubmit, onCancel, isLoading }) {
     </form>
   )
 }
-

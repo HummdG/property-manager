@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Building2, Mail, Lock, User, Loader2, Home, Wrench, Users } from 'lucide-react'
+import { Building2, Mail, Lock, User, Loader2, Home, Wrench, Users, ArrowRight, Check } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -86,33 +86,33 @@ export default function RegisterPage() {
   }
 
   return (
-    <Card className="border-slate-800 bg-slate-900/80 backdrop-blur-sm shadow-2xl">
+    <Card className="border-slate-200/60 bg-white/80 backdrop-blur-sm shadow-2xl shadow-blue-950/5">
       <CardHeader className="text-center pb-2">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 shadow-lg shadow-teal-500/25">
-          <Building2 className="h-7 w-7 text-white" />
+        <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 shadow-lg shadow-amber-500/30">
+          <Building2 className="h-8 w-8 text-white" />
         </div>
-        <CardTitle className="text-2xl font-bold text-slate-50">Create an account</CardTitle>
-        <CardDescription className="text-slate-400">
+        <CardTitle className="text-2xl font-bold text-blue-950">Create an account</CardTitle>
+        <CardDescription className="text-slate-500">
           Join Property Manager to get started
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-4">
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="rounded-lg bg-red-500/10 border border-red-500/20 p-3 text-sm text-red-400">
+            <div className="rounded-xl bg-red-50 border border-red-100 p-3 text-sm text-red-600">
               {error}
             </div>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="name" className="text-slate-300">Full Name</Label>
+            <Label htmlFor="name">Full Name</Label>
             <div className="relative">
-              <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <User className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
                 id="name"
                 type="text"
                 placeholder="John Doe"
-                className="pl-10 bg-slate-800/50 border-slate-700 text-slate-100 placeholder:text-slate-500 focus:border-teal-500 focus:ring-teal-500/20"
+                className="pl-10"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
@@ -121,14 +121,14 @@ export default function RegisterPage() {
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-slate-300">Email</Label>
+            <Label htmlFor="email">Email</Label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
                 id="email"
                 type="email"
                 placeholder="you@example.com"
-                className="pl-10 bg-slate-800/50 border-slate-700 text-slate-100 placeholder:text-slate-500 focus:border-teal-500 focus:ring-teal-500/20"
+                className="pl-10"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
@@ -137,14 +137,14 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-slate-300">Password</Label>
+            <Label htmlFor="password">Password</Label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
                 id="password"
                 type="password"
                 placeholder="••••••••"
-                className="pl-10 bg-slate-800/50 border-slate-700 text-slate-100 placeholder:text-slate-500 focus:border-teal-500 focus:ring-teal-500/20"
+                className="pl-10"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
@@ -153,14 +153,14 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword" className="text-slate-300">Confirm Password</Label>
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+              <Lock className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
               <Input
                 id="confirmPassword"
                 type="password"
                 placeholder="••••••••"
-                className="pl-10 bg-slate-800/50 border-slate-700 text-slate-100 placeholder:text-slate-500 focus:border-teal-500 focus:ring-teal-500/20"
+                className="pl-10"
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                 required
@@ -169,32 +169,38 @@ export default function RegisterPage() {
           </div>
 
           <div className="space-y-3">
-            <Label className="text-slate-300">I am a...</Label>
+            <Label>I am a...</Label>
             <div className="grid gap-2">
               {roles.map((role) => {
                 const Icon = role.icon
+                const isSelected = formData.role === role.id
                 return (
                   <button
                     key={role.id}
                     type="button"
                     onClick={() => setFormData({ ...formData, role: role.id })}
-                    className={`flex items-center gap-3 rounded-lg border p-3 text-left transition-all ${
-                      formData.role === role.id
-                        ? 'border-teal-500 bg-teal-500/10 ring-1 ring-teal-500/50'
-                        : 'border-slate-700 bg-slate-800/30 hover:border-slate-600'
+                    className={`flex items-center gap-3 rounded-xl border p-3.5 text-left transition-all duration-200 ${
+                      isSelected
+                        ? 'border-amber-400 bg-amber-50 shadow-sm shadow-amber-500/10'
+                        : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
                     }`}
                   >
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${
-                      formData.role === role.id ? 'bg-teal-500/20 text-teal-400' : 'bg-slate-700/50 text-slate-400'
+                    <div className={`flex h-11 w-11 items-center justify-center rounded-lg transition-colors ${
+                      isSelected ? 'bg-gradient-to-br from-amber-400 to-amber-500 text-white' : 'bg-slate-100 text-slate-500'
                     }`}>
                       <Icon className="h-5 w-5" />
                     </div>
-                    <div>
-                      <p className={`font-medium ${formData.role === role.id ? 'text-teal-400' : 'text-slate-200'}`}>
+                    <div className="flex-1">
+                      <p className={`font-semibold ${isSelected ? 'text-amber-700' : 'text-blue-950'}`}>
                         {role.label}
                       </p>
                       <p className="text-xs text-slate-500">{role.description}</p>
                     </div>
+                    {isSelected && (
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500">
+                        <Check className="h-3.5 w-3.5 text-white" />
+                      </div>
+                    )}
                   </button>
                 )
               })}
@@ -203,7 +209,7 @@ export default function RegisterPage() {
 
           <Button
             type="submit"
-            className="w-full bg-gradient-to-r from-teal-500 to-emerald-600 hover:from-teal-600 hover:to-emerald-700 text-white font-medium shadow-lg shadow-teal-500/25"
+            className="w-full group"
             disabled={isLoading}
           >
             {isLoading ? (
@@ -212,15 +218,18 @@ export default function RegisterPage() {
                 Creating account...
               </>
             ) : (
-              'Create account'
+              <>
+                Create account
+                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </>
             )}
           </Button>
         </form>
       </CardContent>
-      <CardFooter className="flex justify-center border-t border-slate-800 pt-6">
-        <p className="text-sm text-slate-400">
+      <CardFooter className="flex justify-center border-t border-slate-100 pt-6">
+        <p className="text-sm text-slate-500">
           Already have an account?{' '}
-          <Link href="/login" className="font-medium text-teal-400 hover:text-teal-300 transition-colors">
+          <Link href="/login" className="font-semibold text-amber-600 hover:text-amber-700 transition-colors">
             Sign in
           </Link>
         </p>
@@ -228,4 +237,3 @@ export default function RegisterPage() {
     </Card>
   )
 }
-

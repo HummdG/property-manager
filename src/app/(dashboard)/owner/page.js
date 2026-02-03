@@ -53,8 +53,8 @@ export default async function OwnerDashboard() {
     <div className="space-y-6">
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-bold text-slate-100">Dashboard</h1>
-        <p className="text-slate-400 mt-1">Overview of your property portfolio</p>
+        <h1 className="text-2xl font-bold text-blue-950">Dashboard</h1>
+        <p className="text-slate-500 mt-1">Overview of your property portfolio</p>
       </div>
 
       {/* Stats grid */}
@@ -64,43 +64,47 @@ export default async function OwnerDashboard() {
           value={stats.properties}
           icon={Building2}
           subtitle="In your portfolio"
+          iconColor="amber"
         />
         <StatsCard
           title="Active Requests"
           value={stats.requests}
           icon={ClipboardList}
           subtitle="Needs attention"
+          iconColor="blue"
         />
         <StatsCard
           title="Tenants"
           value={stats.tenants}
           icon={Users}
           subtitle="Currently housed"
+          iconColor="emerald"
         />
         <StatsCard
           title="Pending Payments"
           value={stats.pendingPayments}
           icon={CreditCard}
           subtitle="Awaiting payment"
+          iconColor="purple"
         />
       </div>
 
       {/* Recent activity */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Recent service requests */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg text-slate-100">Recent Service Requests</CardTitle>
+            <CardTitle className="text-lg">Recent Service Requests</CardTitle>
             <Link
               href="/owner/requests"
-              className="text-sm text-teal-400 hover:text-teal-300 transition-colors"
+              className="text-sm font-semibold text-amber-600 hover:text-amber-700 transition-colors"
             >
               View all
             </Link>
           </CardHeader>
           <CardContent>
             {recentRequests.length === 0 ? (
-              <p className="text-slate-500 text-sm py-8 text-center">
+              <p className="text-slate-400 text-sm py-8 text-center">
                 No service requests yet
               </p>
             ) : (
@@ -108,16 +112,16 @@ export default async function OwnerDashboard() {
                 {recentRequests.map(request => (
                   <div
                     key={request.id}
-                    className="flex items-start justify-between gap-4 pb-4 border-b border-slate-800 last:border-0 last:pb-0"
+                    className="flex items-start justify-between gap-4 pb-4 border-b border-slate-100 last:border-0 last:pb-0"
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-slate-200 truncate">
+                      <p className="font-semibold text-blue-950 truncate">
                         {request.title}
                       </p>
                       <p className="text-sm text-slate-500 truncate">
                         {request.property.name} • {request.category?.name}
                       </p>
-                      <p className="text-xs text-slate-600 mt-1">
+                      <p className="text-xs text-slate-400 mt-1">
                         {formatDate(request.createdAt)}
                       </p>
                     </div>
@@ -132,44 +136,44 @@ export default async function OwnerDashboard() {
         </Card>
 
         {/* Quick actions */}
-        <Card className="bg-slate-900 border-slate-800">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-lg text-slate-100">Quick Actions</CardTitle>
+            <CardTitle className="text-lg">Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-3">
             <Link
               href="/owner/properties?action=add"
-              className="flex items-center gap-3 p-4 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition-colors group"
+              className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 hover:bg-amber-50 border border-slate-100 hover:border-amber-200 transition-all duration-200 group"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-teal-500/10 group-hover:bg-teal-500/20 transition-colors">
-                <Building2 className="h-5 w-5 text-teal-400" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 group-hover:bg-amber-200 transition-colors">
+                <Building2 className="h-6 w-6 text-amber-600" />
               </div>
               <div>
-                <p className="font-medium text-slate-200">Add New Property</p>
+                <p className="font-semibold text-blue-950">Add New Property</p>
                 <p className="text-sm text-slate-500">Register a property to manage</p>
               </div>
             </Link>
             <Link
               href="/owner/requests"
-              className="flex items-center gap-3 p-4 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition-colors group"
+              className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-100 hover:border-blue-200 transition-all duration-200 group"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/10 group-hover:bg-amber-500/20 transition-colors">
-                <ClipboardList className="h-5 w-5 text-amber-400" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 group-hover:bg-blue-200 transition-colors">
+                <ClipboardList className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <p className="font-medium text-slate-200">View Service Requests</p>
+                <p className="font-semibold text-blue-950">View Service Requests</p>
                 <p className="text-sm text-slate-500">Manage maintenance requests</p>
               </div>
             </Link>
             <Link
               href="/owner/payments"
-              className="flex items-center gap-3 p-4 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition-colors group"
+              className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-100 hover:border-emerald-200 transition-all duration-200 group"
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-colors">
-                <CreditCard className="h-5 w-5 text-emerald-400" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-100 group-hover:bg-emerald-200 transition-colors">
+                <CreditCard className="h-6 w-6 text-emerald-600" />
               </div>
               <div>
-                <p className="font-medium text-slate-200">Payment History</p>
+                <p className="font-semibold text-blue-950">Payment History</p>
                 <p className="text-sm text-slate-500">Track payments and invoices</p>
               </div>
             </Link>
@@ -179,4 +183,3 @@ export default async function OwnerDashboard() {
     </div>
   )
 }
-

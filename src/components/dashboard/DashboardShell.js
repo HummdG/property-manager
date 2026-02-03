@@ -8,7 +8,7 @@ export function DashboardShell({ user, children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="dark min-h-screen bg-slate-950">
+    <div className="min-h-screen bg-slate-50">
       <Sidebar
         user={user}
         isOpen={sidebarOpen}
@@ -26,4 +26,3 @@ export function DashboardShell({ user, children }) {
     </div>
   )
 }
-

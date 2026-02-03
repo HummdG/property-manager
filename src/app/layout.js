@@ -1,9 +1,16 @@
-import { Geist, Geist_Mono } from 'next/font/google'
+import { DM_Sans, Plus_Jakarta_Sans, Geist_Mono } from 'next/font/google'
 import './globals.css'
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin']
+const dmSans = DM_Sans({
+  variable: '--font-dm-sans',
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700']
+})
+
+const jakarta = Plus_Jakarta_Sans({
+  variable: '--font-jakarta',
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700']
 })
 
 const geistMono = Geist_Mono({
@@ -12,15 +19,15 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata = {
-  title: 'Property Manager',
-  description: 'Manage your properties, tenants, and service requests'
+  title: 'Property Manager | UAE Premium Property Management',
+  description: 'Manage your properties, tenants, and service requests with luxury and ease'
 }
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${dmSans.variable} ${jakarta.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
         {children}
