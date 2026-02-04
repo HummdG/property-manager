@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth/config'
 import { NextResponse } from 'next/server'
 
-const publicRoutes = ['/login', '/register', '/api/auth']
+const publicRoutes = ['/login', '/register', '/api/auth', '/properties', '/api/public']
 const apiRoutes = ['/api/']  // API routes handle their own auth
 
 const roleRoutes = {

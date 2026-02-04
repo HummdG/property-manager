@@ -16,6 +16,12 @@ const propertyTypes = [
   { value: 'OTHER', label: 'Other' }
 ]
 
+const listingTypes = [
+  { value: 'RENT', label: 'For Rent' },
+  { value: 'SALE', label: 'For Sale' },
+  { value: 'BOTH', label: 'Rent or Sale' }
+]
+
 export function PropertyForm({ property, onSubmit, onCancel, isLoading }) {
   const [formData, setFormData] = useState({
     name: property?.name || '',
@@ -24,11 +30,13 @@ export function PropertyForm({ property, onSubmit, onCancel, isLoading }) {
     postcode: property?.postcode || '',
     country: property?.country || 'United Arab Emirates',
     type: property?.type || 'APARTMENT',
+    listingType: property?.listingType || 'RENT',
     bedrooms: property?.bedrooms || '',
     bathrooms: property?.bathrooms || '',
     squareFeet: property?.squareFeet || '',
     description: property?.description || '',
     monthlyRent: property?.monthlyRent || '',
+    salePrice: property?.salePrice || '',
     isListed: property?.isListed || false
   })
 
@@ -118,17 +126,51 @@ export function PropertyForm({ property, onSubmit, onCancel, isLoading }) {
         </div>
 
         <div>
-          <Label htmlFor="monthlyRent">Monthly Rent (AED)</Label>
-          <Input
-            id="monthlyRent"
-            name="monthlyRent"
-            type="number"
-            value={formData.monthlyRent}
+          <Label htmlFor="listingType">Listing Type</Label>
+          <select
+            id="listingType"
+            name="listingType"
+            value={formData.listingType}
             onChange={handleChange}
-            placeholder="5000"
-            className="mt-1.5"
-          />
+            className="mt-1.5 flex h-11 w-full rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all duration-200"
+          >
+            {listingTypes.map(type => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </select>
         </div>
+
+        {(formData.listingType === 'RENT' || formData.listingType === 'BOTH') && (
+          <div>
+            <Label htmlFor="monthlyRent">Monthly Rent (AED)</Label>
+            <Input
+              id="monthlyRent"
+              name="monthlyRent"
+              type="number"
+              value={formData.monthlyRent}
+              onChange={handleChange}
+              placeholder="5000"
+              className="mt-1.5"
+            />
+          </div>
+        )}
+
+        {(formData.listingType === 'SALE' || formData.listingType === 'BOTH') && (
+          <div>
+            <Label htmlFor="salePrice">Sale Price (AED)</Label>
+            <Input
+              id="salePrice"
+              name="salePrice"
+              type="number"
+              value={formData.salePrice}
+              onChange={handleChange}
+              placeholder="1000000"
+              className="mt-1.5"
+            />
+          </div>
+        )}
 
         <div>
           <Label htmlFor="bedrooms">Bedrooms</Label>

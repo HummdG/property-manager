@@ -1,13 +1,5 @@
 import { redirect } from 'next/navigation'
-import { auth } from '@/lib/auth'
-import { getDashboardPath } from '@/lib/auth'
 
-export default async function Home() {
-  const session = await auth()
-
-  if (session?.user) {
-    redirect(getDashboardPath(session.user.role))
-  }
-
-  redirect('/login')
+export default function Home() {
+  redirect('/properties')
 }

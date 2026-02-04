@@ -70,7 +70,7 @@ export async function POST(request) {
     }
 
     const body = await request.json()
-    const { name, address, city, postcode, country, type, bedrooms, bathrooms, squareFeet, description, monthlyRent, isListed } = body
+    const { name, address, city, postcode, country, type, listingType, bedrooms, bathrooms, squareFeet, description, monthlyRent, salePrice, isListed } = body
 
     if (!name || !address || !city || !postcode) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -82,13 +82,15 @@ export async function POST(request) {
         address,
         city,
         postcode,
-        country: country || 'United Kingdom',
-        type: type || 'HOUSE',
+        country: country || 'United Arab Emirates',
+        type: type || 'APARTMENT',
+        listingType: listingType || 'RENT',
         bedrooms: bedrooms ? parseInt(bedrooms) : null,
         bathrooms: bathrooms ? parseInt(bathrooms) : null,
         squareFeet: squareFeet ? parseInt(squareFeet) : null,
         description,
         monthlyRent: monthlyRent ? parseInt(monthlyRent) : null,
+        salePrice: salePrice ? parseInt(salePrice) : null,
         isListed: isListed || false,
         ownerId: session.user.id
       }

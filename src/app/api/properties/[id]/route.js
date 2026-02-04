@@ -75,7 +75,7 @@ export async function PATCH(request, { params }) {
     }
 
     const body = await request.json()
-    const { name, address, city, postcode, country, type, bedrooms, bathrooms, squareFeet, description, monthlyRent, isListed } = body
+    const { name, address, city, postcode, country, type, listingType, bedrooms, bathrooms, squareFeet, description, monthlyRent, salePrice, isListed } = body
 
     const property = await db.property.update({
       where: { id },
@@ -86,11 +86,13 @@ export async function PATCH(request, { params }) {
         ...(postcode && { postcode }),
         ...(country && { country }),
         ...(type && { type }),
+        ...(listingType && { listingType }),
         ...(bedrooms !== undefined && { bedrooms: bedrooms ? parseInt(bedrooms) : null }),
         ...(bathrooms !== undefined && { bathrooms: bathrooms ? parseInt(bathrooms) : null }),
         ...(squareFeet !== undefined && { squareFeet: squareFeet ? parseInt(squareFeet) : null }),
         ...(description !== undefined && { description }),
         ...(monthlyRent !== undefined && { monthlyRent: monthlyRent ? parseInt(monthlyRent) : null }),
+        ...(salePrice !== undefined && { salePrice: salePrice ? parseInt(salePrice) : null }),
         ...(isListed !== undefined && { isListed })
       }
     })

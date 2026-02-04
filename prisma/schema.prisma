@@ -55,6 +55,12 @@ enum PaymentStatus {
   REFUNDED
 }
 
+enum ListingType {
+  RENT
+  SALE
+  BOTH
+}
+
 // Models
 model User {
   id            String    @id @default(cuid())
@@ -130,6 +136,7 @@ model Property {
   postcode    String
   country     String       @default("United Kingdom")
   type        PropertyType @default(HOUSE)
+  listingType ListingType  @default(RENT)
   bedrooms    Int?
   bathrooms   Int?
   squareFeet  Int?
@@ -137,6 +144,7 @@ model Property {
   images      String[]
   isListed    Boolean      @default(false)
   monthlyRent Int?
+  salePrice   Int?
   ownerId     String
   tenantId    String?
   createdAt   DateTime     @default(now())
