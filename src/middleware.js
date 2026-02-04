@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth/config'
 import { NextResponse } from 'next/server'
 
-const publicRoutes = ['/login', '/register', '/api/auth', '/properties', '/api/public']
+const publicPrefixes = ['/login', '/register', '/api/auth', '/properties', '/api/public']
 const apiRoutes = ['/api/']  // API routes handle their own auth
 
 const roleRoutes = {
@@ -15,8 +15,13 @@ export default auth((req) => {
   const { nextUrl, auth: session } = req
   const pathname = nextUrl.pathname
 
+  // Allow root path (redirects to /properties)
+  if (pathname === '/') {
+    return NextResponse.next()
+  }
+
   // Allow public routes
-  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route))
+  const isPublicRoute = publicPrefixes.some(route => pathname.startsWith(route))
   if (isPublicRoute) {
     // If logged in and trying to access auth pages, redirect to dashboard
     if (session?.user && (pathname === '/login' || pathname === '/register')) {
