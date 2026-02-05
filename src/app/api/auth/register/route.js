@@ -27,7 +27,7 @@ export async function POST(request) {
 
     const hashedPassword = await bcrypt.hash(password, 12)
 
-    const validRoles = ['OWNER', 'TENANT', 'TRADER']
+    const validRoles = ['OWNER', 'TENANT', 'TRADER', 'AGENT']
     const userRole = validRoles.includes(role) ? role : 'OWNER'
 
     const user = await db.user.create({
@@ -46,6 +46,10 @@ export async function POST(request) {
       })
     } else if (userRole === 'TRADER') {
       await db.traderProfile.create({
+        data: { userId: user.id }
+      })
+    } else if (userRole === 'AGENT') {
+      await db.agentProfile.create({
         data: { userId: user.id }
       })
     }
