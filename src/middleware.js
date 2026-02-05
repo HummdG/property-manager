@@ -1,8 +1,5 @@
-import NextAuth from 'next-auth'
 import { NextResponse } from 'next/server'
-import { authEdgeConfig } from '@/lib/auth/auth.edge'
-
-const { auth } = NextAuth(authEdgeConfig)
+import { getToken } from 'next-auth/jwt'
 
 const publicPrefixes = ['/login', '/register', '/api/auth', '/properties', '/api/public']
 const apiRoutes = ['/api/']
@@ -24,11 +21,17 @@ function getDashboardForRole(role) {
   return paths[role] || '/owner'
 }
 
-export default auth((req) => {
-  const { nextUrl, auth: session } = req
+export async function middleware(req) {
+  const { nextUrl } = req
   const pathname = nextUrl.pathname
 
-  // Allow root path (redirects to /properties)
+  // Get token using next-auth/jwt (Edge compatible)
+  const token = await getToken({
+    req,
+    secret: process.env.AUTH_SECRET,
+  })
+
+  // Allow root path
   if (pathname === '/') {
     return NextResponse.next()
   }
@@ -37,8 +40,8 @@ export default auth((req) => {
   const isPublicRoute = publicPrefixes.some(route => pathname.startsWith(route))
   if (isPublicRoute) {
     // If logged in and trying to access auth pages, redirect to dashboard
-    if (session?.user && (pathname === '/login' || pathname === '/register')) {
-      const dashboardPath = getDashboardForRole(session.user.role)
+    if (token && (pathname === '/login' || pathname === '/register')) {
+      const dashboardPath = getDashboardForRole(token.role)
       return NextResponse.redirect(new URL(dashboardPath, nextUrl))
     }
     return NextResponse.next()
@@ -51,14 +54,14 @@ export default auth((req) => {
   }
 
   // Require authentication for all other routes
-  if (!session?.user) {
+  if (!token) {
     const loginUrl = new URL('/login', nextUrl)
     loginUrl.searchParams.set('callbackUrl', pathname)
     return NextResponse.redirect(loginUrl)
   }
 
   // Check role-based access
-  const userRole = session.user.role
+  const userRole = token.role
   const allowedRoutes = roleRoutes[userRole] || []
   const hasAccess = allowedRoutes.some(route => pathname.startsWith(route))
 
@@ -69,7 +72,7 @@ export default auth((req) => {
   }
 
   return NextResponse.next()
-})
+}
 
 export const config = {
   matcher: [
