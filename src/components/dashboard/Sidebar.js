@@ -26,28 +26,28 @@ import { getInitials } from '@/lib/utils'
 
 const navigationByRole = {
   OWNER: [
-    { name: 'Dashboard', href: '/owner', icon: LayoutDashboard },
+    { name: 'Dashboard', href: '/owner', icon: LayoutDashboard, exact: true },
     { name: 'Properties', href: '/owner/properties', icon: Building2 },
     { name: 'Service Requests', href: '/owner/requests', icon: ClipboardList },
     { name: 'Payments', href: '/owner/payments', icon: FileText }
   ],
   TENANT: [
-    { name: 'Dashboard', href: '/tenant', icon: LayoutDashboard },
+    { name: 'Dashboard', href: '/tenant', icon: LayoutDashboard, exact: true },
     { name: 'My Property', href: '/tenant/property', icon: Home },
     { name: 'Report Issue', href: '/tenant/issues', icon: AlertCircle }
   ],
   TRADER: [
-    { name: 'Dashboard', href: '/trader', icon: LayoutDashboard },
+    { name: 'Dashboard', href: '/trader', icon: LayoutDashboard, exact: true },
     { name: 'My Jobs', href: '/trader/jobs', icon: Briefcase }
   ],
   AGENT: [
-    { name: 'Dashboard', href: '/agent', icon: LayoutDashboard },
+    { name: 'Dashboard', href: '/agent', icon: LayoutDashboard, exact: true },
     { name: 'Inquiries', href: '/agent/inquiries', icon: MessageSquare },
     { name: 'Daily Logs', href: '/agent/logs', icon: CalendarDays },
     { name: 'Subscription', href: '/agent/subscription', icon: CreditCard }
   ],
   ADMIN: [
-    { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+    { name: 'Dashboard', href: '/admin', icon: LayoutDashboard, exact: true },
     { name: 'Users', href: '/admin/users', icon: Users },
     { name: 'Agents', href: '/admin/agents', icon: MapPin },
     { name: 'All Requests', href: '/admin/requests', icon: ClipboardList },
@@ -110,7 +110,9 @@ export function Sidebar({ user, isOpen, onClose }) {
           <ul className="space-y-1">
             {navigation.map((item) => {
               const Icon = item.icon
-              const active = pathname === item.href || pathname.startsWith(item.href + '/')
+              const active = item.exact
+                ? pathname === item.href
+                : pathname === item.href || pathname.startsWith(item.href + '/')
               return (
                 <li key={item.name}>
                   <Link

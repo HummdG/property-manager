@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { signIn, getSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Building2, Mail, Lock, Loader2, ArrowRight } from 'lucide-react'
+import { Building2, Mail, Lock, Loader2, ArrowRight, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -69,6 +69,10 @@ export default function LoginPage() {
   return (
     <Card className="border-slate-200/60 bg-white/80 backdrop-blur-sm shadow-2xl shadow-blue-950/5">
       <CardHeader className="text-center pb-2">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-amber-600 transition-colors mb-4 self-start">
+          <ArrowLeft className="h-4 w-4" />
+          Back to home
+        </Link>
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 shadow-lg shadow-amber-500/30">
           <Building2 className="h-8 w-8 text-white" />
         </div>
