@@ -4,18 +4,11 @@ import Google from 'next-auth/providers/google'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { db } from '@/lib/db'
 import bcrypt from 'bcryptjs'
+import { authEdgeConfig } from './auth.edge'
 
 export const authConfig = {
-  secret: process.env.AUTH_SECRET,
+  ...authEdgeConfig,
   adapter: PrismaAdapter(db),
-  session: {
-    strategy: 'jwt',
-  },
-  pages: {
-    signIn: '/login',
-    signUp: '/register',
-    error: '/auth/error',
-  },
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -70,6 +63,7 @@ export const authConfig = {
     }),
   ],
   callbacks: {
+    ...authEdgeConfig.callbacks,
     async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id
@@ -88,16 +82,7 @@ export const authConfig = {
 
       return token
     },
-    async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id
-        session.user.role = token.role
-      }
-      return session
-    },
   },
-  trustHost: true,
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth(authConfig)
-

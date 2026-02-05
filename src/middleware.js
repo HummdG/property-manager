@@ -1,14 +1,27 @@
-import { auth } from '@/lib/auth/config'
+import NextAuth from 'next-auth'
 import { NextResponse } from 'next/server'
+import { authEdgeConfig } from '@/lib/auth/auth.edge'
+
+const { auth } = NextAuth(authEdgeConfig)
 
 const publicPrefixes = ['/login', '/register', '/api/auth', '/properties', '/api/public']
-const apiRoutes = ['/api/']  // API routes handle their own auth
+const apiRoutes = ['/api/']
 
 const roleRoutes = {
   OWNER: ['/owner'],
   TENANT: ['/tenant'],
   TRADER: ['/trader'],
-  ADMIN: ['/admin', '/owner', '/tenant', '/trader'] // Admin can access all
+  ADMIN: ['/admin', '/owner', '/tenant', '/trader']
+}
+
+function getDashboardForRole(role) {
+  const paths = {
+    ADMIN: '/admin',
+    OWNER: '/owner',
+    TENANT: '/tenant',
+    TRADER: '/trader'
+  }
+  return paths[role] || '/owner'
 }
 
 export default auth((req) => {
@@ -58,16 +71,6 @@ export default auth((req) => {
   return NextResponse.next()
 })
 
-function getDashboardForRole(role) {
-  const paths = {
-    ADMIN: '/admin',
-    OWNER: '/owner',
-    TENANT: '/tenant',
-    TRADER: '/trader'
-  }
-  return paths[role] || '/owner'
-}
-
 export const config = {
   matcher: [
     /*
@@ -76,9 +79,7 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - public files (public folder)
-     * - api routes that don't need protection
      */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'
   ]
 }
-

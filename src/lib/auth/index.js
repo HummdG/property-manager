@@ -1,5 +1,6 @@
 export { auth, signIn, signOut, handlers } from './config'
 export { auth as getServerSession } from './config'
+export { authEdgeConfig } from './auth.edge'
 
 export const ROLES = {
   OWNER: 'OWNER',
@@ -28,4 +29,3 @@ export function hasRole(userRole, requiredRoles) {
   const roles = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles]
   return roles.includes(userRole)
 }
-
