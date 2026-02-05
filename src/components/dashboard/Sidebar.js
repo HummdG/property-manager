@@ -13,7 +13,11 @@ import {
   Briefcase,
   AlertCircle,
   LayoutDashboard,
-  X
+  X,
+  MessageSquare,
+  CalendarDays,
+  CreditCard,
+  MapPin
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -36,17 +40,32 @@ const navigationByRole = {
     { name: 'Dashboard', href: '/trader', icon: LayoutDashboard },
     { name: 'My Jobs', href: '/trader/jobs', icon: Briefcase }
   ],
+  AGENT: [
+    { name: 'Dashboard', href: '/agent', icon: LayoutDashboard },
+    { name: 'Inquiries', href: '/agent/inquiries', icon: MessageSquare },
+    { name: 'Daily Logs', href: '/agent/logs', icon: CalendarDays },
+    { name: 'Subscription', href: '/agent/subscription', icon: CreditCard }
+  ],
   ADMIN: [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
     { name: 'Users', href: '/admin/users', icon: Users },
+    { name: 'Agents', href: '/admin/agents', icon: MapPin },
     { name: 'All Requests', href: '/admin/requests', icon: ClipboardList },
+    { name: 'Agent Inquiries', href: '/admin/inquiries', icon: MessageSquare },
     { name: 'Traders', href: '/admin/traders', icon: Wrench }
   ]
 }
 
 export function Sidebar({ user, isOpen, onClose }) {
   const pathname = usePathname()
-  const navigation = navigationByRole[user?.role] || navigationByRole.OWNER
+  
+  // Determine user role with fallback
+  const userRole = user?.role || 'OWNER'
+  
+  // Debug: Log user role
+  console.log('Sidebar - User:', user, '| Role:', userRole)
+  
+  const navigation = navigationByRole[userRole] || navigationByRole.OWNER
 
   return (
     <>
@@ -71,7 +90,10 @@ export function Sidebar({ user, isOpen, onClose }) {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 shadow-md shadow-amber-500/20">
               <Building2 className="h-5 w-5 text-white" />
             </div>
-            <span className="text-lg font-bold text-blue-950 tracking-tight">PropManager</span>
+            <div>
+              <span className="text-lg font-bold text-blue-950 tracking-tight">GoFor</span>
+              <span className="text-lg font-bold bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">Properties</span>
+            </div>
           </Link>
           <Button
             variant="ghost"
@@ -88,7 +110,7 @@ export function Sidebar({ user, isOpen, onClose }) {
           <ul className="space-y-1">
             {navigation.map((item) => {
               const Icon = item.icon
-              const isActive = pathname === item.href || pathname.startsWith(item.href + '/')
+              const active = pathname === item.href || pathname.startsWith(item.href + '/')
               return (
                 <li key={item.name}>
                   <Link
@@ -96,7 +118,7 @@ export function Sidebar({ user, isOpen, onClose }) {
                     onClick={onClose}
                     className={cn(
                       'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
-                      isActive
+                      active
                         ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-white shadow-md shadow-amber-500/20'
                         : 'text-slate-600 hover:bg-slate-100 hover:text-blue-950'
                     )}

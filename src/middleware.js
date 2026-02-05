@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 
-const publicPrefixes = ['/login', '/register', '/api/auth', '/properties', '/api/public']
+const publicPrefixes = ['/login', '/register', '/api/auth', '/properties', '/api/public', '/services']
 const apiRoutes = ['/api/']
 
 const roleRoutes = {
   OWNER: ['/owner'],
   TENANT: ['/tenant'],
   TRADER: ['/trader'],
-  ADMIN: ['/admin', '/owner', '/tenant', '/trader']
+  AGENT: ['/agent'],
+  ADMIN: ['/admin', '/owner', '/tenant', '/trader', '/agent']
 }
 
 function getDashboardForRole(role) {
@@ -16,7 +17,8 @@ function getDashboardForRole(role) {
     ADMIN: '/admin',
     OWNER: '/owner',
     TENANT: '/tenant',
-    TRADER: '/trader'
+    TRADER: '/trader',
+    AGENT: '/agent'
   }
   return paths[role] || '/owner'
 }

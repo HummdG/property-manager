@@ -93,7 +93,7 @@ export default function RegisterPage() {
         </div>
         <CardTitle className="text-2xl font-bold text-blue-950">Create an account</CardTitle>
         <CardDescription className="text-slate-500">
-          Join Property Manager to get started
+          Join GoFor Properties to get started
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-4">

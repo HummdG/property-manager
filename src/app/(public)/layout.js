@@ -3,7 +3,7 @@ import { Building2, Search, User } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export const metadata = {
-  title: 'Browse Properties | Property Manager',
+  title: 'Browse Properties | GoFor Properties',
   description: 'Find your dream property - browse homes, apartments, and commercial spaces for rent or sale'
 }
 
@@ -15,13 +15,13 @@ export default function PublicLayout({ children }) {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <Link href="/properties" className="flex items-center gap-2.5 group">
+            <Link href="/" className="flex items-center gap-2.5 group">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 shadow-md shadow-amber-500/20 transition-shadow group-hover:shadow-lg group-hover:shadow-amber-500/30">
                 <Building2 className="h-5 w-5 text-white" />
               </div>
               <div className="hidden sm:block">
-                <span className="text-lg font-bold text-blue-950">Property</span>
-                <span className="text-lg font-bold bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">Manager</span>
+                <span className="text-lg font-bold text-blue-950">GoFor</span>
+                <span className="text-lg font-bold bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">Properties</span>
               </div>
             </Link>
 
@@ -76,13 +76,13 @@ export default function PublicLayout({ children }) {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Brand */}
             <div className="md:col-span-2">
-              <Link href="/properties" className="flex items-center gap-2.5">
+              <Link href="/" className="flex items-center gap-2.5">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 shadow-md shadow-amber-500/20">
                   <Building2 className="h-5 w-5 text-white" />
                 </div>
                 <div>
-                  <span className="text-lg font-bold text-blue-950">Property</span>
-                  <span className="text-lg font-bold bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">Manager</span>
+                  <span className="text-lg font-bold text-blue-950">GoFor</span>
+                  <span className="text-lg font-bold bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">Properties</span>
                 </div>
               </Link>
               <p className="mt-4 text-sm text-slate-500 max-w-md">
@@ -138,7 +138,7 @@ export default function PublicLayout({ children }) {
           {/* Copyright */}
           <div className="mt-12 pt-8 border-t border-slate-200">
             <p className="text-center text-sm text-slate-400">
-              &copy; {new Date().getFullYear()} Property Manager. All rights reserved.
+              &copy; {new Date().getFullYear()} GoFor Properties. All rights reserved.
             </p>
           </div>
         </div>

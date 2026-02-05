@@ -86,3 +86,46 @@ export function truncate(str, length = 50) {
   if (!str || str.length <= length) return str
   return `${str.slice(0, length)}...`
 }
+
+/**
+ * Get inquiry status color class
+ */
+export function getInquiryStatusColor(status) {
+  const statusColors = {
+    open: 'bg-amber-100 text-amber-700 border-amber-200',
+    contacted: 'bg-blue-100 text-blue-700 border-blue-200',
+    meeting_scheduled: 'bg-purple-100 text-purple-700 border-purple-200',
+    follow_up: 'bg-orange-100 text-orange-700 border-orange-200',
+    accepted: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    rejected: 'bg-red-100 text-red-700 border-red-200',
+    closed: 'bg-slate-100 text-slate-600 border-slate-200'
+  }
+  return statusColors[status?.toLowerCase()] || 'bg-slate-100 text-slate-600 border-slate-200'
+}
+
+/**
+ * Get inquiry type color class
+ */
+export function getInquiryTypeColor(type) {
+  const typeColors = {
+    rent: 'bg-blue-100 text-blue-700 border-blue-200',
+    sale: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    maintenance: 'bg-orange-100 text-orange-700 border-orange-200'
+  }
+  return typeColors[type?.toLowerCase()] || 'bg-slate-100 text-slate-600 border-slate-200'
+}
+
+/**
+ * Get activity type color class
+ */
+export function getActivityTypeColor(type) {
+  const typeColors = {
+    call: 'bg-blue-100 text-blue-700 border-blue-200',
+    viewing: 'bg-purple-100 text-purple-700 border-purple-200',
+    meeting: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    site_visit: 'bg-amber-100 text-amber-700 border-amber-200',
+    paperwork: 'bg-slate-100 text-slate-600 border-slate-200',
+    other: 'bg-slate-100 text-slate-600 border-slate-200'
+  }
+  return typeColors[type?.toLowerCase()] || 'bg-slate-100 text-slate-600 border-slate-200'
+}

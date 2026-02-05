@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata = {
-  title: 'Property Manager | UAE Premium Property Management',
+  title: 'GoFor Properties | UAE Premium Property Management',
   description: 'Manage your properties, tenants, and service requests with luxury and ease'
 }
 

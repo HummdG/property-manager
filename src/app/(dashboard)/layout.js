@@ -10,7 +10,13 @@ export default async function DashboardLayout({ children }) {
   }
 
   return (
-    <DashboardShell user={session.user}>
+    <DashboardShell user={{
+      id: session.user.id,
+      name: session.user.name,
+      email: session.user.email,
+      image: session.user.image,
+      role: session.user.role
+    }}>
       {children}
     </DashboardShell>
   )

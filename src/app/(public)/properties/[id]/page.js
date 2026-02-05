@@ -86,12 +86,12 @@ export async function generateMetadata({ params }) {
   
   if (!property) {
     return {
-      title: 'Property Not Found | Property Manager'
+      title: 'Property Not Found | GoFor Properties'
     }
   }
 
   return {
-    title: `${property.name} | Property Manager`,
+    title: `${property.name} | GoFor Properties`,
     description: property.description || `${property.bedrooms} bedroom ${property.type.toLowerCase()} in ${property.city}`
   }
 }

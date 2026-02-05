@@ -381,6 +381,237 @@ async function main() {
   })
   console.log('Created sample service request')
 
+  // Create sample agent
+  const agentPassword = await bcrypt.hash('agent123', 12)
+  const agent = await prisma.user.upsert({
+    where: { email: 'agent@example.com' },
+    update: {},
+    create: {
+      email: 'agent@example.com',
+      name: 'Ahmed Agent',
+      password: agentPassword,
+      role: 'AGENT',
+      phone: '+971 50 123 4567',
+      isActive: true
+    }
+  })
+  console.log(`Created agent user: ${agent.email}`)
+
+  // Create agent profile
+  await prisma.agentProfile.upsert({
+    where: { userId: agent.id },
+    update: {},
+    create: {
+      userId: agent.id,
+      companyName: 'GoFor Properties',
+      licenseNumber: 'RERA-12345',
+      description: 'Experienced real estate agent specializing in luxury properties in Dubai Marina and Downtown.',
+      commissionRate: 2.5,
+      serviceAreas: ['Dubai Marina', 'Downtown Dubai', 'Palm Jumeirah', 'Business Bay'],
+      specializations: ['Luxury Properties', 'Off-Plan', 'Investment Properties'],
+      rating: 4.8,
+      completedDeals: 45,
+      isAvailable: true,
+      tcAcceptedAt: new Date()
+    }
+  })
+  console.log('Created agent profile')
+
+  // Create subscription plans
+  const subscriptionPlans = await Promise.all([
+    prisma.subscriptionPlan.upsert({
+      where: { name: 'Basic' },
+      update: {},
+      create: {
+        name: 'Basic',
+        description: 'Perfect for individual agents starting out',
+        monthlyPrice: 9900, // AED 99
+        yearlyPrice: 95000, // AED 950 (save ~20%)
+        maxInquiries: 50,
+        maxThirdPartyPlatforms: 0,
+        features: ['Up to 50 inquiries/month', 'Daily activity logging', 'Basic analytics', 'Email support'],
+        isActive: true,
+        sortOrder: 0
+      }
+    }),
+    prisma.subscriptionPlan.upsert({
+      where: { name: 'Professional' },
+      update: {},
+      create: {
+        name: 'Professional',
+        description: 'Best for active agents with growing client base',
+        monthlyPrice: 29900, // AED 299
+        yearlyPrice: 287000, // AED 2870 (save ~20%)
+        maxInquiries: null, // Unlimited
+        maxThirdPartyPlatforms: 3,
+        features: ['Unlimited inquiries', '3 third-party platforms', 'Location tracking', 'Advanced analytics', 'Priority support', 'Client CRM'],
+        isActive: true,
+        sortOrder: 1
+      }
+    }),
+    prisma.subscriptionPlan.upsert({
+      where: { name: 'Enterprise' },
+      update: {},
+      create: {
+        name: 'Enterprise',
+        description: 'For agencies and top-performing agents',
+        monthlyPrice: 59900, // AED 599
+        yearlyPrice: 575000, // AED 5750 (save ~20%)
+        maxInquiries: null, // Unlimited
+        maxThirdPartyPlatforms: 10,
+        features: ['Unlimited everything', 'All third-party platforms', 'Team management', 'API access', 'Custom integrations', 'Dedicated account manager', 'White-label options'],
+        isActive: true,
+        sortOrder: 2
+      }
+    })
+  ])
+  console.log(`Created ${subscriptionPlans.length} subscription plans`)
+
+  // Create third-party platforms
+  const platforms = await Promise.all([
+    prisma.thirdPartyPlatform.upsert({
+      where: { name: 'Airbnb' },
+      update: {},
+      create: {
+        name: 'Airbnb',
+        description: 'Short-term vacation rental platform',
+        website: 'https://www.airbnb.com',
+        baseFee: 0,
+        perListingFee: 5000, // AED 50 per listing
+        isActive: true
+      }
+    }),
+    prisma.thirdPartyPlatform.upsert({
+      where: { name: 'Property Finder' },
+      update: {},
+      create: {
+        name: 'Property Finder',
+        description: 'Leading property portal in UAE',
+        website: 'https://www.propertyfinder.ae',
+        baseFee: 0,
+        perListingFee: 15000, // AED 150 per listing
+        isActive: true
+      }
+    }),
+    prisma.thirdPartyPlatform.upsert({
+      where: { name: 'Dubizzle' },
+      update: {},
+      create: {
+        name: 'Dubizzle',
+        description: 'Popular classifieds platform',
+        website: 'https://www.dubizzle.com',
+        baseFee: 0,
+        perListingFee: 10000, // AED 100 per listing
+        isActive: true
+      }
+    }),
+    prisma.thirdPartyPlatform.upsert({
+      where: { name: 'Bayut' },
+      update: {},
+      create: {
+        name: 'Bayut',
+        description: 'UAE property marketplace',
+        website: 'https://www.bayut.com',
+        baseFee: 0,
+        perListingFee: 12000, // AED 120 per listing
+        isActive: true
+      }
+    }),
+    prisma.thirdPartyPlatform.upsert({
+      where: { name: 'Booking.com' },
+      update: {},
+      create: {
+        name: 'Booking.com',
+        description: 'Hotel and vacation rental platform',
+        website: 'https://www.booking.com',
+        baseFee: 0,
+        perListingFee: 8000, // AED 80 per listing
+        isActive: true
+      }
+    })
+  ])
+  console.log(`Created ${platforms.length} third-party platforms`)
+
+  // Create sample inquiries for agent
+  const agentProfile = await prisma.agentProfile.findUnique({
+    where: { userId: agent.id }
+  })
+
+  if (agentProfile) {
+    const inquiries = await Promise.all([
+      prisma.inquiry.upsert({
+        where: { id: 'sample-inquiry-1' },
+        update: {},
+        create: {
+          id: 'sample-inquiry-1',
+          type: 'RENT',
+          status: 'OPEN',
+          source: 'website',
+          agentId: agentProfile.id,
+          clientName: 'Mohammed Al Rashid',
+          clientEmail: 'mohammed@example.com',
+          clientPhone: '+971 55 123 4567',
+          message: 'Looking for a 2-bedroom apartment in Dubai Marina, budget around AED 10,000/month.',
+          budget: 10000,
+          preferredArea: 'Dubai Marina'
+        }
+      }),
+      prisma.inquiry.upsert({
+        where: { id: 'sample-inquiry-2' },
+        update: {},
+        create: {
+          id: 'sample-inquiry-2',
+          type: 'SALE',
+          status: 'MEETING_SCHEDULED',
+          source: 'referral',
+          agentId: agentProfile.id,
+          propertyId: property3.id,
+          clientName: 'Sarah Thompson',
+          clientEmail: 'sarah.t@example.com',
+          clientPhone: '+971 50 987 6543',
+          message: 'Interested in the Downtown Penthouse. Would like to schedule a viewing.',
+          budget: 3000000,
+          preferredArea: 'Downtown Dubai',
+          scheduledAt: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000) // 2 days from now
+        }
+      }),
+      prisma.inquiry.upsert({
+        where: { id: 'sample-inquiry-3' },
+        update: {},
+        create: {
+          id: 'sample-inquiry-3',
+          type: 'MAINTENANCE',
+          status: 'CONTACTED',
+          source: 'phone',
+          agentId: agentProfile.id,
+          propertyId: property2.id,
+          clientName: 'James Wilson',
+          clientEmail: 'james.w@example.com',
+          clientPhone: '+971 56 111 2222',
+          message: 'AC unit in the master bedroom is not cooling properly. Need maintenance.',
+          notes: 'Contacted the client, will send technician next week.'
+        }
+      })
+    ])
+    console.log(`Created ${inquiries.length} sample inquiries`)
+
+    // Create sample follow-ups
+    await prisma.inquiryFollowUp.upsert({
+      where: { id: 'sample-followup-1' },
+      update: {},
+      create: {
+        id: 'sample-followup-1',
+        inquiryId: inquiries[1].id,
+        type: 'CALL',
+        title: 'Initial call to discuss requirements',
+        description: 'Discussed the client\'s requirements. They are looking for a property with a view and good investment potential.',
+        outcome: 'positive',
+        completedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
+      }
+    })
+    console.log('Created sample follow-ups')
+  }
+
   console.log('Seed completed successfully!')
   console.log('')
   console.log('Test accounts:')
@@ -388,6 +619,7 @@ async function main() {
   console.log('- Owner: owner@example.com / owner123')
   console.log('- Tenant: tenant@example.com / tenant123')
   console.log('- Trader: trader@example.com / trader123')
+  console.log('- Agent: agent@example.com / agent123')
 }
 
 main()

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { signIn } from 'next-auth/react'
+import { signIn, getSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Building2, Mail, Lock, Loader2, ArrowRight } from 'lucide-react'
@@ -9,6 +9,17 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+
+const getDashboardByRole = (role) => {
+  const dashboards = {
+    OWNER: '/owner',
+    AGENT: '/agent',
+    TENANT: '/tenant',
+    TRADER: '/trader',
+    ADMIN: '/admin'
+  }
+  return dashboards[role] || '/owner'
+}
 
 export default function LoginPage() {
   const router = useRouter()
@@ -37,7 +48,11 @@ export default function LoginPage() {
         return
       }
 
-      router.push('/owner')
+      // Get the session to determine user's role
+      const session = await getSession()
+      const dashboard = getDashboardByRole(session?.user?.role)
+      
+      router.push(dashboard)
       router.refresh()
     } catch (err) {
       setError('Something went wrong. Please try again.')
@@ -47,6 +62,7 @@ export default function LoginPage() {
 
   async function handleGoogleSignIn() {
     setIsLoading(true)
+    // Redirect to /owner - middleware will redirect to correct dashboard based on role
     await signIn('google', { callbackUrl: '/owner' })
   }
 
@@ -58,7 +74,7 @@ export default function LoginPage() {
         </div>
         <CardTitle className="text-2xl font-bold text-blue-950">Welcome back</CardTitle>
         <CardDescription className="text-slate-500">
-          Sign in to your Property Manager account
+          Sign in to your GoFor Properties account
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-4">

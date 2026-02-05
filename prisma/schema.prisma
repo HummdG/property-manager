@@ -16,6 +16,39 @@ enum UserRole {
   TENANT
   TRADER
   ADMIN
+  AGENT
+}
+
+enum InquiryType {
+  RENT
+  SALE
+  MAINTENANCE
+}
+
+enum InquiryStatus {
+  OPEN
+  CONTACTED
+  MEETING_SCHEDULED
+  FOLLOW_UP
+  ACCEPTED
+  REJECTED
+  CLOSED
+}
+
+enum ActivityType {
+  CALL
+  VIEWING
+  MEETING
+  SITE_VISIT
+  PAPERWORK
+  OTHER
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  CANCELLED
 }
 
 enum PropertyType {
@@ -82,6 +115,7 @@ model User {
   serviceRequests ServiceRequest[]
   traderProfile  TraderProfile?
   tenantProfile  TenantProfile?
+  agentProfile   AgentProfile?
   jobAssignments JobAssignment[]
   payments       Payment[]
 
@@ -151,9 +185,11 @@ model Property {
   updatedAt   DateTime     @updatedAt
 
   // Relations
-  owner           User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  serviceRequests ServiceRequest[]
-  tenantProfiles  TenantProfile[]
+  owner            User              @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  serviceRequests  ServiceRequest[]
+  tenantProfiles   TenantProfile[]
+  inquiries        Inquiry[]
+  propertyListings PropertyListing[]
 
   @@map("properties")
 }
@@ -315,4 +351,194 @@ model Contract {
   updatedAt    DateTime  @updatedAt
 
   @@map("contracts")
+}
+
+// Agent Models
+model AgentProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  companyName     String?
+  licenseNumber   String?
+  description     String?  @db.Text
+  commissionRate  Float    @default(0)
+  serviceAreas    String[]
+  specializations String[]
+  rating          Float    @default(0)
+  completedDeals  Int      @default(0)
+  isAvailable     Boolean  @default(true)
+  tcAcceptedAt    DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  inquiries     Inquiry[]
+  dailyLogs     AgentDailyLog[]
+  locationLogs  AgentLocationLog[]
+  subscription  AgentSubscription?
+
+  @@map("agent_profiles")
+}
+
+model Inquiry {
+  id            String        @id @default(cuid())
+  type          InquiryType
+  status        InquiryStatus @default(OPEN)
+  source        String?       // Where inquiry came from (website, phone, referral, etc.)
+  propertyId    String?
+  agentId       String
+  clientName    String
+  clientEmail   String
+  clientPhone   String?
+  message       String?       @db.Text
+  budget        Int?
+  preferredArea String?
+  notes         String?       @db.Text
+  scheduledAt   DateTime?
+  closedAt      DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  property  Property?        @relation(fields: [propertyId], references: [id])
+  agent     AgentProfile     @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  followUps InquiryFollowUp[]
+
+  @@map("inquiries")
+}
+
+model InquiryFollowUp {
+  id          String       @id @default(cuid())
+  inquiryId   String
+  type        ActivityType
+  title       String
+  description String?      @db.Text
+  outcome     String?      // Accepted, Rejected, Rescheduled, etc.
+  scheduledAt DateTime?
+  completedAt DateTime?
+  notes       String?      @db.Text
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Relations
+  inquiry Inquiry @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+
+  @@map("inquiry_follow_ups")
+}
+
+model AgentDailyLog {
+  id          String       @id @default(cuid())
+  agentId     String
+  type        ActivityType
+  title       String
+  description String?      @db.Text
+  location    String?
+  duration    Int?         // Duration in minutes
+  date        DateTime     @default(now())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  // Relations
+  agent AgentProfile @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@map("agent_daily_logs")
+}
+
+model AgentLocationLog {
+  id        String   @id @default(cuid())
+  agentId   String
+  latitude  Float
+  longitude Float
+  address   String?
+  accuracy  Float?
+  timestamp DateTime @default(now())
+  createdAt DateTime @default(now())
+
+  // Relations
+  agent AgentProfile @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@map("agent_location_logs")
+}
+
+model SubscriptionPlan {
+  id                    String   @id @default(cuid())
+  name                  String   @unique
+  description           String?  @db.Text
+  monthlyPrice          Int      // In cents
+  yearlyPrice           Int?     // In cents (discounted)
+  maxInquiries          Int?     // null = unlimited
+  maxThirdPartyPlatforms Int     @default(0)
+  features              String[]
+  isActive              Boolean  @default(true)
+  sortOrder             Int      @default(0)
+  stripeProductId       String?
+  stripePriceIdMonthly  String?
+  stripePriceIdYearly   String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  subscriptions AgentSubscription[]
+
+  @@map("subscription_plans")
+}
+
+model AgentSubscription {
+  id                   String             @id @default(cuid())
+  agentId              String             @unique
+  planId               String
+  status               SubscriptionStatus @default(TRIAL)
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean            @default(false)
+  stripeSubscriptionId String?
+  stripeCustomerId     String?
+  trialEndsAt          DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  // Relations
+  agent AgentProfile     @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  plan  SubscriptionPlan @relation(fields: [planId], references: [id])
+
+  @@map("agent_subscriptions")
+}
+
+model ThirdPartyPlatform {
+  id             String   @id @default(cuid())
+  name           String   @unique
+  description    String?
+  website        String?
+  baseFee        Int?     // Monthly base fee in cents
+  perListingFee  Int?     // Per property listing fee in cents
+  logoUrl        String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Relations
+  propertyListings PropertyListing[]
+
+  @@map("third_party_platforms")
+}
+
+model PropertyListing {
+  id            String   @id @default(cuid())
+  propertyId    String
+  platformId    String
+  externalId    String?  // ID on the third-party platform
+  listingUrl    String?
+  monthlyFee    Int      // Fee in cents
+  status        String   @default("active") // active, paused, expired
+  listedAt      DateTime @default(now())
+  expiresAt     DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  property Property           @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  platform ThirdPartyPlatform @relation(fields: [platformId], references: [id])
+
+  @@unique([propertyId, platformId])
+  @@map("property_listings")
 }

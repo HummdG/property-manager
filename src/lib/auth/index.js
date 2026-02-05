@@ -7,6 +7,7 @@ export const ROLES = {
   TENANT: 'TENANT',
   TRADER: 'TRADER',
   ADMIN: 'ADMIN',
+  AGENT: 'AGENT',
 }
 
 export function getDashboardPath(role) {
@@ -19,6 +20,8 @@ export function getDashboardPath(role) {
       return '/trader'
     case ROLES.TENANT:
       return '/tenant'
+    case ROLES.AGENT:
+      return '/agent'
     default:
       return '/'
   }
