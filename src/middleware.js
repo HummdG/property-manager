@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getToken } from 'next-auth/jwt'
+import { authMiddleware } from '@/lib/auth/auth.edge'
 
 const publicPrefixes = ['/login', '/register', '/api/auth', '/properties', '/api/public', '/services']
 const apiRoutes = ['/api/']
@@ -23,15 +23,10 @@ function getDashboardForRole(role) {
   return paths[role] || '/owner'
 }
 
-export async function middleware(req) {
+export default authMiddleware((req) => {
   const { nextUrl } = req
   const pathname = nextUrl.pathname
-
-  // Get token using next-auth/jwt (Edge compatible)
-  const token = await getToken({
-    req,
-    secret: process.env.AUTH_SECRET,
-  })
+  const session = req.auth
 
   // Allow root path
   if (pathname === '/') {
@@ -42,8 +37,8 @@ export async function middleware(req) {
   const isPublicRoute = publicPrefixes.some(route => pathname.startsWith(route))
   if (isPublicRoute) {
     // If logged in and trying to access auth pages, redirect to dashboard
-    if (token && (pathname === '/login' || pathname === '/register')) {
-      const dashboardPath = getDashboardForRole(token.role)
+    if (session && (pathname === '/login' || pathname === '/register')) {
+      const dashboardPath = getDashboardForRole(session.user?.role)
       return NextResponse.redirect(new URL(dashboardPath, nextUrl))
     }
     return NextResponse.next()
@@ -56,14 +51,14 @@ export async function middleware(req) {
   }
 
   // Require authentication for all other routes
-  if (!token) {
+  if (!session) {
     const loginUrl = new URL('/login', nextUrl)
     loginUrl.searchParams.set('callbackUrl', pathname)
     return NextResponse.redirect(loginUrl)
   }
 
   // Check role-based access
-  const userRole = token.role
+  const userRole = session.user?.role
   const allowedRoutes = roleRoutes[userRole] || []
   const hasAccess = allowedRoutes.some(route => pathname.startsWith(route))
 
@@ -74,7 +69,7 @@ export async function middleware(req) {
   }
 
   return NextResponse.next()
-}
+})
 
 export const config = {
   matcher: [

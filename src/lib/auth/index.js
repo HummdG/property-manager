@@ -1,6 +1,6 @@
 export { auth, signIn, signOut, handlers } from './config'
 export { auth as getServerSession } from './config'
-export { authEdgeConfig } from './auth.edge'
+export { authEdgeConfig, authMiddleware } from './auth.edge'
 
 export const ROLES = {
   OWNER: 'OWNER',
