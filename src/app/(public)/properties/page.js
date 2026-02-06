@@ -1,31 +1,107 @@
 import { Suspense } from 'react'
 import { Building2, Loader2 } from 'lucide-react'
 import { PublicPropertyCard, PropertyFilters } from '@/components/property'
+import { db } from '@/lib/db'
 
 async function getProperties(searchParams) {
-  const params = new URLSearchParams()
-  
-  if (searchParams.search) params.set('search', searchParams.search)
-  if (searchParams.listingType) params.set('listingType', searchParams.listingType)
-  if (searchParams.type) params.set('type', searchParams.type)
-  if (searchParams.city) params.set('city', searchParams.city)
-  if (searchParams.minPrice) params.set('minPrice', searchParams.minPrice)
-  if (searchParams.maxPrice) params.set('maxPrice', searchParams.maxPrice)
-  if (searchParams.bedrooms) params.set('bedrooms', searchParams.bedrooms)
-  if (searchParams.page) params.set('page', searchParams.page)
-
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-  
   try {
-    const res = await fetch(`${baseUrl}/api/public/properties?${params.toString()}`, {
-      cache: 'no-store'
-    })
-    
-    if (!res.ok) {
-      throw new Error('Failed to fetch properties')
+    const page = parseInt(searchParams.page || '1')
+    const limit = 12
+    const skip = (page - 1) * limit
+
+    const { listingType, type: propertyType, city, minPrice, maxPrice, bedrooms, search } = searchParams
+
+    // Build where clause - only show listed properties
+    const where = { isListed: true }
+
+    if (listingType && listingType !== 'ALL') {
+      where.listingType = listingType
     }
-    
-    return res.json()
+
+    if (propertyType && propertyType !== 'ALL') {
+      where.type = propertyType
+    }
+
+    if (city) {
+      where.city = { contains: city, mode: 'insensitive' }
+    }
+
+    if (bedrooms) {
+      where.bedrooms = parseInt(bedrooms)
+    }
+
+    if (minPrice || maxPrice) {
+      const priceFilter = {}
+      if (minPrice) priceFilter.gte = parseInt(minPrice)
+      if (maxPrice) priceFilter.lte = parseInt(maxPrice)
+
+      if (listingType === 'SALE') {
+        where.salePrice = priceFilter
+      } else if (listingType === 'RENT') {
+        where.monthlyRent = priceFilter
+      } else {
+        where.OR = [
+          { monthlyRent: priceFilter },
+          { salePrice: priceFilter }
+        ]
+      }
+    }
+
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { address: { contains: search, mode: 'insensitive' } },
+        { city: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } }
+      ]
+    }
+
+    const [properties, total] = await Promise.all([
+      db.property.findMany({
+        where,
+        select: {
+          id: true,
+          name: true,
+          address: true,
+          city: true,
+          postcode: true,
+          country: true,
+          type: true,
+          listingType: true,
+          bedrooms: true,
+          bathrooms: true,
+          squareFeet: true,
+          description: true,
+          images: true,
+          monthlyRent: true,
+          salePrice: true,
+          createdAt: true,
+          owner: {
+            select: {
+              id: true,
+              name: true
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit
+      }),
+      db.property.count({ where })
+    ])
+
+    const cities = await db.property.findMany({
+      where: { isListed: true },
+      select: { city: true },
+      distinct: ['city'],
+      orderBy: { city: 'asc' }
+    })
+
+    return {
+      properties,
+      pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+      filterOptions: { cities: cities.map(c => c.city) }
+    }
   } catch (error) {
     console.error('Error fetching properties:', error)
     return { properties: [], pagination: { total: 0, totalPages: 0 }, filterOptions: { cities: [] } }

@@ -20,24 +20,44 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { InquiryForm } from '@/components/property'
 import { formatCurrency, formatDate, cn } from '@/lib/utils'
+import { db } from '@/lib/db'
 
 async function getProperty(id) {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
-  
   try {
-    const res = await fetch(`${baseUrl}/api/public/properties/${id}`, {
-      cache: 'no-store'
-    })
-    
-    if (!res.ok) {
-      if (res.status === 404) {
-        return null
+    const property = await db.property.findUnique({
+      where: { 
+        id,
+        isListed: true 
+      },
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        city: true,
+        postcode: true,
+        country: true,
+        type: true,
+        listingType: true,
+        bedrooms: true,
+        bathrooms: true,
+        squareFeet: true,
+        description: true,
+        images: true,
+        monthlyRent: true,
+        salePrice: true,
+        createdAt: true,
+        owner: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            phone: true
+          }
+        }
       }
-      throw new Error('Failed to fetch property')
-    }
-    
-    const data = await res.json()
-    return data.property
+    })
+
+    return property || null
   } catch (error) {
     console.error('Error fetching property:', error)
     return null
