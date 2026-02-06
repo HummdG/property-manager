@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { signIn, getSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Building2, Mail, Lock, Loader2, ArrowRight, ArrowLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -22,7 +21,6 @@ const getDashboardByRole = (role) => {
 }
 
 export default function LoginPage() {
-  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [formData, setFormData] = useState({
@@ -44,18 +42,18 @@ export default function LoginPage() {
 
       if (result?.error) {
         setError('Invalid email or password')
-        setIsLoading(false)
         return
       }
 
       // Get the session to determine user's role
       const session = await getSession()
       const dashboard = getDashboardByRole(session?.user?.role)
-      
-      router.push(dashboard)
-      router.refresh()
+
+      // Use full page navigation to ensure cookies are sent properly
+      window.location.href = dashboard
     } catch (err) {
       setError('Something went wrong. Please try again.')
+    } finally {
       setIsLoading(false)
     }
   }

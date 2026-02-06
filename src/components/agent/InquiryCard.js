@@ -76,3 +76,4 @@ export function InquiryCard({ inquiry, showAgent = false }) {
   )
 }
 
+

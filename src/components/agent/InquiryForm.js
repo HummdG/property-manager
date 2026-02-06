@@ -262,3 +262,4 @@ export function InquiryForm({ open, onOpenChange, onSuccess }) {
   )
 }
 
+

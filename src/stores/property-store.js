@@ -20,3 +20,4 @@ export const usePropertyStore = create((set, get) => ({
   getPropertyById: (id) => get().properties.find((p) => p.id === id),
 }))
 
+

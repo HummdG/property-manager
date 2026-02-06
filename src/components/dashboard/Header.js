@@ -20,6 +20,7 @@ export function Header({ user, onMenuClick }) {
     OWNER: 'Property Owner',
     TENANT: 'Tenant',
     TRADER: 'Trader',
+    AGENT: 'Real Estate Agent',
     ADMIN: 'Administrator'
   }
 

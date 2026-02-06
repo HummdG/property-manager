@@ -1,4 +1,5 @@
 import { DM_Sans, Plus_Jakarta_Sans, Geist_Mono } from 'next/font/google'
+import { Providers } from '@/components/providers'
 import './globals.css'
 
 const dmSans = DM_Sans({
@@ -30,7 +31,9 @@ export default function RootLayout({ children }) {
         className={`${dmSans.variable} ${jakarta.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        {children}
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   )
