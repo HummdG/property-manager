@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { logEvent } from '@/lib/events'
 
 async function getAgentProfile(userId) {
   return db.agentProfile.findUnique({
@@ -145,6 +146,18 @@ export async function PATCH(request, { params }) {
       }
     })
 
+    await logEvent({
+      type: 'INQUIRY_UPDATED',
+      action: 'updated',
+      entity: 'inquiry',
+      entityId: id,
+      userId: session.user.id,
+      metadata: {
+        clientName: inquiry.clientName,
+        ...(status && { newStatus: status.toUpperCase() })
+      }
+    })
+
     return NextResponse.json({ inquiry })
   } catch (error) {
     console.error('Error updating inquiry:', error)
@@ -180,6 +193,15 @@ export async function DELETE(request, { params }) {
 
     await db.inquiry.delete({
       where: { id }
+    })
+
+    await logEvent({
+      type: 'INQUIRY_DELETED',
+      action: 'deleted',
+      entity: 'inquiry',
+      entityId: id,
+      userId: session.user.id,
+      metadata: { clientName: existingInquiry.clientName }
     })
 
     return NextResponse.json({ success: true })

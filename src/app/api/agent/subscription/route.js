@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { logEvent } from '@/lib/events'
 
 async function getAgentProfile(userId) {
   return db.agentProfile.findUnique({
@@ -126,6 +127,15 @@ export async function POST(request) {
       include: { plan: true }
     })
 
+    await logEvent({
+      type: 'SUBSCRIPTION_CREATED',
+      action: 'created',
+      entity: 'agentSubscription',
+      entityId: subscription.id,
+      userId: session.user.id,
+      metadata: { planName: subscription.plan?.name, status: subscription.status }
+    })
+
     return NextResponse.json({ subscription }, { status: 201 })
   } catch (error) {
     console.error('Error creating subscription:', error)
@@ -153,6 +163,15 @@ export async function DELETE(request) {
         cancelAtPeriodEnd: true
       },
       include: { plan: true }
+    })
+
+    await logEvent({
+      type: 'SUBSCRIPTION_CANCELLED',
+      action: 'cancelled',
+      entity: 'agentSubscription',
+      entityId: subscription.id,
+      userId: session.user.id,
+      metadata: { planName: subscription.plan?.name }
     })
 
     return NextResponse.json({ subscription })

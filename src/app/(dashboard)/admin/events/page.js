@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from 'react'
 import {
   Search, Loader2, Calendar, Activity, User, Building2,
   Briefcase, ClipboardList, UserPlus, Trash2, CheckCircle,
-  XCircle, Play, Eye, Filter
+  XCircle, Play, Eye, Filter, MessageSquare, CalendarDays,
+  FileText, UserX, CreditCard, Ban
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -22,6 +23,7 @@ import { formatDate } from '@/lib/utils'
 
 const eventTypeConfig = {
   USER_REGISTERED: { icon: UserPlus, color: 'bg-blue-100 text-blue-600', label: 'User Registered' },
+  USER_TOGGLED_ACTIVE: { icon: UserX, color: 'bg-orange-100 text-orange-600', label: 'User Toggled Active' },
   PROPERTY_CREATED: { icon: Building2, color: 'bg-emerald-100 text-emerald-600', label: 'Property Created' },
   PROPERTY_UPDATED: { icon: Building2, color: 'bg-amber-100 text-amber-600', label: 'Property Updated' },
   PROPERTY_LISTED: { icon: Eye, color: 'bg-green-100 text-green-600', label: 'Property Listed' },
@@ -32,7 +34,15 @@ const eventTypeConfig = {
   JOB_REJECTED: { icon: XCircle, color: 'bg-red-100 text-red-600', label: 'Job Rejected' },
   JOB_STARTED: { icon: Play, color: 'bg-amber-100 text-amber-600', label: 'Job Started' },
   JOB_COMPLETED: { icon: CheckCircle, color: 'bg-green-100 text-green-600', label: 'Job Completed' },
-  DOCUMENT_UPLOADED: { icon: ClipboardList, color: 'bg-indigo-100 text-indigo-600', label: 'Document Uploaded' }
+  DOCUMENT_UPLOADED: { icon: FileText, color: 'bg-indigo-100 text-indigo-600', label: 'Document Uploaded' },
+  DOCUMENT_DELETED: { icon: Trash2, color: 'bg-red-100 text-red-600', label: 'Document Deleted' },
+  INQUIRY_CREATED: { icon: MessageSquare, color: 'bg-cyan-100 text-cyan-600', label: 'Inquiry Created' },
+  INQUIRY_UPDATED: { icon: MessageSquare, color: 'bg-teal-100 text-teal-600', label: 'Inquiry Updated' },
+  INQUIRY_DELETED: { icon: Trash2, color: 'bg-red-100 text-red-600', label: 'Inquiry Deleted' },
+  FOLLOW_UP_CREATED: { icon: CalendarDays, color: 'bg-violet-100 text-violet-600', label: 'Follow-Up Created' },
+  AGENT_LOG_CREATED: { icon: CalendarDays, color: 'bg-sky-100 text-sky-600', label: 'Agent Log Created' },
+  SUBSCRIPTION_CREATED: { icon: CreditCard, color: 'bg-emerald-100 text-emerald-600', label: 'Subscription Created' },
+  SUBSCRIPTION_CANCELLED: { icon: Ban, color: 'bg-red-100 text-red-600', label: 'Subscription Cancelled' }
 }
 
 const defaultConfig = { icon: Activity, color: 'bg-slate-100 text-slate-600', label: 'Event' }
@@ -43,7 +53,11 @@ const entityOptions = [
   { value: 'property', label: 'Properties' },
   { value: 'serviceRequest', label: 'Service Requests' },
   { value: 'jobAssignment', label: 'Job Assignments' },
-  { value: 'propertyDocument', label: 'Documents' }
+  { value: 'propertyDocument', label: 'Documents' },
+  { value: 'inquiry', label: 'Inquiries' },
+  { value: 'inquiryFollowUp', label: 'Follow-Ups' },
+  { value: 'agentDailyLog', label: 'Agent Logs' },
+  { value: 'agentSubscription', label: 'Subscriptions' }
 ]
 
 export default function AdminEventsPage() {

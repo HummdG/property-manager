@@ -6,6 +6,7 @@ import {
   ClipboardList,
   Wrench,
   TrendingUp,
+  TrendingDown,
   AlertCircle,
   UserCheck,
   MessageSquare,
@@ -18,7 +19,17 @@ import {
   MoreHorizontal,
   Activity,
   FileCheck,
-  ArrowRight
+  ArrowRight,
+  ArrowUpRight,
+  ArrowDownRight,
+  XCircle,
+  Briefcase,
+  CheckCircle,
+  Play,
+  Trash2,
+  UserPlus,
+  CreditCard,
+  Ban
 } from 'lucide-react'
 import { StatsCard } from '@/components/dashboard'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -34,6 +45,52 @@ const typeIcons = {
   SITE_VISIT: MapPin,
   PAPERWORK: FileText,
   OTHER: MoreHorizontal
+}
+
+const typeLabels = {
+  CALL: 'Calls',
+  VIEWING: 'Viewings',
+  MEETING: 'Meetings',
+  SITE_VISIT: 'Site Visits',
+  PAPERWORK: 'Paperwork',
+  OTHER: 'Other'
+}
+
+const eventTypeConfig = {
+  USER_REGISTERED: { icon: UserPlus, color: 'bg-blue-100 text-blue-600', label: 'User Registered' },
+  USER_TOGGLED_ACTIVE: { icon: Users, color: 'bg-orange-100 text-orange-600', label: 'User Toggled' },
+  PROPERTY_CREATED: { icon: Building2, color: 'bg-emerald-100 text-emerald-600', label: 'Property Created' },
+  PROPERTY_UPDATED: { icon: Building2, color: 'bg-amber-100 text-amber-600', label: 'Property Updated' },
+  PROPERTY_LISTED: { icon: Eye, color: 'bg-green-100 text-green-600', label: 'Property Listed' },
+  PROPERTY_DELETED: { icon: Trash2, color: 'bg-red-100 text-red-600', label: 'Property Deleted' },
+  SERVICE_REQUEST_CREATED: { icon: ClipboardList, color: 'bg-purple-100 text-purple-600', label: 'Request Created' },
+  JOB_ASSIGNED: { icon: Briefcase, color: 'bg-blue-100 text-blue-600', label: 'Job Assigned' },
+  JOB_ACCEPTED: { icon: CheckCircle, color: 'bg-emerald-100 text-emerald-600', label: 'Job Accepted' },
+  JOB_REJECTED: { icon: XCircle, color: 'bg-red-100 text-red-600', label: 'Job Rejected' },
+  JOB_STARTED: { icon: Play, color: 'bg-amber-100 text-amber-600', label: 'Job Started' },
+  JOB_COMPLETED: { icon: CheckCircle, color: 'bg-green-100 text-green-600', label: 'Job Completed' },
+  INQUIRY_CREATED: { icon: MessageSquare, color: 'bg-cyan-100 text-cyan-600', label: 'Inquiry Created' },
+  INQUIRY_UPDATED: { icon: MessageSquare, color: 'bg-teal-100 text-teal-600', label: 'Inquiry Updated' },
+  INQUIRY_DELETED: { icon: Trash2, color: 'bg-red-100 text-red-600', label: 'Inquiry Deleted' },
+  FOLLOW_UP_CREATED: { icon: CalendarDays, color: 'bg-violet-100 text-violet-600', label: 'Follow-Up Created' },
+  AGENT_LOG_CREATED: { icon: CalendarDays, color: 'bg-sky-100 text-sky-600', label: 'Log Created' },
+  SUBSCRIPTION_CREATED: { icon: CreditCard, color: 'bg-emerald-100 text-emerald-600', label: 'Subscription Created' },
+  SUBSCRIPTION_CANCELLED: { icon: Ban, color: 'bg-red-100 text-red-600', label: 'Subscription Cancelled' },
+  DOCUMENT_UPLOADED: { icon: FileText, color: 'bg-indigo-100 text-indigo-600', label: 'Document Uploaded' }
+}
+
+const defaultEventConfig = { icon: Activity, color: 'bg-slate-100 text-slate-600', label: 'Event' }
+
+function timeAgo (date) {
+  const seconds = Math.floor((new Date() - new Date(date)) / 1000)
+  if (seconds < 60) return 'just now'
+  const minutes = Math.floor(seconds / 60)
+  if (minutes < 60) return `${minutes}m ago`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}h ago`
+  const days = Math.floor(hours / 24)
+  if (days < 7) return `${days}d ago`
+  return new Date(date).toLocaleDateString('en-AE', { month: 'short', day: 'numeric' })
 }
 
 async function getAdminStats() {
@@ -138,6 +195,70 @@ async function getAdminStats() {
     take: 8
   })
 
+  // Weekly logs comparison
+  const weekStart = new Date()
+  weekStart.setDate(weekStart.getDate() - weekStart.getDay())
+  weekStart.setHours(0, 0, 0, 0)
+
+  const lastWeekStart = new Date(weekStart)
+  lastWeekStart.setDate(lastWeekStart.getDate() - 7)
+
+  const [thisWeekLogs, lastWeekLogs, thisWeekByType, topAgentsThisWeek] = await Promise.all([
+    db.agentDailyLog.count({
+      where: { date: { gte: weekStart } }
+    }),
+    db.agentDailyLog.count({
+      where: { date: { gte: lastWeekStart, lt: weekStart } }
+    }),
+    db.agentDailyLog.groupBy({
+      by: ['type'],
+      where: { date: { gte: weekStart } },
+      _count: true,
+      orderBy: { _count: { type: 'desc' } }
+    }),
+    db.agentDailyLog.groupBy({
+      by: ['agentId'],
+      where: { date: { gte: weekStart } },
+      _count: true,
+      orderBy: { _count: { type: 'desc' } },
+      take: 3
+    })
+  ])
+
+  // Fetch agent names for top agents this week
+  const topAgentIds = topAgentsThisWeek.map(a => a.agentId)
+  const topAgentProfiles = topAgentIds.length > 0
+    ? await db.agentProfile.findMany({
+      where: { id: { in: topAgentIds } },
+      include: { user: { select: { name: true, image: true } } }
+    })
+    : []
+
+  const topAgentsWeekly = topAgentsThisWeek.map(a => {
+    const profile = topAgentProfiles.find(p => p.id === a.agentId)
+    return { agentId: a.agentId, count: a._count, name: profile?.user?.name, image: profile?.user?.image }
+  })
+
+  // Recent system events for the dashboard feed
+  const recentEvents = await db.systemEvent.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: 8
+  })
+
+  // Fetch user names for events
+  const eventUserIds = [...new Set(recentEvents.filter(e => e.userId).map(e => e.userId))]
+  const eventUsers = eventUserIds.length > 0
+    ? await db.user.findMany({
+      where: { id: { in: eventUserIds } },
+      select: { id: true, name: true }
+    })
+    : []
+
+  const recentEventsWithUsers = recentEvents.map(event => ({
+    ...event,
+    userName: eventUsers.find(u => u.id === event.userId)?.name || null
+  }))
+
   return {
     totals: { users, properties, requests, traders, agents },
     usersByRole,
@@ -152,7 +273,17 @@ async function getAdminStats() {
       todayLocations
     },
     topAgents,
-    recentAgentLogs
+    recentAgentLogs,
+    weeklyLogs: {
+      thisWeek: thisWeekLogs,
+      lastWeek: lastWeekLogs,
+      byType: thisWeekByType.reduce((acc, item) => {
+        acc[item.type] = item._count
+        return acc
+      }, {}),
+      topAgents: topAgentsWeekly
+    },
+    recentEvents: recentEventsWithUsers
   }
 }
 
@@ -238,45 +369,179 @@ export default async function AdminDashboard() {
         </Card>
       )}
 
-      {/* Quick Access - Logs & Events */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Link href="/admin/logs">
-          <Card className="group border-slate-200 hover:border-amber-300 hover:shadow-md transition-all duration-200 cursor-pointer">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100">
-                    <FileCheck className="h-6 w-6 text-blue-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-blue-950">Agent Logs</h3>
-                    <p className="text-sm text-slate-500">View all agent daily activity logs</p>
-                  </div>
-                </div>
-                <ArrowRight className="h-5 w-5 text-slate-300 group-hover:text-amber-500 transition-colors" />
+      {/* Agent Logs Summary */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100">
+              <FileCheck className="h-4 w-4 text-blue-600" />
+            </div>
+            Agent Logs Summary
+          </CardTitle>
+          <Link href="/admin/logs">
+            <Button variant="outline" size="sm">
+              View All Logs
+              <ArrowRight className="h-4 w-4 ml-1" />
+            </Button>
+          </Link>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 sm:grid-cols-3 mb-5">
+            {/* This week vs last week */}
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+              <p className="text-sm font-medium text-slate-500 mb-1">This Week</p>
+              <div className="flex items-end gap-2">
+                <p className="text-3xl font-bold text-blue-950">{stats.weeklyLogs.thisWeek}</p>
+                {(() => {
+                  const diff = stats.weeklyLogs.thisWeek - stats.weeklyLogs.lastWeek
+                  const pct = stats.weeklyLogs.lastWeek > 0
+                    ? Math.round((diff / stats.weeklyLogs.lastWeek) * 100)
+                    : stats.weeklyLogs.thisWeek > 0 ? 100 : 0
+                  if (diff > 0) {
+                    return (
+                      <span className="flex items-center text-xs font-semibold text-emerald-600 mb-1">
+                        <ArrowUpRight className="h-3 w-3" />
+                        +{pct}%
+                      </span>
+                    )
+                  } else if (diff < 0) {
+                    return (
+                      <span className="flex items-center text-xs font-semibold text-red-500 mb-1">
+                        <ArrowDownRight className="h-3 w-3" />
+                        {pct}%
+                      </span>
+                    )
+                  }
+                  return <span className="text-xs font-semibold text-slate-400 mb-1">No change</span>
+                })()}
               </div>
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/admin/events">
-          <Card className="group border-slate-200 hover:border-amber-300 hover:shadow-md transition-all duration-200 cursor-pointer">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-100">
-                    <Activity className="h-6 w-6 text-purple-600" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-blue-950">System Events</h3>
-                    <p className="text-sm text-slate-500">Audit log of all system actions</p>
-                  </div>
+              <p className="text-xs text-slate-400 mt-1">Last week: {stats.weeklyLogs.lastWeek}</p>
+            </div>
+
+            {/* Activity breakdown */}
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+              <p className="text-sm font-medium text-slate-500 mb-2">Activity Breakdown</p>
+              {Object.keys(stats.weeklyLogs.byType).length === 0 ? (
+                <p className="text-xs text-slate-400">No logs this week</p>
+              ) : (
+                <div className="flex flex-wrap gap-1.5">
+                  {Object.entries(stats.weeklyLogs.byType).map(([type, count]) => {
+                    const Icon = typeIcons[type] || MoreHorizontal
+                    return (
+                      <div key={type} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-slate-100">
+                        <div className={`flex h-5 w-5 items-center justify-center rounded ${getActivityTypeColor(type)}`}>
+                          <Icon className="h-3 w-3" />
+                        </div>
+                        <span className="text-xs font-medium text-blue-950">{typeLabels[type] || type}</span>
+                        <Badge variant="secondary" className="text-[10px] h-4 px-1">{count}</Badge>
+                      </div>
+                    )
+                  })}
                 </div>
-                <ArrowRight className="h-5 w-5 text-slate-300 group-hover:text-amber-500 transition-colors" />
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-      </div>
+              )}
+            </div>
+
+            {/* Top 3 agents this week */}
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+              <p className="text-sm font-medium text-slate-500 mb-2">Most Active This Week</p>
+              {stats.weeklyLogs.topAgents.length === 0 ? (
+                <p className="text-xs text-slate-400">No agent activity this week</p>
+              ) : (
+                <div className="space-y-2">
+                  {stats.weeklyLogs.topAgents.map((agent, idx) => (
+                    <div key={agent.agentId} className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-slate-400 w-3">{idx + 1}</span>
+                      <Avatar className="h-6 w-6">
+                        <AvatarImage src={agent.image} />
+                        <AvatarFallback className="bg-gradient-to-br from-amber-400 to-amber-500 text-white text-[9px]">
+                          {getInitials(agent.name)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm font-medium text-blue-950 flex-1 truncate">{agent.name || 'Unknown'}</span>
+                      <Badge variant="secondary" className="text-[10px]">{agent.count} logs</Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Recent System Events Feed */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100">
+              <Activity className="h-4 w-4 text-purple-600" />
+            </div>
+            Recent System Events
+          </CardTitle>
+          <Link href="/admin/events">
+            <Button variant="outline" size="sm">
+              View All Events
+              <ArrowRight className="h-4 w-4 ml-1" />
+            </Button>
+          </Link>
+        </CardHeader>
+        <CardContent>
+          {stats.recentEvents.length === 0 ? (
+            <div className="text-center py-8">
+              <Activity className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+              <p className="text-sm text-slate-400">No system events recorded yet</p>
+            </div>
+          ) : (
+            <div className="space-y-1">
+              {stats.recentEvents.map((event, idx) => {
+                const config = eventTypeConfig[event.type] || defaultEventConfig
+                const EventIcon = config.icon
+                return (
+                  <div
+                    key={event.id}
+                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors"
+                  >
+                    <div className="relative flex flex-col items-center">
+                      <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${config.color}`}>
+                        <EventIcon className="h-4 w-4" />
+                      </div>
+                      {idx < stats.recentEvents.length - 1 && (
+                        <div className="w-px h-4 bg-slate-200 mt-1" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 font-semibold">
+                          {config.label}
+                        </Badge>
+                        {event.userName && (
+                          <span className="text-xs text-slate-500">by {event.userName}</span>
+                        )}
+                      </div>
+                      {event.metadata && typeof event.metadata === 'object' && (
+                        <p className="text-xs text-slate-400 mt-0.5 truncate">
+                          {event.metadata.serviceRequestTitle
+                            || event.metadata.propertyName
+                            || event.metadata.clientName
+                            || event.metadata.userName
+                            || event.metadata.title
+                            || event.metadata.planName
+                            || ''}
+                          {event.metadata.rejectionReason && (
+                            <span className="text-red-400"> — {event.metadata.rejectionReason}</span>
+                          )}
+                        </p>
+                      )}
+                    </div>
+                    <span className="text-[11px] text-slate-400 flex-shrink-0">
+                      {timeAgo(event.createdAt)}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Agent Insights Section */}
       <Card className="border-emerald-200 bg-gradient-to-r from-emerald-50/50 to-blue-50/50">

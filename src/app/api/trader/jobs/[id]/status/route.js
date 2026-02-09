@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { logEvent } from '@/lib/events'
+import { notifyAdmins } from '@/lib/notifications'
 
 export async function PATCH(request, { params }) {
   try {
@@ -96,6 +97,22 @@ export async function PATCH(request, { params }) {
         ...(rejectionReason && { rejectionReason: rejectionReason.trim() })
       }
     })
+
+    // Notify admins when a trader rejects a job
+    if (status === 'reject') {
+      await notifyAdmins({
+        type: 'JOB_REJECTED',
+        title: 'Job Rejected by Trader',
+        message: `${session.user.name || 'A trader'} rejected "${job.serviceRequest.title}". Reason: ${rejectionReason.trim()}`,
+        link: '/admin/requests',
+        metadata: {
+          jobAssignmentId: id,
+          serviceRequestId: job.serviceRequestId,
+          traderName: session.user.name,
+          rejectionReason: rejectionReason.trim()
+        }
+      })
+    }
 
     return NextResponse.json({ job: updatedJob })
   } catch (error) {

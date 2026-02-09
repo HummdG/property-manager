@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { logEvent } from '@/lib/events'
 
 async function getAgentProfile(userId) {
   return db.agentProfile.findUnique({
@@ -100,6 +101,15 @@ export async function POST(request, { params }) {
         })
       }
     }
+
+    await logEvent({
+      type: 'FOLLOW_UP_CREATED',
+      action: 'created',
+      entity: 'inquiryFollowUp',
+      entityId: followUp.id,
+      userId: session.user.id,
+      metadata: { inquiryId, title, type: type.toUpperCase(), outcome: outcome || null }
+    })
 
     return NextResponse.json({ followUp }, { status: 201 })
   } catch (error) {

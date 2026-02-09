@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { logEvent } from '@/lib/events'
 
 async function getAgentProfile(userId) {
   return db.agentProfile.findUnique({
@@ -166,6 +167,15 @@ export async function POST(request) {
           select: { id: true, name: true, address: true }
         }
       }
+    })
+
+    await logEvent({
+      type: 'INQUIRY_CREATED',
+      action: 'created',
+      entity: 'inquiry',
+      entityId: inquiry.id,
+      userId: session.user.id,
+      metadata: { clientName, clientEmail, type: type.toUpperCase(), source: source || 'direct' }
     })
 
     return NextResponse.json({ inquiry }, { status: 201 })

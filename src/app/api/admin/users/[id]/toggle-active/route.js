@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { logEvent } from '@/lib/events'
 
 export async function PATCH(request, { params }) {
   try {
@@ -32,6 +33,15 @@ export async function PATCH(request, { params }) {
         role: true,
         isActive: true
       }
+    })
+
+    await logEvent({
+      type: 'USER_TOGGLED_ACTIVE',
+      action: isActive ? 'activated' : 'deactivated',
+      entity: 'user',
+      entityId: id,
+      userId: session.user.id,
+      metadata: { userName: user.name, userEmail: user.email, userRole: user.role, isActive }
     })
 
     return NextResponse.json({ user })
