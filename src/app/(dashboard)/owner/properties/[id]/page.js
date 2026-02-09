@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { ArrowLeft, Building2, MapPin, Bed, Bath, Square, Users, Calendar, Mail, Phone } from 'lucide-react'
+import { ArrowLeft, Building2, MapPin, Bed, Bath, Square, Users, Calendar, Mail, Phone, FileText, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -25,6 +25,9 @@ async function getProperty(id, userId) {
         },
         orderBy: { createdAt: 'desc' },
         take: 10
+      },
+      documents: {
+        select: { id: true, type: true, fileName: true, fileUrl: true, uploadedAt: true }
       }
     }
   })
@@ -225,6 +228,45 @@ export default async function PropertyDetailPage({ params }) {
                   <Badge variant="outline" className="mt-2">
                     Vacant
                   </Badge>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Documents */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-amber-500" />
+                Documents
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {property.documents?.length > 0 ? (
+                <div className="space-y-3">
+                  {property.documents.map(doc => (
+                    <div
+                      key={doc.id}
+                      className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100"
+                    >
+                      <CheckCircle className="h-5 w-5 text-emerald-500 flex-shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-blue-950 text-sm">
+                          {doc.type === 'DEED' ? 'Title Deed' : 'NOC'}
+                        </p>
+                        <p className="text-xs text-slate-500 truncate">{doc.fileName}</p>
+                      </div>
+                      <Badge variant="outline" className="flex-shrink-0 text-xs">
+                        {formatDate(doc.uploadedAt)}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-4">
+                  <FileText className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+                  <p className="text-slate-500 text-sm">No documents uploaded</p>
+                  <p className="text-xs text-slate-400 mt-1">Edit property to upload Deed & NOC</p>
                 </div>
               )}
             </CardContent>

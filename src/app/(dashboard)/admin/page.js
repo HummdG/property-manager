@@ -15,7 +15,10 @@ import {
   Phone,
   Eye,
   FileText,
-  MoreHorizontal
+  MoreHorizontal,
+  Activity,
+  FileCheck,
+  ArrowRight
 } from 'lucide-react'
 import { StatsCard } from '@/components/dashboard'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -234,6 +237,46 @@ export default async function AdminDashboard() {
           </CardContent>
         </Card>
       )}
+
+      {/* Quick Access - Logs & Events */}
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Link href="/admin/logs">
+          <Card className="group border-slate-200 hover:border-amber-300 hover:shadow-md transition-all duration-200 cursor-pointer">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100">
+                    <FileCheck className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-blue-950">Agent Logs</h3>
+                    <p className="text-sm text-slate-500">View all agent daily activity logs</p>
+                  </div>
+                </div>
+                <ArrowRight className="h-5 w-5 text-slate-300 group-hover:text-amber-500 transition-colors" />
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/admin/events">
+          <Card className="group border-slate-200 hover:border-amber-300 hover:shadow-md transition-all duration-200 cursor-pointer">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-100">
+                    <Activity className="h-6 w-6 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-blue-950">System Events</h3>
+                    <p className="text-sm text-slate-500">Audit log of all system actions</p>
+                  </div>
+                </div>
+                <ArrowRight className="h-5 w-5 text-slate-300 group-hover:text-amber-500 transition-colors" />
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+      </div>
 
       {/* Agent Insights Section */}
       <Card className="border-emerald-200 bg-gradient-to-r from-emerald-50/50 to-blue-50/50">

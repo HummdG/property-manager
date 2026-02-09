@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { logEvent } from '@/lib/events'
 
 export async function GET(request) {
   try {
@@ -31,6 +32,9 @@ export async function GET(request) {
                 select: { id: true, name: true, email: true }
               }
             }
+          },
+          documents: {
+            select: { id: true, type: true, fileName: true, fileUrl: true, uploadedAt: true }
           },
           _count: {
             select: { serviceRequests: true }
@@ -94,6 +98,15 @@ export async function POST(request) {
         isListed: isListed || false,
         ownerId: session.user.id
       }
+    })
+
+    await logEvent({
+      type: 'PROPERTY_CREATED',
+      action: 'created',
+      entity: 'property',
+      entityId: property.id,
+      userId: session.user.id,
+      metadata: { name: property.name, address: property.address, city: property.city }
     })
 
     return NextResponse.json({ property }, { status: 201 })

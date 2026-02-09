@@ -190,6 +190,7 @@ model Property {
   tenantProfiles   TenantProfile[]
   inquiries        Inquiry[]
   propertyListings PropertyListing[]
+  documents        PropertyDocument[]
 
   @@map("properties")
 }
@@ -287,6 +288,8 @@ model JobAssignment {
   acceptedAt       DateTime?
   startedAt        DateTime?
   completedAt      DateTime?
+  rejectedAt       DateTime?
+  rejectionReason  String?   @db.Text
   estimatedCost    Int?
   actualCost       Int?
   notes            String?   @db.Text
@@ -541,4 +544,38 @@ model PropertyListing {
 
   @@unique([propertyId, platformId])
   @@map("property_listings")
+}
+
+// System Events / Audit Log
+model SystemEvent {
+  id        String   @id @default(cuid())
+  type      String   // e.g. USER_REGISTERED, PROPERTY_CREATED, JOB_ASSIGNED, JOB_REJECTED
+  action    String   // e.g. "created", "updated", "deleted", "rejected"
+  entity    String   // e.g. "user", "property", "jobAssignment", "serviceRequest"
+  entityId  String?
+  userId    String?  // Who performed the action
+  metadata  Json?    // Additional context (property name, rejection reason, etc.)
+  createdAt DateTime @default(now())
+
+  @@map("system_events")
+}
+
+// Property Documents (Deed, NOC)
+model PropertyDocument {
+  id         String   @id @default(cuid())
+  propertyId String
+  type       String   // "DEED" or "NOC"
+  fileName   String
+  fileUrl    String
+  fileKey    String   // S3 key for deletion
+  fileSize   Int?
+  uploadedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relations
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([propertyId, type])
+  @@map("property_documents")
 }

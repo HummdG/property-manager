@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { db } from '@/lib/db'
+import { logEvent } from '@/lib/events'
 
 export async function POST(request) {
   try {
@@ -53,6 +54,15 @@ export async function POST(request) {
         data: { userId: user.id }
       })
     }
+
+    await logEvent({
+      type: 'USER_REGISTERED',
+      action: 'created',
+      entity: 'user',
+      entityId: user.id,
+      userId: user.id,
+      metadata: { name: user.name, email: user.email, role: user.role }
+    })
 
     return NextResponse.json(
       { 

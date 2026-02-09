@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { logEvent } from '@/lib/events'
 
 export async function GET(request) {
   try {
@@ -125,6 +126,15 @@ export async function POST(request) {
         property: { select: { name: true } },
         category: { select: { name: true } }
       }
+    })
+
+    await logEvent({
+      type: 'SERVICE_REQUEST_CREATED',
+      action: 'created',
+      entity: 'serviceRequest',
+      entityId: serviceRequest.id,
+      userId: session.user.id,
+      metadata: { title, propertyName: serviceRequest.property?.name, categoryName: serviceRequest.category?.name }
     })
 
     return NextResponse.json({ serviceRequest }, { status: 201 })

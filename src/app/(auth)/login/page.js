@@ -42,6 +42,7 @@ export default function LoginPage() {
 
       if (result?.error) {
         setError('Invalid email or password')
+        setIsLoading(false)
         return
       }
 
@@ -50,10 +51,10 @@ export default function LoginPage() {
       const dashboard = getDashboardByRole(session?.user?.role)
 
       // Use full page navigation to ensure cookies are sent properly
+      // Keep isLoading true so the spinner stays visible during redirect
       window.location.href = dashboard
     } catch (err) {
       setError('Something went wrong. Please try again.')
-    } finally {
       setIsLoading(false)
     }
   }

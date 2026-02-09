@@ -1,11 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Briefcase, Search, Loader2, MapPin, Calendar, CheckCircle, XCircle, Play } from 'lucide-react'
+import { Briefcase, Search, Loader2, MapPin, Calendar, CheckCircle, XCircle, Play, AlertTriangle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
 import {
   Dialog,
   DialogContent,
@@ -18,7 +19,8 @@ const statusFilters = [
   { value: '', label: 'All' },
   { value: 'pending', label: 'Pending' },
   { value: 'accepted', label: 'In Progress' },
-  { value: 'completed', label: 'Completed' }
+  { value: 'completed', label: 'Completed' },
+  { value: 'rejected', label: 'Rejected' }
 ]
 
 export default function TraderJobsPage() {
@@ -28,6 +30,9 @@ export default function TraderJobsPage() {
   const [statusFilter, setStatusFilter] = useState('')
   const [selectedJob, setSelectedJob] = useState(null)
   const [isUpdating, setIsUpdating] = useState(false)
+  const [showRejectDialog, setShowRejectDialog] = useState(false)
+  const [rejectionReason, setRejectionReason] = useState('')
+  const [rejectError, setRejectError] = useState('')
 
   useEffect(() => {
     fetchJobs()
@@ -45,18 +50,26 @@ export default function TraderJobsPage() {
     }
   }
 
-  async function updateJobStatus(jobId, status) {
+  async function updateJobStatus(jobId, status, extra = {}) {
     setIsUpdating(true)
     try {
       const response = await fetch(`/api/trader/jobs/${jobId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status })
+        body: JSON.stringify({ status, ...extra })
       })
 
       if (response.ok) {
         setSelectedJob(null)
+        setShowRejectDialog(false)
+        setRejectionReason('')
+        setRejectError('')
         fetchJobs()
+      } else {
+        const data = await response.json()
+        if (status === 'reject') {
+          setRejectError(data.error || 'Failed to reject job')
+        }
       }
     } catch (error) {
       console.error('Failed to update job:', error)
@@ -65,25 +78,47 @@ export default function TraderJobsPage() {
     }
   }
 
+  function handleRejectClick() {
+    setShowRejectDialog(true)
+    setRejectionReason('')
+    setRejectError('')
+  }
+
+  function handleConfirmReject() {
+    if (!rejectionReason.trim()) {
+      setRejectError('Please provide a reason for rejecting this job')
+      return
+    }
+    updateJobStatus(selectedJob.id, 'reject', { rejectionReason: rejectionReason.trim() })
+  }
+
+  function handleCloseRejectDialog() {
+    setShowRejectDialog(false)
+    setRejectionReason('')
+    setRejectError('')
+  }
+
   function getJobStatus(job) {
     if (job.completedAt) return 'completed'
+    if (job.rejectedAt) return 'rejected'
     if (job.startedAt) return 'in_progress'
     if (job.acceptedAt) return 'accepted'
     return 'pending'
   }
 
   const filteredJobs = jobs.filter(job => {
-    const matchesSearch = 
+    const matchesSearch =
       job.serviceRequest.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       job.serviceRequest.property.name.toLowerCase().includes(searchQuery.toLowerCase())
-    
+
     if (!statusFilter) return matchesSearch
-    
+
     const jobStatus = getJobStatus(job)
-    if (statusFilter === 'pending') return matchesSearch && !job.acceptedAt
+    if (statusFilter === 'pending') return matchesSearch && !job.acceptedAt && !job.rejectedAt
     if (statusFilter === 'accepted') return matchesSearch && job.acceptedAt && !job.completedAt
     if (statusFilter === 'completed') return matchesSearch && job.completedAt
-    
+    if (statusFilter === 'rejected') return matchesSearch && job.rejectedAt
+
     return matchesSearch
   })
 
@@ -150,17 +185,31 @@ export default function TraderJobsPage() {
                     <Badge className={getPriorityColor(job.serviceRequest.priority)}>
                       {job.serviceRequest.priority}
                     </Badge>
-                    <Badge className={getStatusColor(job.serviceRequest.status)}>
-                      {status === 'pending' ? 'Pending Acceptance' : status.replace('_', ' ')}
+                    <Badge className={status === 'rejected'
+                      ? 'bg-red-100 text-red-700 border-red-200'
+                      : getStatusColor(job.serviceRequest.status)}
+                    >
+                      {status === 'pending' ? 'Pending Acceptance'
+                        : status === 'rejected' ? 'Rejected'
+                        : status.replace('_', ' ')}
                     </Badge>
                   </div>
-                  
+
                   <h3 className="font-bold text-blue-950 truncate group-hover:text-amber-600 transition-colors">
                     {job.serviceRequest.title}
                   </h3>
                   <p className="text-sm text-slate-500 mt-1.5 line-clamp-2">
                     {job.serviceRequest.description}
                   </p>
+
+                  {/* Show rejection reason preview */}
+                  {job.rejectedAt && job.rejectionReason && (
+                    <div className="mt-2 p-2 rounded-lg bg-red-50 border border-red-100">
+                      <p className="text-xs text-red-600 line-clamp-2">
+                        <span className="font-medium">Reason: </span>{job.rejectionReason}
+                      </p>
+                    </div>
+                  )}
 
                   <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-slate-100 text-sm text-slate-500">
                     <div className="flex items-center gap-1.5">
@@ -180,7 +229,7 @@ export default function TraderJobsPage() {
       )}
 
       {/* Job details dialog */}
-      <Dialog open={!!selectedJob} onOpenChange={() => setSelectedJob(null)}>
+      <Dialog open={!!selectedJob && !showRejectDialog} onOpenChange={() => setSelectedJob(null)}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Job Details</DialogTitle>
@@ -219,9 +268,32 @@ export default function TraderJobsPage() {
                 </div>
               </div>
 
+              {/* Show rejection info if rejected */}
+              {selectedJob.rejectedAt && (
+                <div className="pt-4 border-t border-slate-100">
+                  <div className="p-4 rounded-xl bg-red-50 border border-red-200">
+                    <div className="flex items-start gap-3">
+                      <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-semibold text-red-700">Job Rejected</p>
+                        <p className="text-sm text-red-600 mt-1">
+                          Rejected on {formatDate(selectedJob.rejectedAt)}
+                        </p>
+                        {selectedJob.rejectionReason && (
+                          <p className="text-sm text-red-600 mt-2">
+                            <span className="font-medium">Reason: </span>
+                            {selectedJob.rejectionReason}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Action buttons based on status */}
               <div className="pt-4 border-t border-slate-100 space-y-2">
-                {!selectedJob.acceptedAt && (
+                {!selectedJob.acceptedAt && !selectedJob.rejectedAt && (
                   <div className="flex gap-2">
                     <Button
                       className="flex-1 bg-emerald-500 hover:bg-emerald-600"
@@ -234,7 +306,7 @@ export default function TraderJobsPage() {
                     <Button
                       variant="outline"
                       className="flex-1 border-red-300 text-red-600 hover:bg-red-50"
-                      onClick={() => updateJobStatus(selectedJob.id, 'reject')}
+                      onClick={handleRejectClick}
                       disabled={isUpdating}
                     >
                       <XCircle className="mr-2 h-4 w-4" />
@@ -274,6 +346,57 @@ export default function TraderJobsPage() {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Rejection reason dialog */}
+      <Dialog open={showRejectDialog} onOpenChange={handleCloseRejectDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <XCircle className="h-5 w-5 text-red-500" />
+              Decline Job
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-slate-500">
+              Please provide a reason for declining this job assignment. This will be recorded and visible to the admin.
+            </p>
+            <div>
+              <Label htmlFor="rejectionReason">Reason for declining</Label>
+              <textarea
+                id="rejectionReason"
+                value={rejectionReason}
+                onChange={(e) => {
+                  setRejectionReason(e.target.value)
+                  setRejectError('')
+                }}
+                rows={4}
+                placeholder="e.g., Schedule conflict, outside service area, job requires different expertise..."
+                className="mt-1.5 flex w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 transition-all duration-200"
+              />
+              {rejectError && (
+                <p className="mt-1.5 text-sm text-red-500">{rejectError}</p>
+              )}
+            </div>
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={handleCloseRejectDialog}>
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleConfirmReject}
+                disabled={isUpdating}
+              >
+                {isUpdating ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <XCircle className="mr-2 h-4 w-4" />
+                )}
+                Confirm Decline
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>

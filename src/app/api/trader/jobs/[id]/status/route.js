@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { logEvent } from '@/lib/events'
 
 export async function PATCH(request, { params }) {
   try {
@@ -11,7 +12,7 @@ export async function PATCH(request, { params }) {
 
     const { id } = await params
     const body = await request.json()
-    const { status } = body
+    const { status, rejectionReason } = body
 
     const job = await db.jobAssignment.findUnique({
       where: { id },
@@ -29,27 +30,35 @@ export async function PATCH(request, { params }) {
     const now = new Date()
     let jobUpdate = {}
     let requestUpdate = {}
+    let eventType = ''
 
     switch (status) {
       case 'accept':
         jobUpdate.acceptedAt = now
         requestUpdate.status = 'ACCEPTED'
+        eventType = 'JOB_ACCEPTED'
         break
       case 'reject':
-        // Delete the job assignment and reset request status
-        await db.jobAssignment.delete({ where: { id } })
-        await db.serviceRequest.update({
-          where: { id: job.serviceRequestId },
-          data: { status: 'PENDING' }
-        })
-        return NextResponse.json({ message: 'Job declined' })
+        if (!rejectionReason || !rejectionReason.trim()) {
+          return NextResponse.json(
+            { error: 'Rejection reason is required' },
+            { status: 400 }
+          )
+        }
+        jobUpdate.rejectedAt = now
+        jobUpdate.rejectionReason = rejectionReason.trim()
+        requestUpdate.status = 'REJECTED'
+        eventType = 'JOB_REJECTED'
+        break
       case 'start':
         jobUpdate.startedAt = now
         requestUpdate.status = 'IN_PROGRESS'
+        eventType = 'JOB_STARTED'
         break
       case 'complete':
         jobUpdate.completedAt = now
         requestUpdate.status = 'COMPLETED'
+        eventType = 'JOB_COMPLETED'
         break
       default:
         return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
@@ -74,11 +83,23 @@ export async function PATCH(request, { params }) {
       })
     }
 
+    // Log the event
+    await logEvent({
+      type: eventType,
+      action: status === 'reject' ? 'rejected' : status === 'accept' ? 'accepted' : status === 'start' ? 'started' : 'completed',
+      entity: 'jobAssignment',
+      entityId: id,
+      userId: session.user.id,
+      metadata: {
+        serviceRequestId: job.serviceRequestId,
+        serviceRequestTitle: job.serviceRequest.title,
+        ...(rejectionReason && { rejectionReason: rejectionReason.trim() })
+      }
+    })
+
     return NextResponse.json({ job: updatedJob })
   } catch (error) {
     console.error('Error updating job status:', error)
     return NextResponse.json({ error: 'Failed to update job' }, { status: 500 })
   }
 }
-
-

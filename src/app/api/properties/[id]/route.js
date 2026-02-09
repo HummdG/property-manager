@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { logEvent } from '@/lib/events'
 
 export async function GET(request, { params }) {
   try {
@@ -33,6 +34,9 @@ export async function GET(request, { params }) {
           },
           orderBy: { createdAt: 'desc' },
           take: 5
+        },
+        documents: {
+          select: { id: true, type: true, fileName: true, fileUrl: true, fileSize: true, uploadedAt: true }
         }
       }
     })
@@ -63,7 +67,10 @@ export async function PATCH(request, { params }) {
     const { id } = await params
 
     const existing = await db.property.findUnique({
-      where: { id }
+      where: { id },
+      include: {
+        documents: { select: { type: true } }
+      }
     })
 
     if (!existing) {
@@ -76,6 +83,23 @@ export async function PATCH(request, { params }) {
 
     const body = await request.json()
     const { name, address, city, postcode, country, type, listingType, bedrooms, bathrooms, squareFeet, description, monthlyRent, salePrice, isListed } = body
+
+    // Enforce document upload before listing
+    if (isListed === true && !existing.isListed) {
+      const docTypes = existing.documents.map(d => d.type)
+      const hasDeed = docTypes.includes('DEED')
+      const hasNoc = docTypes.includes('NOC')
+
+      if (!hasDeed || !hasNoc) {
+        const missing = []
+        if (!hasDeed) missing.push('Title Deed')
+        if (!hasNoc) missing.push('NOC')
+        return NextResponse.json(
+          { error: `Cannot list property without uploading: ${missing.join(', ')}` },
+          { status: 400 }
+        )
+      }
+    }
 
     const property = await db.property.update({
       where: { id },
@@ -96,6 +120,27 @@ export async function PATCH(request, { params }) {
         ...(isListed !== undefined && { isListed })
       }
     })
+
+    // Log appropriate event
+    if (isListed === true && !existing.isListed) {
+      await logEvent({
+        type: 'PROPERTY_LISTED',
+        action: 'listed',
+        entity: 'property',
+        entityId: id,
+        userId: session.user.id,
+        metadata: { name: property.name }
+      })
+    } else {
+      await logEvent({
+        type: 'PROPERTY_UPDATED',
+        action: 'updated',
+        entity: 'property',
+        entityId: id,
+        userId: session.user.id,
+        metadata: { name: property.name }
+      })
+    }
 
     return NextResponse.json({ property })
   } catch (error) {
@@ -129,10 +174,18 @@ export async function DELETE(request, { params }) {
       where: { id }
     })
 
+    await logEvent({
+      type: 'PROPERTY_DELETED',
+      action: 'deleted',
+      entity: 'property',
+      entityId: id,
+      userId: session.user.id,
+      metadata: { name: existing.name }
+    })
+
     return NextResponse.json({ message: 'Property deleted' })
   } catch (error) {
     console.error('Error deleting property:', error)
     return NextResponse.json({ error: 'Failed to delete property' }, { status: 500 })
   }
 }
-

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
+import { logEvent } from '@/lib/events'
 
 export async function GET(request, { params }) {
   try {
@@ -113,6 +114,21 @@ export async function PATCH(request, { params }) {
         }
       }
     })
+
+    // Log job assignment event
+    if (traderId && (isOwner || isAdmin)) {
+      await logEvent({
+        type: 'JOB_ASSIGNED',
+        action: 'assigned',
+        entity: 'serviceRequest',
+        entityId: id,
+        userId: session.user.id,
+        metadata: {
+          title: serviceRequest.property?.name,
+          traderName: serviceRequest.jobAssignment?.trader?.name
+        }
+      })
+    }
 
     return NextResponse.json({ serviceRequest })
   } catch (error) {
