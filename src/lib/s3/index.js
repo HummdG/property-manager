@@ -80,3 +80,4 @@ export function generateDocumentKey(propertyId, docType, originalName) {
   return `properties/${propertyId}/documents/${docType.toLowerCase()}_${timestamp}.${ext}`
 }
 
+

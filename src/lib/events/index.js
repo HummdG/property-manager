@@ -28,3 +28,4 @@ export async function logEvent({ type, action, entity, entityId, userId, metadat
   }
 }
 
+
