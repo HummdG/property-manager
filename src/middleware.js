@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { authMiddleware } from '@/lib/auth/auth.edge'
 
-const publicPrefixes = ['/login', '/register', '/api/auth', '/properties', '/api/public', '/services']
+const publicPrefixes = ['/login', '/register', '/api/auth', '/properties', '/api/public', '/services', '/opengraph-image']
 const apiRoutes = ['/api/']
 
 const roleRoutes = {
