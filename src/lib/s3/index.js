@@ -92,6 +92,15 @@ export function generateAgentPhotoKey(agentId, originalName) {
   return `agents/${agentId}/profile/photo_${timestamp}.${ext}`
 }
 
-
-
-
+/**
+ * Generate a unique S3 key for a property image
+ * @param {string} propertyId
+ * @param {string} originalName - Original file name (for extension extraction)
+ * @returns {string} The S3 key
+ */
+export function generateImageKey(propertyId, originalName) {
+  const ext = originalName.split('.').pop().toLowerCase()
+  const timestamp = Date.now()
+  const random = Math.random().toString(36).slice(2, 8)
+  return `properties/${propertyId}/images/${timestamp}_${random}.${ext}`
+}

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Loader2, AlertCircle } from 'lucide-react'
 import { DocumentUpload } from './DocumentUpload'
+import { ImageUpload } from './ImageUpload'
 
 const propertyTypes = [
   { value: 'HOUSE', label: 'House' },
@@ -42,6 +43,7 @@ export function PropertyForm({ property, onSubmit, onCancel, isLoading }) {
   })
 
   const [documents, setDocuments] = useState(property?.documents || [])
+  const [images, setImages] = useState(property?.images || [])
   const [listingError, setListingError] = useState('')
 
   const hasDeed = documents.some(d => d.type === 'DEED')
@@ -242,6 +244,18 @@ export function PropertyForm({ property, onSubmit, onCancel, isLoading }) {
           />
         </div>
       </div>
+
+      {/* Image upload section -- only show when editing an existing property */}
+      {property?.id && (
+        <div className="pt-4 border-t border-wire">
+          <ImageUpload
+            propertyId={property.id}
+            images={images}
+            onImagesChange={setImages}
+            disabled={isLoading}
+          />
+        </div>
+      )}
 
       {property?.id && (
         <div className="pt-4 border-t border-wire">

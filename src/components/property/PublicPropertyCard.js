@@ -58,13 +58,21 @@ export function PublicPropertyCard({ property }) {
   return (
     <Link href={`/properties/${property.id}`}>
       <Card className="group h-full border-slate-200 bg-white hover:shadow-xl hover:shadow-blue-950/5 hover:border-amber-200/50 transition-all duration-300 overflow-hidden cursor-pointer">
-        {/* Property image placeholder */}
+        {/* Property image */}
         <div className="relative h-48 bg-gradient-to-br from-slate-100 to-slate-50 overflow-hidden">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-sm group-hover:scale-105 transition-transform duration-300">
-              <Icon className="h-10 w-10 text-slate-300" />
+          {property.images?.[0] ? (
+            <img
+              src={property.images[0]}
+              alt={property.name}
+              className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-sm group-hover:scale-105 transition-transform duration-300">
+                <Icon className="h-10 w-10 text-slate-300" />
+              </div>
             </div>
-          </div>
+          )}
           {/* Decorative gold accent */}
           <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-amber-400/10 to-transparent" />
           

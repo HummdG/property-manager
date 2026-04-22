@@ -10,8 +10,18 @@ export function PropertyCard({ property, onEdit, onDelete, basePath = '/owner' }
   return (
     <div className="border border-wire bg-cream flex flex-col group">
       {/* Image area */}
-      <div className="relative h-32 bg-linen border-b border-wire flex items-center justify-center overflow-hidden">
-        <Building2 className="h-10 w-10 text-wire" />
+      <div className="relative h-32 bg-linen border-b border-wire overflow-hidden">
+        {property.images?.[0] ? (
+          <img
+            src={property.images[0]}
+            alt={property.name}
+            className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Building2 className="h-10 w-10 text-wire" />
+          </div>
+        )}
         <div className="absolute inset-x-0 top-0 flex items-start justify-between px-3 pt-3">
           <div className="flex gap-1.5">
             {property.isListed && (

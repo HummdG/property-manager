@@ -61,3 +61,18 @@ export const agentReviewSchema = z.object({
   (d) => d.action !== 'REJECT' || (d.rejectionNote && d.rejectionNote.trim().length > 0),
   { message: 'Rejection note is required when rejecting', path: ['rejectionNote'] }
 )
+
+export const imageUploadSchema = z.object({
+  fileName: z.string().min(1, 'File name is required'),
+  contentType: z.enum(
+    ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+    { errorMap: () => ({ message: 'Only JPEG, PNG, and WebP images are allowed' }) }
+  ),
+  fileSize: z.number().int().positive().max(8 * 1024 * 1024, 'Image must be under 8MB').optional()
+})
+
+export const imageDeleteSchema = z.object({
+  fileKey: z.string()
+    .min(1, 'File key is required')
+    .regex(/^properties\/[^/]+\/images\/.+$/, 'Invalid file key format')
+})

@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { ArrowLeft, Building2, MapPin, Bed, Bath, Square, Users, Calendar, Mail, Phone, FileText, CheckCircle } from 'lucide-react'
+import { ArrowLeft, Building2, MapPin, Bed, Bath, Square, Users, Calendar, Mail, Phone, FileText, CheckCircle, ImageIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -185,6 +185,34 @@ export default async function PropertyDetailPage({ params }) {
                   <Badge variant="outline" className="mt-2">
                     Vacant
                   </Badge>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Photos */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ImageIcon className="h-5 w-5 text-amber-500" />
+                Photos
+                <Badge variant="outline" className="ml-auto">{property.images?.length || 0}</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {property.images?.length > 0 ? (
+                <div className="grid grid-cols-2 gap-2">
+                  {property.images.map((url, i) => (
+                    <div key={i} className="aspect-square rounded-lg overflow-hidden bg-slate-100">
+                      <img src={url} alt={`Photo ${i + 1}`} className="h-full w-full object-cover" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-4">
+                  <ImageIcon className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+                  <p className="text-slate-500 text-sm">No photos uploaded yet</p>
+                  <p className="text-xs text-slate-400 mt-1">Edit property to add photos</p>
                 </div>
               )}
             </CardContent>
