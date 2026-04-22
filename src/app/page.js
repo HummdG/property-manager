@@ -144,6 +144,20 @@ export default function HomePage() {
           style={{ background: 'radial-gradient(ellipse 55% 65% at 28% 58%, rgba(184,150,90,0.09) 0%, transparent 72%)' }}
         />
 
+        {/* Atmospheric background image — mobile only (desktop shows it inside the stats panel) */}
+        <div className="absolute inset-0 lg:hidden overflow-hidden">
+          <Image
+            src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=900&q=75"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover opacity-[0.18]"
+            aria-hidden="true"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-sable/30 via-transparent to-sable/50 pointer-events-none" />
+        </div>
+
         {/* Ghost watermark — giant "IMPERVIA" in faint Cormorant */}
         <div className="absolute bottom-0 right-[-2%] pointer-events-none select-none overflow-hidden leading-none">
           <span
@@ -245,6 +259,7 @@ export default function HomePage() {
                 src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=900&q=75"
                 alt=""
                 fill
+                priority
                 className="object-cover opacity-[0.18]"
                 aria-hidden="true"
               />
@@ -447,7 +462,7 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-12 gap-1 h-[320px] lg:h-[480px]">
 
             {/* Large primary image */}
-            <div className="lg:col-span-8 relative overflow-hidden group border border-bronze/10">
+            <div className="lg:col-span-8 relative overflow-hidden group border border-bronze/10 h-[320px] lg:h-auto">
               <Image
                 src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200&q=85"
                 alt="Dubai Marina skyline at night"
