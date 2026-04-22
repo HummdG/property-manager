@@ -22,6 +22,7 @@ enum UserRole {
 enum InquiryType {
   RENT
   SALE
+  MAINTENANCE
 }
 
 enum InquiryStatus {
