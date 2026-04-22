@@ -123,7 +123,7 @@ export async function GET(request) {
 
     const [activeAgents, pendingApproval] = await Promise.all([
       db.agentProfile.count({ where: { isAvailable: true } }),
-      db.agentProfile.count({ where: { approvalStatus: 'SUBMITTED' } })
+      db.agentProfile.count({ where: { approvalStatus: { in: ['SUBMITTED', 'PENDING_INFO'] } } })
     ])
 
     return NextResponse.json({

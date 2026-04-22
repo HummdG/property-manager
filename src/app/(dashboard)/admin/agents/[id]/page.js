@@ -6,7 +6,7 @@ import Link from 'next/link'
 import {
   Loader2, ArrowLeft, MessageSquare, CalendarDays, MapPin, Star,
   Mail, Phone, Building2, FileText, CheckCircle, Clock, TrendingUp,
-  Calendar, Filter, Shield, Download, AlertCircle, ShieldCheck, ShieldX
+  Calendar, Filter, Shield, Download, AlertCircle, ShieldCheck, ShieldX, HelpCircle
 } from 'lucide-react'
 import { AgentActivityFeed, LocationTimeline, LocationStats } from '@/components/admin'
 import { StatsCard } from '@/components/dashboard'
@@ -78,6 +78,7 @@ export default function AgentDetailPage() {
   const [documents, setDocuments] = useState([])
   const [documentsLoading, setDocumentsLoading] = useState(false)
   const [rejectionNote, setRejectionNote] = useState('')
+  const [infoRequestNote, setInfoRequestNote] = useState('')
   const [reviewLoading, setReviewLoading] = useState(false)
   const [reviewError, setReviewError] = useState(null)
   const [reviewSuccess, setReviewSuccess] = useState(null)
@@ -166,6 +167,10 @@ export default function AgentDetailPage() {
       setReviewError('Please provide a rejection reason')
       return
     }
+    if (action === 'REQUEST_INFO' && !infoRequestNote.trim()) {
+      setReviewError('Please describe what information is needed')
+      return
+    }
     setReviewLoading(true)
     setReviewError(null)
     setReviewSuccess(null)
@@ -173,14 +178,24 @@ export default function AgentDetailPage() {
       const res = await fetch(`/api/admin/agents/${agentId}/review`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, rejectionNote: rejectionNote.trim() || undefined }),
+        body: JSON.stringify({
+          action,
+          rejectionNote: action === 'REJECT' ? rejectionNote.trim() : undefined,
+          infoRequestNote: action === 'REQUEST_INFO' ? infoRequestNote.trim() : undefined,
+        }),
       })
       if (!res.ok) {
         const data = await res.json()
         throw new Error(data.error || 'Review action failed')
       }
-      setReviewSuccess(action === 'APPROVE' ? 'Agent approved successfully' : 'Agent rejected')
+      const successMessages = {
+        APPROVE: 'Agent approved successfully',
+        REJECT: 'Agent rejected',
+        REQUEST_INFO: 'Information request sent to agent',
+      }
+      setReviewSuccess(successMessages[action])
       setRejectionNote('')
+      setInfoRequestNote('')
       await fetchAgent()
     } catch (err) {
       setReviewError(err.message)
@@ -338,9 +353,12 @@ export default function AgentDetailPage() {
                       'text-[0.6rem] uppercase tracking-[0.08em] font-medium px-2.5 py-1 border',
                       agent.approvalStatus === 'SUBMITTED' && 'bg-amber-50 text-amber-700 border-amber-200',
                       agent.approvalStatus === 'REJECTED' && 'bg-red-50 text-red-600 border-red-200',
+                      agent.approvalStatus === 'PENDING_INFO' && 'bg-amber-50 text-amber-700 border-amber-200',
                       agent.approvalStatus === 'DRAFT' && 'bg-linen text-fog border-wire',
                     )}>
-                      {agent.approvalStatus === 'SUBMITTED' ? 'Pending Review' : (agent.approvalStatus?.charAt(0) + agent.approvalStatus?.slice(1).toLowerCase())}
+                      {agent.approvalStatus === 'SUBMITTED' ? 'Pending Review'
+                        : agent.approvalStatus === 'PENDING_INFO' ? 'Info Requested'
+                        : (agent.approvalStatus?.charAt(0) + agent.approvalStatus?.slice(1).toLowerCase())}
                     </span>
                   </div>
                   {agent.submittedAt && (
@@ -351,7 +369,7 @@ export default function AgentDetailPage() {
                   )}
                 </div>
 
-                {agent.approvalStatus === 'SUBMITTED' && (
+                {['SUBMITTED', 'PENDING_INFO'].includes(agent.approvalStatus) && (
                   <>
                     <button
                       onClick={() => handleTabChange('documents')}
@@ -375,6 +393,19 @@ export default function AgentDetailPage() {
                         />
                       </div>
 
+                      <div>
+                        <label className="text-[0.65rem] uppercase tracking-wide text-fog mb-1.5 block">
+                          Information request message (required if requesting info)
+                        </label>
+                        <textarea
+                          value={infoRequestNote}
+                          onChange={(e) => { setInfoRequestNote(e.target.value); setReviewError(null) }}
+                          placeholder="Describe exactly what additional information or documents are needed…"
+                          rows={2}
+                          className="w-full border border-wire bg-linen px-3 py-2 text-xs text-sable placeholder:text-fog resize-none outline-none focus:border-amber-400 transition-colors"
+                        />
+                      </div>
+
                       {reviewError && (
                         <p className="text-xs text-red-600 flex items-center gap-1">
                           <AlertCircle className="h-3 w-3" />{reviewError}
@@ -386,7 +417,7 @@ export default function AgentDetailPage() {
                         </p>
                       )}
 
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 flex-wrap">
                         <button
                           onClick={() => handleReview('REJECT')}
                           disabled={reviewLoading}
@@ -394,6 +425,14 @@ export default function AgentDetailPage() {
                         >
                           {reviewLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <ShieldX className="h-3 w-3" />}
                           Reject
+                        </button>
+                        <button
+                          onClick={() => handleReview('REQUEST_INFO')}
+                          disabled={reviewLoading}
+                          className="flex items-center gap-1.5 px-4 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-medium border border-amber-200 text-amber-700 bg-amber-50 hover:bg-amber-100 disabled:opacity-50 transition-colors"
+                        >
+                          {reviewLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <HelpCircle className="h-3 w-3" />}
+                          Request Info
                         </button>
                         <button
                           onClick={() => handleReview('APPROVE')}
@@ -406,6 +445,13 @@ export default function AgentDetailPage() {
                       </div>
                     </div>
                   </>
+                )}
+
+                {agent.approvalStatus === 'PENDING_INFO' && agent.infoRequestNote && (
+                  <div className="bg-amber-50 border border-amber-200 p-3 text-xs text-amber-700">
+                    <p className="font-medium mb-1">Information requested from agent</p>
+                    <p>{agent.infoRequestNote}</p>
+                  </div>
                 )}
 
                 {agent.approvalStatus === 'REJECTED' && agent.approvalNote && (

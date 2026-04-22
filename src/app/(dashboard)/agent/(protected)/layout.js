@@ -31,5 +31,9 @@ export default async function AgentProtectedLayout({ children }) {
     redirect('/agent/setup?rejected=true')
   }
 
+  if (profile.approvalStatus === 'PENDING_INFO') {
+    redirect('/agent/setup?info_requested=true')
+  }
+
   return <>{children}</>
 }

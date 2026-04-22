@@ -23,7 +23,7 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: 'Validation failed', details: result.error.flatten() }, { status: 400 })
     }
 
-    const { action, rejectionNote } = result.data
+    const { action, rejectionNote, infoRequestNote } = result.data
 
     const agent = await db.agentProfile.findUnique({
       where: { id },
@@ -34,7 +34,7 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: 'Agent not found' }, { status: 404 })
     }
 
-    if (agent.approvalStatus !== 'SUBMITTED') {
+    if (!['SUBMITTED', 'PENDING_INFO'].includes(agent.approvalStatus)) {
       return NextResponse.json({ error: 'Agent profile is not pending review' }, { status: 400 })
     }
 
@@ -46,6 +46,7 @@ export async function POST(request, { params }) {
           reviewedAt: new Date(),
           reviewedBy: session.user.id,
           approvalNote: null,
+          infoRequestNote: null,
         }
       })
 
@@ -65,6 +66,39 @@ export async function POST(request, { params }) {
         entityId: id,
         userId: session.user.id,
         metadata: { agentName: agent.user.name, agentEmail: agent.user.email }
+      })
+
+      return NextResponse.json({ profile: updatedProfile })
+    }
+
+    if (action === 'REQUEST_INFO') {
+      const updatedProfile = await db.agentProfile.update({
+        where: { id },
+        data: {
+          approvalStatus: 'PENDING_INFO',
+          reviewedAt: new Date(),
+          reviewedBy: session.user.id,
+          infoRequestNote,
+          approvalNote: null,
+        }
+      })
+
+      await createNotification({
+        userId: agent.user.id,
+        type: 'AGENT_INFO_REQUESTED',
+        title: 'Additional Information Required',
+        message: infoRequestNote,
+        link: '/agent/setup',
+        metadata: { agentProfileId: id }
+      })
+
+      await logEvent({
+        type: 'AGENT_PROFILE_INFO_REQUESTED',
+        action: 'updated',
+        entity: 'agentProfile',
+        entityId: id,
+        userId: session.user.id,
+        metadata: { agentName: agent.user.name, agentEmail: agent.user.email, request: infoRequestNote }
       })
 
       return NextResponse.json({ profile: updatedProfile })

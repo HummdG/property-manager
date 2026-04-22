@@ -69,11 +69,15 @@ export const agentDocumentUploadSchema = z.object({
 })
 
 export const agentReviewSchema = z.object({
-  action:       z.enum(['APPROVE', 'REJECT']),
-  rejectionNote: z.string().optional(),
+  action:          z.enum(['APPROVE', 'REJECT', 'REQUEST_INFO']),
+  rejectionNote:   z.string().optional(),
+  infoRequestNote: z.string().optional(),
 }).refine(
   (d) => d.action !== 'REJECT' || (d.rejectionNote && d.rejectionNote.trim().length > 0),
   { message: 'Rejection note is required when rejecting', path: ['rejectionNote'] }
+).refine(
+  (d) => d.action !== 'REQUEST_INFO' || (d.infoRequestNote && d.infoRequestNote.trim().length > 0),
+  { message: 'Info request message is required', path: ['infoRequestNote'] }
 )
 
 export const imageUploadSchema = z.object({

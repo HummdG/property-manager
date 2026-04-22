@@ -130,7 +130,7 @@ function SectionHeader({ icon: Icon, title, subtitle }) {
   )
 }
 
-export default function AgentSetupForm({ initialProfile, initialUser, isRejected }) {
+export default function AgentSetupForm({ initialProfile, initialUser, isRejected, isInfoRequested }) {
   const router = useRouter()
 
   const [profile, setProfile] = useState({
@@ -306,6 +306,18 @@ export default function AgentSetupForm({ initialProfile, initialUser, isRejected
             <p className="text-[0.75rem] font-medium text-red-700 mb-1">Profile Rejected</p>
             <p className="text-[0.75rem] text-red-600">{initialProfile.approvalNote}</p>
             <p className="text-[0.65rem] text-red-400 mt-2">Update your details and documents below, then re-submit.</p>
+          </div>
+        </div>
+      )}
+
+      {/* Info request notice */}
+      {isInfoRequested && initialProfile?.infoRequestNote && (
+        <div className="border border-amber-200 bg-amber-50 p-4 flex gap-3">
+          <AlertCircle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-[0.75rem] font-medium text-amber-700 mb-1">Additional Information Required</p>
+            <p className="text-[0.75rem] text-amber-600">{initialProfile.infoRequestNote}</p>
+            <p className="text-[0.65rem] text-amber-400 mt-2">Update your details or documents below, then re-submit.</p>
           </div>
         </div>
       )}

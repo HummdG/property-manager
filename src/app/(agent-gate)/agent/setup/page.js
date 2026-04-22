@@ -30,6 +30,7 @@ export default async function AgentSetupPage({ searchParams }) {
   })
 
   const isRejected = resolvedParams?.rejected === 'true' || profile?.approvalStatus === 'REJECTED'
+  const isInfoRequested = resolvedParams?.info_requested === 'true' || profile?.approvalStatus === 'PENDING_INFO'
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-5">
@@ -65,6 +66,7 @@ export default async function AgentSetupPage({ searchParams }) {
         } : null}
         initialUser={user}
         isRejected={isRejected}
+        isInfoRequested={isInfoRequested}
       />
     </div>
   )

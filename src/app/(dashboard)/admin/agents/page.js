@@ -15,6 +15,7 @@ const statusOptions = [
 const approvalOptions = [
   { value: 'all', label: 'All Statuses' },
   { value: 'SUBMITTED', label: 'Pending Review' },
+  { value: 'PENDING_INFO', label: 'Info Requested' },
   { value: 'APPROVED', label: 'Approved' },
   { value: 'REJECTED', label: 'Rejected' },
   { value: 'DRAFT', label: 'Draft' },

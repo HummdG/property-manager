@@ -49,6 +49,7 @@ export async function POST(request) {
         approvalStatus: 'SUBMITTED',
         submittedAt: new Date(),
         approvalNote: null,
+        infoRequestNote: null,
       }
     })
 

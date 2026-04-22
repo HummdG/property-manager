@@ -93,9 +93,12 @@ export function AgentCard({ agent }) {
                   agent.approvalStatus === 'APPROVED' && 'bg-emerald-50 text-emerald-700 border-emerald-200',
                   agent.approvalStatus === 'SUBMITTED' && 'bg-amber-50 text-amber-700 border-amber-200',
                   agent.approvalStatus === 'REJECTED' && 'bg-red-50 text-red-600 border-red-200',
+                  agent.approvalStatus === 'PENDING_INFO' && 'bg-amber-50 text-amber-700 border-amber-200',
                   agent.approvalStatus === 'DRAFT' && 'bg-linen text-fog border-wire',
                 )}>
-                  {agent.approvalStatus === 'SUBMITTED' ? 'Pending Review' : agent.approvalStatus.charAt(0) + agent.approvalStatus.slice(1).toLowerCase()}
+                  {agent.approvalStatus === 'SUBMITTED' ? 'Pending Review'
+                    : agent.approvalStatus === 'PENDING_INFO' ? 'Info Requested'
+                    : agent.approvalStatus.charAt(0) + agent.approvalStatus.slice(1).toLowerCase()}
                 </span>
               )}
               {agent.rating > 0 && (

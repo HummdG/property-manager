@@ -47,6 +47,7 @@ enum AgentApprovalStatus {
   SUBMITTED
   APPROVED
   REJECTED
+  PENDING_INFO
 }
 
 enum AgentDocumentType {
@@ -206,6 +207,7 @@ model AgentProfile {
   // Approval workflow
   approvalStatus  AgentApprovalStatus @default(DRAFT)
   approvalNote    String?             @db.Text
+  infoRequestNote String?             @db.Text
   submittedAt     DateTime?
   reviewedAt      DateTime?
   reviewedBy      String?

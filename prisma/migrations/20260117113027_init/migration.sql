@@ -1,0 +1,2 @@
+-- This migration was applied directly to the production database.
+-- The file was recreated locally so Prisma can track it.
