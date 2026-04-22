@@ -1,150 +1,113 @@
+'use client'
+
 import Link from 'next/link'
-import { Building2, MapPin, Bed, Bath, Square, Users, MoreVertical, Pencil, Trash2, Eye } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu'
-import { cn, formatCurrency } from '@/lib/utils'
+import { Building2, MapPin, Bed, Bath, Square, Users, Eye, Pencil, Trash2 } from 'lucide-react'
+import { formatCurrency } from '@/lib/utils'
 
-const propertyTypeIcons = {
-  HOUSE: Building2,
-  APARTMENT: Building2,
-  CONDO: Building2,
-  TOWNHOUSE: Building2,
-  COMMERCIAL: Building2,
-  LAND: Square,
-  OTHER: Building2
-}
-
-export function PropertyCard({ property, onEdit, onDelete }) {
-  const Icon = propertyTypeIcons[property.type] || Building2
+export function PropertyCard({ property, onEdit, onDelete, basePath = '/owner' }) {
   const hasTenant = property.tenantProfiles?.length > 0
 
   return (
-    <Card className="group border-slate-200 bg-white hover:shadow-xl hover:shadow-blue-950/5 transition-all duration-300 overflow-hidden">
-      {/* Property image placeholder */}
-      <div className="relative h-44 bg-gradient-to-br from-slate-100 to-slate-50 overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-sm">
-            <Icon className="h-10 w-10 text-slate-300" />
+    <div className="border border-wire bg-cream flex flex-col group">
+      {/* Image area */}
+      <div className="relative h-32 bg-linen border-b border-wire flex items-center justify-center overflow-hidden">
+        <Building2 className="h-10 w-10 text-wire" />
+        <div className="absolute inset-x-0 top-0 flex items-start justify-between px-3 pt-3">
+          <div className="flex gap-1.5">
+            {property.isListed && (
+              <span className="text-[0.6rem] uppercase tracking-[0.08em] font-medium px-2 py-0.5 bg-bronze/10 text-bronze border border-bronze/40">
+                Listed
+              </span>
+            )}
           </div>
-        </div>
-        {/* Decorative gold accent */}
-        <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-amber-400/10 to-transparent" />
-        <div className="absolute top-3 right-3 flex gap-2">
-          {property.isListed && (
-            <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200">
-              Listed
-            </Badge>
-          )}
-          <Badge variant="outline" className="bg-white/90 text-slate-600 border-slate-200">
+          <span className="text-[0.6rem] uppercase tracking-[0.08em] font-medium px-2 py-0.5 bg-cream text-pewter border border-wire">
             {property.type}
-          </Badge>
+          </span>
         </div>
         <div className="absolute bottom-3 left-3">
           {hasTenant ? (
-            <Badge className="bg-blue-100 text-blue-700 border-blue-200">
-              <Users className="w-3 h-3 mr-1" />
+            <span className="inline-flex items-center gap-1 text-[0.6rem] uppercase tracking-[0.08em] font-medium px-2 py-0.5 bg-sable text-cream border border-sable/80">
+              <Users className="h-2.5 w-2.5" />
               Occupied
-            </Badge>
+            </span>
           ) : (
-            <Badge variant="outline" className="bg-white/90 text-slate-500 border-slate-200">
+            <span className="text-[0.6rem] uppercase tracking-[0.08em] font-medium px-2 py-0.5 bg-cream text-fog border border-wire">
               Vacant
-            </Badge>
+            </span>
           )}
         </div>
       </div>
 
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-blue-950 truncate">{property.name}</h3>
-            <div className="flex items-center gap-1 mt-1 text-sm text-slate-500">
-              <MapPin className="h-3.5 w-3.5 flex-shrink-0 text-amber-500" />
-              <span className="truncate">{property.address}, {property.city}</span>
-            </div>
+      {/* Content */}
+      <div className="px-5 py-4 flex-1 flex flex-col gap-3">
+        <div>
+          <h3 className="font-display text-[1.0625rem] font-light text-sable leading-snug truncate">
+            {property.name}
+          </h3>
+          <div className="flex items-center gap-1.5 mt-1 text-[0.75rem] text-fog">
+            <MapPin className="h-3 w-3 text-bronze flex-shrink-0" />
+            <span className="truncate">{property.address}, {property.city}</span>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-slate-400 hover:text-blue-950 opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild>
-                <Link href={`/owner/properties/${property.id}`}>
-                  <Eye className="mr-2 h-4 w-4" />
-                  View Details
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onEdit?.(property)}>
-                <Pencil className="mr-2 h-4 w-4" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="text-red-600 focus:bg-red-50 focus:text-red-600"
-                onClick={() => onDelete?.(property)}
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
 
-        {/* Property details */}
-        <div className="flex items-center gap-4 mt-4 text-sm text-slate-500">
-          {property.bedrooms && (
-            <div className="flex items-center gap-1.5">
-              <Bed className="h-4 w-4 text-slate-400" />
-              <span className="font-medium">{property.bedrooms}</span>
-            </div>
-          )}
-          {property.bathrooms && (
-            <div className="flex items-center gap-1.5">
-              <Bath className="h-4 w-4 text-slate-400" />
-              <span className="font-medium">{property.bathrooms}</span>
-            </div>
-          )}
-          {property.squareFeet && (
-            <div className="flex items-center gap-1.5">
-              <Square className="h-4 w-4 text-slate-400" />
-              <span className="font-medium">{property.squareFeet.toLocaleString()} sqft</span>
-            </div>
-          )}
-        </div>
+        {(property.bedrooms || property.bathrooms || property.squareFeet) && (
+          <div className="flex items-center gap-4 text-[0.75rem] pt-3 border-t border-wire">
+            {property.bedrooms && (
+              <div className="flex items-center gap-1.5 text-fog">
+                <Bed className="h-3 w-3 text-haze" />
+                <span className="font-medium text-sable">{property.bedrooms}</span>
+              </div>
+            )}
+            {property.bathrooms && (
+              <div className="flex items-center gap-1.5 text-fog">
+                <Bath className="h-3 w-3 text-haze" />
+                <span className="font-medium text-sable">{property.bathrooms}</span>
+              </div>
+            )}
+            {property.squareFeet && (
+              <div className="flex items-center gap-1.5 text-fog">
+                <Square className="h-3 w-3 text-haze" />
+                <span className="font-medium text-sable">{property.squareFeet.toLocaleString()}</span>
+                <span className="text-haze text-[0.7rem]">sqft</span>
+              </div>
+            )}
+          </div>
+        )}
 
-        {/* Monthly rent */}
         {property.monthlyRent && (
-          <div className="mt-4 pt-4 border-t border-slate-100">
-            <div className="flex items-baseline justify-between">
-              <span className="text-sm text-slate-500">Monthly Rent</span>
-              <span className="text-xl font-bold bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">
-                {formatCurrency(property.monthlyRent * 100)}
-              </span>
-            </div>
+          <div className="flex items-baseline justify-between pt-3 border-t border-wire mt-auto">
+            <span className="text-[0.65rem] uppercase tracking-[0.08em] text-fog font-medium">Monthly Rent</span>
+            <span className="font-display text-[1.25rem] font-light text-bronze leading-none">
+              {formatCurrency(property.monthlyRent * 100)}
+            </span>
           </div>
         )}
+      </div>
 
-        {/* Service requests count */}
-        {property._count?.serviceRequests > 0 && (
-          <div className="mt-3 flex items-center justify-between text-sm">
-            <span className="text-slate-500">Active requests</span>
-            <Badge variant="warning" className="font-semibold">
-              {property._count.serviceRequests}
-            </Badge>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+      {/* Action strip */}
+      <div className="flex border-t border-wire">
+        <Link
+          href={`${basePath}/properties/${property.id}`}
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[0.65rem] uppercase tracking-[0.08em] font-medium text-fog hover:text-sable hover:bg-linen transition-colors border-r border-wire"
+        >
+          <Eye className="h-3 w-3" />
+          View
+        </Link>
+        <button
+          onClick={() => onEdit?.(property)}
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[0.65rem] uppercase tracking-[0.08em] font-medium text-fog hover:text-sable hover:bg-linen transition-colors border-r border-wire"
+        >
+          <Pencil className="h-3 w-3" />
+          Edit
+        </button>
+        <button
+          onClick={() => onDelete?.(property)}
+          className="flex-1 flex items-center justify-center gap-1.5 py-2.5 text-[0.65rem] uppercase tracking-[0.08em] font-medium text-fog hover:text-red-600 hover:bg-red-50 transition-colors"
+        >
+          <Trash2 className="h-3 w-3" />
+          Delete
+        </button>
+      </div>
+    </div>
   )
 }

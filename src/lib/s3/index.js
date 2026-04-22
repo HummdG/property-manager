@@ -80,4 +80,18 @@ export function generateDocumentKey(propertyId, docType, originalName) {
   return `properties/${propertyId}/documents/${docType.toLowerCase()}_${timestamp}.${ext}`
 }
 
+export function generateAgentDocumentKey(agentId, docType, originalName) {
+  const ext = originalName.split('.').pop()
+  const timestamp = Date.now()
+  return `agents/${agentId}/documents/${docType.toLowerCase()}_${timestamp}.${ext}`
+}
+
+export function generateAgentPhotoKey(agentId, originalName) {
+  const ext = originalName.split('.').pop()
+  const timestamp = Date.now()
+  return `agents/${agentId}/profile/photo_${timestamp}.${ext}`
+}
+
+
+
 

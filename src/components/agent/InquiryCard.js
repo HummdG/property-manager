@@ -1,43 +1,57 @@
 'use client'
 
 import Link from 'next/link'
-import { Phone, Mail, MapPin, Calendar, MessageSquare } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { formatDate, getInquiryStatusColor, getInquiryTypeColor } from '@/lib/utils'
+import { Phone, Mail, MapPin, Calendar, MessageSquare, CalendarDays } from 'lucide-react'
+import { formatDate } from '@/lib/utils'
 
-export function InquiryCard({ inquiry, showAgent = false }) {
+const statusConfig = {
+  OPEN: 'text-bronze border-bronze/40 bg-bronze/5',
+  CONTACTED: 'text-pewter border-wire bg-linen',
+  MEETING_SCHEDULED: 'text-sable border-wire bg-linen',
+  FOLLOW_UP: 'text-fog border-wire bg-linen',
+  ACCEPTED: 'text-emerald-700 border-emerald-300 bg-emerald-50',
+  REJECTED: 'text-red-600 border-red-200 bg-red-50',
+  CLOSED: 'text-haze border-wire bg-linen',
+}
+
+const typeConfig = {
+  RENT: 'text-bronze border-bronze/40 bg-bronze/5',
+  SALE: 'text-pewter border-wire bg-linen',
+}
+
+export function InquiryCard({ inquiry }) {
+  const statusCls = statusConfig[inquiry.status] || 'text-haze border-wire bg-linen'
+  const typeCls = typeConfig[inquiry.type] || 'text-haze border-wire bg-linen'
+
   return (
-    <Link href={`/agent/inquiries/${inquiry.id}`}>
-      <Card className="border-slate-200 hover:shadow-lg hover:border-amber-200 transition-all duration-300 cursor-pointer">
-        <CardContent className="p-5">
+    <Link href={`/agent/inquiries/${inquiry.id}`} className="block group">
+      <div className="border border-wire bg-cream group-hover:bg-linen transition-colors">
+        <div className="px-5 py-4">
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
-              {/* Client info */}
-              <div className="flex items-center gap-2 mb-2">
-                <h3 className="font-semibold text-blue-950 truncate">
+              <div className="flex items-center gap-2.5 flex-wrap mb-2.5">
+                <h3 className="text-[0.9375rem] font-medium text-sable truncate">
                   {inquiry.clientName}
                 </h3>
-                <Badge className={getInquiryTypeColor(inquiry.type)}>
+                <span className={`inline-flex items-center text-[0.6rem] uppercase tracking-[0.08em] font-medium px-2 py-0.5 border ${typeCls}`}>
                   {inquiry.type}
-                </Badge>
+                </span>
               </div>
 
-              {/* Contact details */}
-              <div className="space-y-1 text-sm text-slate-500">
-                <div className="flex items-center gap-2">
-                  <Mail className="h-3.5 w-3.5" />
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2 text-[0.75rem] text-fog">
+                  <Mail className="h-3 w-3 flex-shrink-0 text-haze" />
                   <span className="truncate">{inquiry.clientEmail}</span>
                 </div>
                 {inquiry.clientPhone && (
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-3.5 w-3.5" />
+                  <div className="flex items-center gap-2 text-[0.75rem] text-fog">
+                    <Phone className="h-3 w-3 flex-shrink-0 text-haze" />
                     <span>{inquiry.clientPhone}</span>
                   </div>
                 )}
                 {(inquiry.property?.name || inquiry.preferredArea) && (
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-3.5 w-3.5" />
+                  <div className="flex items-center gap-2 text-[0.75rem] text-fog">
+                    <MapPin className="h-3 w-3 flex-shrink-0 text-bronze" />
                     <span className="truncate">
                       {inquiry.property?.name || inquiry.preferredArea}
                     </span>
@@ -45,36 +59,32 @@ export function InquiryCard({ inquiry, showAgent = false }) {
                 )}
               </div>
 
-              {/* Message preview */}
               {inquiry.message && (
-                <div className="mt-3 flex items-start gap-2 text-sm text-slate-400">
-                  <MessageSquare className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
+                <div className="mt-3 pt-3 border-t border-wire flex items-start gap-2 text-[0.75rem] text-haze">
+                  <MessageSquare className="h-3 w-3 mt-0.5 flex-shrink-0" />
                   <p className="line-clamp-2">{inquiry.message}</p>
                 </div>
               )}
             </div>
 
-            {/* Status and date */}
             <div className="flex flex-col items-end gap-2 flex-shrink-0">
-              <Badge variant="outline" className={getInquiryStatusColor(inquiry.status)}>
-                {inquiry.status.replace('_', ' ')}
-              </Badge>
-              <div className="flex items-center gap-1 text-xs text-slate-400">
+              <span className={`inline-flex items-center text-[0.6rem] uppercase tracking-[0.08em] font-medium px-2 py-0.5 border ${statusCls}`}>
+                {inquiry.status.replace(/_/g, ' ')}
+              </span>
+              <div className="flex items-center gap-1.5 text-[0.7rem] text-haze">
                 <Calendar className="h-3 w-3" />
                 <span>{formatDate(inquiry.createdAt)}</span>
               </div>
               {inquiry.followUps?.length > 0 && (
-                <span className="text-xs text-slate-400">
-                  {inquiry.followUps.length} follow-up{inquiry.followUps.length !== 1 ? 's' : ''}
-                </span>
+                <div className="flex items-center gap-1.5 text-[0.7rem] text-fog">
+                  <CalendarDays className="h-3 w-3" />
+                  <span>{inquiry.followUps.length} follow-up{inquiry.followUps.length !== 1 ? 's' : ''}</span>
+                </div>
               )}
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </Link>
   )
 }
-
-
-

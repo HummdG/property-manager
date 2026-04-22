@@ -2,46 +2,22 @@ import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import Link from 'next/link'
 import {
-  Home,
-  MapPin,
-  Calendar,
-  Phone,
-  Mail,
-  User,
-  Building2,
-  BedDouble,
-  Bath,
-  Ruler,
-  AlertCircle
+  Home, MapPin, Calendar, Phone, Mail,
+  Building2, BedDouble, Bath, Ruler
 } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { formatDate, formatCurrency } from '@/lib/utils'
 
 async function getTenantProperty(userId) {
-  const tenantProfile = await db.tenantProfile.findUnique({
+  return db.tenantProfile.findUnique({
     where: { userId },
     include: {
       property: {
         include: {
-          owner: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              phone: true
-            }
-          },
-          _count: {
-            select: { serviceRequests: true }
-          }
+          owner: { select: { id: true, name: true, email: true, phone: true } }
         }
       }
     }
   })
-
-  return tenantProfile
 }
 
 export default async function TenantPropertyPage() {
@@ -51,130 +27,109 @@ export default async function TenantPropertyPage() {
 
   if (!property) {
     return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-blue-950">My Property</h1>
-          <p className="text-slate-500 mt-1">View your rental property details</p>
+      <div className="space-y-5">
+        <div className="border-b border-wire pb-5">
+          <p className="text-[0.65rem] uppercase tracking-[0.15em] text-fog font-medium">Tenant Portal</p>
+          <h1 className="font-display text-[1.875rem] font-light text-sable leading-tight mt-0.5">My Property</h1>
         </div>
-
-        <Card>
-          <CardContent className="py-16">
-            <div className="flex flex-col items-center justify-center text-center">
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-100">
-                <Building2 className="h-10 w-10 text-slate-400" />
-              </div>
-              <h3 className="mt-6 text-xl font-bold text-blue-950">No Property Assigned</h3>
-              <p className="mt-2 text-slate-500 max-w-sm">
-                You haven't been assigned to a property yet. Please contact your landlord or property manager to get set up.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex flex-col items-center justify-center py-20 border border-wire bg-cream text-center">
+          <div className="w-14 h-14 border border-wire bg-linen flex items-center justify-center mb-4">
+            <Building2 className="h-6 w-6 text-haze" />
+          </div>
+          <h3 className="font-display text-[1.375rem] font-light text-sable mt-2">No Property Assigned</h3>
+          <p className="text-[0.8125rem] text-fog mt-2 max-w-sm">
+            You haven't been assigned to a property yet. Please contact your landlord or property manager to get set up.
+          </p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      {/* Page header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-blue-950">My Property</h1>
-          <p className="text-slate-500 mt-1">View your rental property details</p>
-        </div>
-        <Link href="/tenant/issues?action=new">
-          <Button>
-            <AlertCircle className="mr-2 h-4 w-4" />
-            Report Issue
-          </Button>
-        </Link>
+    <div className="space-y-5">
+      <div className="border-b border-wire pb-5">
+        <p className="text-[0.65rem] uppercase tracking-[0.15em] text-fog font-medium">Tenant Portal</p>
+        <h1 className="font-display text-[1.875rem] font-light text-sable leading-tight mt-0.5">My Property</h1>
       </div>
 
-      {/* Property details */}
-      <Card className="overflow-hidden">
-        <div className="bg-gradient-to-r from-amber-50 to-amber-100/50 p-6 border-b border-amber-200/50">
-          <div className="flex items-start gap-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 shadow-lg shadow-amber-500/20">
-              <Home className="h-7 w-7 text-white" />
+      {/* Property header */}
+      <div className="border border-wire bg-cream">
+        <div className="px-6 py-5 border-b border-wire bg-linen flex items-start gap-4">
+          <div className="w-12 h-12 border border-wire bg-cream flex items-center justify-center flex-shrink-0">
+            <Home className="h-5 w-5 text-bronze" />
+          </div>
+          <div>
+            <h2 className="font-display text-[1.375rem] font-light text-sable">{property.name}</h2>
+            <div className="flex items-center gap-2 text-[0.8125rem] text-fog mt-1">
+              <MapPin className="h-3.5 w-3.5 text-bronze flex-shrink-0" />
+              <span>{property.address}, {property.city}, {property.postcode}</span>
             </div>
-            <div>
-              <h2 className="text-xl font-bold text-blue-950">{property.name}</h2>
-              <div className="flex items-center gap-2 text-slate-500 mt-1">
-                <MapPin className="h-4 w-4 text-amber-500" />
-                <span>{property.address}, {property.city}, {property.postcode}</span>
-              </div>
-              <Badge className="mt-3" variant="outline">
-                {property.type}
-              </Badge>
-            </div>
+            <span className="inline-block mt-2 text-[0.6rem] uppercase tracking-[0.08em] font-medium px-2 py-0.5 bg-cream text-pewter border border-wire">
+              {property.type}
+            </span>
           </div>
         </div>
 
-        <CardContent className="p-6">
+        <div className="p-6">
           <div className="grid gap-6 md:grid-cols-2">
             {/* Property specs */}
-            <div className="space-y-4">
-              <h3 className="font-bold text-blue-950">Property Details</h3>
-              <div className="grid gap-4 grid-cols-3">
-                {property.bedrooms && (
-                  <div className="flex flex-col items-center p-4 rounded-xl bg-slate-50 border border-slate-100">
-                    <BedDouble className="h-5 w-5 text-amber-500 mb-2" />
-                    <span className="text-lg font-bold text-blue-950">{property.bedrooms}</span>
-                    <span className="text-xs text-slate-500">Bedrooms</span>
-                  </div>
-                )}
-                {property.bathrooms && (
-                  <div className="flex flex-col items-center p-4 rounded-xl bg-slate-50 border border-slate-100">
-                    <Bath className="h-5 w-5 text-amber-500 mb-2" />
-                    <span className="text-lg font-bold text-blue-950">{property.bathrooms}</span>
-                    <span className="text-xs text-slate-500">Bathrooms</span>
-                  </div>
-                )}
-                {property.squareFeet && (
-                  <div className="flex flex-col items-center p-4 rounded-xl bg-slate-50 border border-slate-100">
-                    <Ruler className="h-5 w-5 text-amber-500 mb-2" />
-                    <span className="text-lg font-bold text-blue-950">{property.squareFeet}</span>
-                    <span className="text-xs text-slate-500">sq ft</span>
-                  </div>
-                )}
-              </div>
-
-              {property.description && (
-                <div className="pt-4">
-                  <p className="text-sm text-slate-500">{property.description}</p>
+            <div>
+              <p className="text-[0.65rem] uppercase tracking-[0.15em] text-fog font-medium mb-4">Property Details</p>
+              {(property.bedrooms || property.bathrooms || property.squareFeet) && (
+                <div className="grid gap-px grid-cols-3 bg-wire border border-wire mb-4">
+                  {property.bedrooms && (
+                    <div className="bg-cream p-4 flex flex-col items-center">
+                      <BedDouble className="h-4 w-4 text-bronze mb-2" />
+                      <p className="font-display text-[1.375rem] font-light text-sable leading-none">{property.bedrooms}</p>
+                      <p className="text-[0.65rem] uppercase tracking-[0.08em] text-fog mt-1">Beds</p>
+                    </div>
+                  )}
+                  {property.bathrooms && (
+                    <div className="bg-cream p-4 flex flex-col items-center">
+                      <Bath className="h-4 w-4 text-bronze mb-2" />
+                      <p className="font-display text-[1.375rem] font-light text-sable leading-none">{property.bathrooms}</p>
+                      <p className="text-[0.65rem] uppercase tracking-[0.08em] text-fog mt-1">Baths</p>
+                    </div>
+                  )}
+                  {property.squareFeet && (
+                    <div className="bg-cream p-4 flex flex-col items-center">
+                      <Ruler className="h-4 w-4 text-bronze mb-2" />
+                      <p className="font-display text-[1.375rem] font-light text-sable leading-none">{property.squareFeet}</p>
+                      <p className="text-[0.65rem] uppercase tracking-[0.08em] text-fog mt-1">sq ft</p>
+                    </div>
+                  )}
                 </div>
+              )}
+              {property.description && (
+                <p className="text-[0.8125rem] text-fog">{property.description}</p>
               )}
             </div>
 
             {/* Lease info */}
-            <div className="space-y-4">
-              <h3 className="font-bold text-blue-950">Lease Information</h3>
+            <div>
+              <p className="text-[0.65rem] uppercase tracking-[0.15em] text-fog font-medium mb-4">Lease Information</p>
               <div className="space-y-3">
                 {tenantProfile.rentAmount && (
-                  <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
-                    <p className="text-sm text-slate-500">Monthly Rent</p>
-                    <p className="text-2xl font-bold bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">
+                  <div className="px-4 py-3 border border-wire bg-linen">
+                    <p className="text-[0.65rem] uppercase tracking-[0.12em] text-fog font-medium">Monthly Rent</p>
+                    <p className="font-display text-[1.75rem] font-light text-bronze leading-none mt-1">
                       {formatCurrency(tenantProfile.rentAmount * 100)}
                     </p>
                   </div>
                 )}
-
                 {tenantProfile.depositPaid && (
-                  <div className="flex justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
-                    <span className="text-slate-500">Deposit Paid</span>
-                    <span className="font-semibold text-blue-950">
-                      {formatCurrency(tenantProfile.depositPaid * 100)}
-                    </span>
+                  <div className="flex justify-between px-4 py-3 border border-wire">
+                    <span className="text-[0.8125rem] text-fog">Deposit Paid</span>
+                    <span className="text-[0.8125rem] font-medium text-sable">{formatCurrency(tenantProfile.depositPaid * 100)}</span>
                   </div>
                 )}
-
                 {tenantProfile.leaseStart && (
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-                    <Calendar className="h-4 w-4 text-amber-500" />
+                  <div className="flex items-center gap-3 px-4 py-3 border border-wire">
+                    <Calendar className="h-3.5 w-3.5 text-bronze flex-shrink-0" />
                     <div>
-                      <p className="text-sm text-slate-500">Lease Period</p>
-                      <p className="font-semibold text-blue-950">
-                        {formatDate(tenantProfile.leaseStart)} - {tenantProfile.leaseEnd ? formatDate(tenantProfile.leaseEnd) : 'Ongoing'}
+                      <p className="text-[0.65rem] uppercase tracking-[0.1em] text-fog font-medium">Lease Period</p>
+                      <p className="text-[0.8125rem] font-medium text-sable mt-0.5">
+                        {formatDate(tenantProfile.leaseStart)} to {tenantProfile.leaseEnd ? formatDate(tenantProfile.leaseEnd) : 'Ongoing'}
                       </p>
                     </div>
                   </div>
@@ -182,66 +137,38 @@ export default async function TenantPropertyPage() {
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Landlord info */}
       {property.owner && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <User className="h-5 w-5 text-amber-500" />
-              Landlord / Property Manager
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-500 text-white text-xl font-semibold">
-                {property.owner.name?.charAt(0) || 'L'}
-              </div>
-              <div className="flex-1 space-y-1">
-                <p className="font-bold text-blue-950 text-lg">{property.owner.name}</p>
-                <div className="flex flex-wrap gap-4 text-sm">
-                  <a
-                    href={`mailto:${property.owner.email}`}
-                    className="flex items-center gap-2 text-slate-500 hover:text-amber-600 transition-colors"
-                  >
-                    <Mail className="h-4 w-4" />
-                    {property.owner.email}
+        <div className="border border-wire bg-cream">
+          <div className="px-5 py-4 border-b border-wire">
+            <p className="text-[0.65rem] uppercase tracking-[0.15em] text-fog font-medium">Landlord / Property Manager</p>
+          </div>
+          <div className="p-5 flex items-center gap-4">
+            <div className="w-12 h-12 bg-bronze/15 border border-bronze/20 flex items-center justify-center flex-shrink-0 text-[1rem] font-medium text-bronze uppercase">
+              {property.owner.name?.charAt(0) || 'L'}
+            </div>
+            <div className="flex-1">
+              <p className="font-display text-[1.125rem] font-light text-sable">{property.owner.name}</p>
+              <div className="flex flex-wrap gap-4 mt-2">
+                <a href={`mailto:${property.owner.email}`} className="flex items-center gap-2 text-[0.75rem] text-fog hover:text-bronze transition-colors">
+                  <Mail className="h-3.5 w-3.5" />
+                  {property.owner.email}
+                </a>
+                {property.owner.phone && (
+                  <a href={`tel:${property.owner.phone}`} className="flex items-center gap-2 text-[0.75rem] text-fog hover:text-bronze transition-colors">
+                    <Phone className="h-3.5 w-3.5" />
+                    {property.owner.phone}
                   </a>
-                  {property.owner.phone && (
-                    <a
-                      href={`tel:${property.owner.phone}`}
-                      className="flex items-center gap-2 text-slate-500 hover:text-amber-600 transition-colors"
-                    >
-                      <Phone className="h-4 w-4" />
-                      {property.owner.phone}
-                    </a>
-                  )}
-                </div>
+                )}
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       )}
 
-      {/* Quick action */}
-      <Card className="bg-gradient-to-r from-amber-50 to-amber-100/50 border-amber-200">
-        <CardContent className="p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h3 className="text-lg font-bold text-blue-950">Something not working?</h3>
-              <p className="text-slate-600 mt-1">Report a maintenance issue and we'll get it fixed</p>
-            </div>
-            <Link href="/tenant/issues?action=new">
-              <Button>
-                <AlertCircle className="mr-2 h-4 w-4" />
-                Report Issue
-              </Button>
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   )
 }

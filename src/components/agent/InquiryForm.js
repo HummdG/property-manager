@@ -15,8 +15,7 @@ import {
 
 const inquiryTypes = [
   { value: 'RENT', label: 'Rent Inquiry' },
-  { value: 'SALE', label: 'Sale Inquiry' },
-  { value: 'MAINTENANCE', label: 'Maintenance Inquiry' }
+  { value: 'SALE', label: 'Sale Inquiry' }
 ]
 
 const sourceOptions = [
@@ -261,6 +260,8 @@ export function InquiryForm({ open, onOpenChange, onSuccess }) {
     </Dialog>
   )
 }
+
+
 
 
 

@@ -1,11 +1,12 @@
 import { db } from '@/lib/db'
+import { sendWhatsAppToAdmins } from '@/lib/whatsapp'
 
 /**
  * Log a system event for audit tracking
  * @param {Object} params
  * @param {string} params.type - Event type (e.g. USER_REGISTERED, PROPERTY_CREATED)
  * @param {string} params.action - Action performed (e.g. "created", "updated", "deleted")
- * @param {string} params.entity - Entity type (e.g. "user", "property", "jobAssignment")
+ * @param {string} params.entity - Entity type (e.g. "user", "property", "inquiry")
  * @param {string} [params.entityId] - ID of the affected entity
  * @param {string} [params.userId] - ID of the user who performed the action
  * @param {Object} [params.metadata] - Additional context data
@@ -23,9 +24,17 @@ export async function logEvent({ type, action, entity, entityId, userId, metadat
       }
     })
   } catch (error) {
-    // Log but don't throw - event logging should never break the main flow
-    console.error('Failed to log system event:', error)
+    console.error('[Events] Failed to write system event:', error)
+    return
+  }
+
+  try {
+    await sendWhatsAppToAdmins({ type, action, entity, entityId, metadata })
+  } catch (error) {
+    console.error('[Events] WhatsApp notification failed:', error)
   }
 }
+
+
 
 

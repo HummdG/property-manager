@@ -2,10 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { Users, Search, Loader2, MoreVertical, UserCheck, UserX, Shield } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,20 +15,21 @@ import {
   DialogTitle
 } from '@/components/ui/dialog'
 import { formatDate } from '@/lib/utils'
+import { cn } from '@/lib/utils'
 
 const roleFilters = [
   { value: '', label: 'All Roles' },
   { value: 'OWNER', label: 'Owners' },
   { value: 'TENANT', label: 'Tenants' },
-  { value: 'TRADER', label: 'Traders' },
+  { value: 'AGENT', label: 'Agents' },
   { value: 'ADMIN', label: 'Admins' }
 ]
 
-const roleColors = {
-  OWNER: 'bg-blue-100 text-blue-700 border-blue-200',
-  TENANT: 'bg-purple-100 text-purple-700 border-purple-200',
-  TRADER: 'bg-amber-100 text-amber-700 border-amber-200',
-  ADMIN: 'bg-red-100 text-red-700 border-red-200'
+const rolePills = {
+  OWNER: 'bg-bronze/10 text-bronze border border-bronze/20',
+  TENANT: 'bg-sable/5 text-pewter border border-wire',
+  AGENT: 'bg-sable/8 text-pewter border border-wire',
+  ADMIN: 'bg-red-50 text-red-600 border border-red-100'
 }
 
 export default function AdminUsersPage() {
@@ -47,18 +44,13 @@ export default function AdminUsersPage() {
   }, [roleFilter])
 
   async function fetchUsers() {
+    setIsLoading(true)
     try {
       const params = new URLSearchParams()
       if (roleFilter) params.set('role', roleFilter)
-
       const response = await fetch(`/api/admin/users?${params}`)
       const data = await response.json()
-
-      if (!response.ok) {
-        console.error('API Error:', data.error)
-        return
-      }
-
+      if (!response.ok) { console.error('API Error:', data.error); return }
       setUsers(data.users || [])
     } catch (error) {
       console.error('Failed to fetch users:', error)
@@ -74,11 +66,7 @@ export default function AdminUsersPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isActive: !currentStatus })
       })
-
-      if (response.ok) {
-        fetchUsers()
-        setSelectedUser(null)
-      }
+      if (response.ok) { fetchUsers(); setSelectedUser(null) }
     } catch (error) {
       console.error('Failed to update user:', error)
     }
@@ -96,198 +84,240 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Page header */}
-      <div>
-        <h1 className="text-2xl font-bold text-blue-950">User Management</h1>
-        <p className="text-slate-500 mt-1">Manage all platform users</p>
+      <div className="border-b border-wire pb-5">
+        <p className="text-[0.65rem] uppercase tracking-[0.15em] text-fog font-medium">Administration</p>
+        <h1 className="font-display text-[1.875rem] font-light text-sable leading-tight mt-0.5">User Management</h1>
       </div>
 
       {/* Stats */}
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-          <p className="text-sm text-slate-500">Total Users</p>
-          <p className="text-2xl font-bold text-blue-950">{userCounts.total}</p>
+      <div className="grid gap-px sm:grid-cols-3 bg-wire border border-wire">
+        <div className="bg-cream p-5">
+          <p className="text-[0.65rem] uppercase tracking-[0.12em] text-fog font-medium mb-2">Total Users</p>
+          <p className="font-display text-[2.25rem] font-light text-sable leading-none">{userCounts.total}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-          <p className="text-sm text-slate-500">Active</p>
-          <p className="text-2xl font-bold text-emerald-600">{userCounts.active}</p>
+        <div className="bg-cream p-5">
+          <p className="text-[0.65rem] uppercase tracking-[0.12em] text-fog font-medium mb-2">Active</p>
+          <p className="font-display text-[2.25rem] font-light text-sable leading-none">{userCounts.active}</p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
-          <p className="text-sm text-slate-500">Inactive</p>
-          <p className="text-2xl font-bold text-red-600">{userCounts.inactive}</p>
+        <div className="bg-cream p-5">
+          <p className="text-[0.65rem] uppercase tracking-[0.12em] text-fog font-medium mb-2">Inactive</p>
+          <p className="font-display text-[2.25rem] font-light text-sable leading-none">{userCounts.inactive}</p>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <Input
+      {/* Filters row */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        {/* Search */}
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-haze" />
+          <input
+            type="text"
             placeholder="Search users..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
+            className="w-full bg-cream border border-wire pl-9 pr-3 py-2 text-[0.8125rem] text-sable placeholder:text-haze focus:outline-none focus:border-bronze/50 transition-colors"
           />
         </div>
-        <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
+
+        {/* Role filters */}
+        <div className="flex gap-0 border border-wire overflow-x-auto">
           {roleFilters.map(filter => (
-            <Button
+            <button
               key={filter.value}
-              variant={roleFilter === filter.value ? 'default' : 'outline'}
-              size="sm"
               onClick={() => setRoleFilter(filter.value)}
+              className={cn(
+                'px-3.5 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-medium transition-colors border-r border-wire last:border-0 whitespace-nowrap',
+                roleFilter === filter.value
+                  ? 'bg-sable text-cream'
+                  : 'bg-cream text-fog hover:text-sable hover:bg-linen'
+              )}
             >
               {filter.label}
-            </Button>
+            </button>
           ))}
         </div>
       </div>
 
       {/* Users list */}
       {isLoading ? (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+        <div className="flex items-center justify-center py-16 border border-wire bg-cream">
+          <Loader2 className="h-5 w-5 animate-spin text-bronze" />
         </div>
       ) : filteredUsers.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12 text-center">
-          <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-100">
-            <Users className="h-10 w-10 text-slate-400" />
+        <div className="flex flex-col items-center justify-center py-16 border border-wire bg-cream text-center">
+          <div className="w-14 h-14 border border-wire bg-linen flex items-center justify-center mb-4">
+            <Users className="h-6 w-6 text-haze" />
           </div>
-          <h3 className="mt-4 text-lg font-semibold text-blue-950">No users found</h3>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="text-[0.8125rem] font-medium text-sable">No users found</p>
+          <p className="text-[0.75rem] text-fog mt-1">
             {searchQuery || roleFilter ? 'Try adjusting your filters' : 'No users registered yet'}
           </p>
         </div>
       ) : (
-        <div className="grid gap-3">
-          {filteredUsers.map(user => (
-            <Card key={user.id}>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-4 min-w-0 flex-1">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-500 text-white font-semibold">
-                      {user.name?.charAt(0) || user.email.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-blue-950 truncate">{user.name || 'No name'}</p>
-                      <p className="text-sm text-slate-500 truncate">{user.email}</p>
-                    </div>
+        <div className="border border-wire bg-cream">
+          {/* Table header */}
+          <div className="hidden sm:grid grid-cols-[1fr_auto_auto_auto] gap-4 px-5 py-3 border-b border-wire bg-linen">
+            <p className="text-[0.6rem] uppercase tracking-[0.15em] text-fog font-medium">User</p>
+            <p className="text-[0.6rem] uppercase tracking-[0.15em] text-fog font-medium">Role</p>
+            <p className="text-[0.6rem] uppercase tracking-[0.15em] text-fog font-medium">Joined</p>
+            <p className="text-[0.6rem] uppercase tracking-[0.15em] text-fog font-medium w-8" />
+          </div>
+
+          <div className="divide-y divide-wire/60">
+            {filteredUsers.map(user => (
+              <div
+                key={user.id}
+                className="flex items-center justify-between gap-4 px-5 py-3.5 hover:bg-linen transition-colors"
+              >
+                {/* Avatar + info */}
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                  <div className="w-8 h-8 bg-bronze/15 border border-bronze/20 flex items-center justify-center flex-shrink-0 text-[0.75rem] font-medium text-bronze uppercase">
+                    {user.name?.charAt(0) || user.email.charAt(0)}
                   </div>
-                  <div className="flex items-center gap-3">
-                    <Badge className={roleColors[user.role]}>
-                      {user.role}
-                    </Badge>
-                    {!user.isActive && (
-                      <Badge variant="destructive">
-                        Inactive
-                      </Badge>
-                    )}
-                    <p className="text-sm text-slate-400 hidden sm:block">
-                      {formatDate(user.createdAt)}
+                  <div className="min-w-0">
+                    <p className="text-[0.8125rem] font-medium text-sable truncate">
+                      {user.name || 'No name'}
                     </p>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="text-slate-400 hover:text-blue-950">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          className="cursor-pointer"
-                          onClick={() => setSelectedUser(user)}
-                        >
-                          <Shield className="mr-2 h-4 w-4" />
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className={user.isActive
-                            ? 'text-red-600 focus:bg-red-50 cursor-pointer'
-                            : 'text-emerald-600 focus:bg-emerald-50 cursor-pointer'
-                          }
-                          onClick={() => toggleUserStatus(user.id, user.isActive)}
-                        >
-                          {user.isActive ? (
-                            <>
-                              <UserX className="mr-2 h-4 w-4" />
-                              Deactivate
-                            </>
-                          ) : (
-                            <>
-                              <UserCheck className="mr-2 h-4 w-4" />
-                              Activate
-                            </>
-                          )}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <p className="text-[0.75rem] text-fog truncate">{user.email}</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+
+                {/* Role + status */}
+                <div className="flex items-center gap-2.5 flex-shrink-0">
+                  <span className={cn(
+                    'text-[0.6rem] uppercase tracking-[0.08em] font-medium px-2 py-0.5',
+                    rolePills[user.role]
+                  )}>
+                    {user.role}
+                  </span>
+                  {!user.isActive && (
+                    <span className="text-[0.6rem] uppercase tracking-[0.08em] font-medium px-2 py-0.5 bg-red-50 text-red-500 border border-red-100">
+                      Inactive
+                    </span>
+                  )}
+                  <p className="text-[0.7rem] text-haze hidden sm:block w-20 text-right">
+                    {formatDate(user.createdAt)}
+                  </p>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="w-7 h-7 flex items-center justify-center text-haze hover:text-sable hover:bg-wire/60 transition-colors">
+                        <MoreVertical className="h-3.5 w-3.5" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      className="border-wire bg-cream shadow-lg text-[0.8125rem]"
+                    >
+                      <DropdownMenuItem
+                        className="cursor-pointer text-pewter hover:text-sable hover:bg-wire/50 px-4 py-2"
+                        onClick={() => setSelectedUser(user)}
+                      >
+                        <Shield className="mr-2.5 h-3.5 w-3.5 text-bronze" />
+                        View Details
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className={cn(
+                          'cursor-pointer px-4 py-2',
+                          user.isActive
+                            ? 'text-red-600 hover:bg-red-50 hover:text-red-700'
+                            : 'text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800'
+                        )}
+                        onClick={() => toggleUserStatus(user.id, user.isActive)}
+                      >
+                        {user.isActive ? (
+                          <><UserX className="mr-2.5 h-3.5 w-3.5" />Deactivate</>
+                        ) : (
+                          <><UserCheck className="mr-2.5 h-3.5 w-3.5" />Activate</>
+                        )}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
       {/* User details dialog */}
       <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>User Details</DialogTitle>
+        <DialogContent className="max-w-md border-wire bg-cream p-0 gap-0">
+          <DialogHeader className="px-6 py-5 border-b border-wire">
+            <DialogTitle className="text-[0.65rem] uppercase tracking-[0.15em] text-fog font-medium">
+              User Details
+            </DialogTitle>
           </DialogHeader>
           {selectedUser && (
-            <div className="space-y-4">
+            <div className="p-6 space-y-5">
+              {/* User identity */}
               <div className="flex items-center gap-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-500 text-white text-2xl font-semibold">
-                  {selectedUser.name?.charAt(0) || selectedUser.email.charAt(0).toUpperCase()}
+                <div className="w-12 h-12 bg-bronze/15 border border-bronze/20 flex items-center justify-center flex-shrink-0 text-[1rem] font-medium text-bronze uppercase">
+                  {selectedUser.name?.charAt(0) || selectedUser.email.charAt(0)}
                 </div>
                 <div>
-                  <h3 className="font-bold text-blue-950 text-lg">{selectedUser.name || 'No name'}</h3>
-                  <p className="text-sm text-slate-500">{selectedUser.email}</p>
+                  <h3 className="font-display text-[1.25rem] font-light text-sable leading-tight">
+                    {selectedUser.name || 'No name'}
+                  </h3>
+                  <p className="text-[0.75rem] text-fog">{selectedUser.email}</p>
                 </div>
               </div>
 
+              {/* Badges */}
               <div className="flex gap-2">
-                <Badge className={roleColors[selectedUser.role]}>
+                <span className={cn(
+                  'text-[0.6rem] uppercase tracking-[0.08em] font-medium px-2.5 py-1',
+                  rolePills[selectedUser.role]
+                )}>
                   {selectedUser.role}
-                </Badge>
-                <Badge className={selectedUser.isActive
-                  ? 'bg-emerald-100 text-emerald-700 border-emerald-200'
-                  : 'bg-red-100 text-red-700 border-red-200'
-                }>
+                </span>
+                <span className={cn(
+                  'text-[0.6rem] uppercase tracking-[0.08em] font-medium px-2.5 py-1',
+                  selectedUser.isActive
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                    : 'bg-red-50 text-red-600 border border-red-100'
+                )}>
                   {selectedUser.isActive ? 'Active' : 'Inactive'}
-                </Badge>
+                </span>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 space-y-2 text-sm">
+              {/* Details */}
+              <div className="border-t border-wire pt-4 space-y-3">
                 {selectedUser.phone && (
-                  <p className="text-slate-500">
-                    <strong className="text-blue-950">Phone:</strong> {selectedUser.phone}
-                  </p>
+                  <div className="flex justify-between">
+                    <p className="text-[0.7rem] uppercase tracking-[0.1em] text-fog font-medium">Phone</p>
+                    <p className="text-[0.8125rem] text-sable">{selectedUser.phone}</p>
+                  </div>
                 )}
-                <p className="text-slate-500">
-                  <strong className="text-blue-950">Joined:</strong> {formatDate(selectedUser.createdAt)}
-                </p>
+                <div className="flex justify-between">
+                  <p className="text-[0.7rem] uppercase tracking-[0.1em] text-fog font-medium">Joined</p>
+                  <p className="text-[0.8125rem] text-sable">{formatDate(selectedUser.createdAt)}</p>
+                </div>
               </div>
 
-              <div className="pt-4 border-t border-slate-100">
-                <Button
-                  variant={selectedUser.isActive ? 'destructive' : 'default'}
-                  className="w-full"
+              {/* Action */}
+              <div className="border-t border-wire pt-4">
+                <button
+                  className={cn(
+                    'w-full py-2.5 text-[0.75rem] uppercase tracking-[0.1em] font-medium transition-colors',
+                    selectedUser.isActive
+                      ? 'bg-red-600 text-white hover:bg-red-700'
+                      : 'bg-sable text-cream hover:bg-cobalt'
+                  )}
                   onClick={() => toggleUserStatus(selectedUser.id, selectedUser.isActive)}
                 >
                   {selectedUser.isActive ? (
-                    <>
-                      <UserX className="mr-2 h-4 w-4" />
-                      Deactivate User
-                    </>
+                    <span className="flex items-center justify-center gap-2">
+                      <UserX className="h-3.5 w-3.5" /> Deactivate User
+                    </span>
                   ) : (
-                    <>
-                      <UserCheck className="mr-2 h-4 w-4" />
-                      Activate User
-                    </>
+                    <span className="flex items-center justify-center gap-2">
+                      <UserCheck className="h-3.5 w-3.5" /> Activate User
+                    </span>
                   )}
-                </Button>
+                </button>
               </div>
             </div>
           )}

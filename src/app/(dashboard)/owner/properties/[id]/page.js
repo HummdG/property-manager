@@ -6,7 +6,7 @@ import { ArrowLeft, Building2, MapPin, Bed, Bath, Square, Users, Calendar, Mail,
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { formatDate, formatCurrency, getStatusColor } from '@/lib/utils'
+import { formatDate, formatCurrency } from '@/lib/utils'
 
 async function getProperty(id, userId) {
   const property = await db.property.findUnique({
@@ -17,14 +17,6 @@ async function getProperty(id, userId) {
         include: {
           user: { select: { id: true, name: true, email: true, phone: true } }
         }
-      },
-      serviceRequests: {
-        include: {
-          category: { select: { name: true } },
-          requester: { select: { name: true } }
-        },
-        orderBy: { createdAt: 'desc' },
-        take: 10
       },
       documents: {
         select: { id: true, type: true, fileName: true, fileUrl: true, uploadedAt: true }
@@ -138,41 +130,6 @@ export default async function PropertyDetailPage({ params }) {
             </CardContent>
           </Card>
 
-          {/* Service requests */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Service Requests</CardTitle>
-              <Link href={`/owner/requests?property=${property.id}`}>
-                <Button variant="outline" size="sm">
-                  View All
-                </Button>
-              </Link>
-            </CardHeader>
-            <CardContent>
-              {property.serviceRequests.length === 0 ? (
-                <p className="text-slate-500 text-sm py-4 text-center">No service requests</p>
-              ) : (
-                <div className="space-y-3">
-                  {property.serviceRequests.map(request => (
-                    <div
-                      key={request.id}
-                      className="flex items-center justify-between gap-4 p-3 rounded-xl bg-slate-50 border border-slate-100"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-blue-950 truncate">{request.title}</p>
-                        <p className="text-sm text-slate-500">
-                          {request.category?.name} • {formatDate(request.createdAt)}
-                        </p>
-                      </div>
-                      <Badge className={getStatusColor(request.status)}>
-                        {request.status.replace('_', ' ')}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
         </div>
 
         {/* Sidebar */}

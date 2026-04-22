@@ -29,10 +29,8 @@ export async function GET(request, { params }) {
             createdAt: true
           }
         },
-        subscription: {
-          include: {
-            plan: true
-          }
+        documents: {
+          orderBy: { createdAt: 'desc' }
         }
       }
     })
@@ -167,6 +165,8 @@ export async function GET(request, { params }) {
     return NextResponse.json({ error: 'Failed to fetch agent' }, { status: 500 })
   }
 }
+
+
 
 
 

@@ -1,6 +1,13 @@
-import { DM_Sans, Plus_Jakarta_Sans, Geist_Mono } from 'next/font/google'
+import { DM_Sans, Plus_Jakarta_Sans, Geist_Mono, Cormorant_Garamond } from 'next/font/google'
 import { Providers } from '@/components/providers'
 import './globals.css'
+
+const cormorant = Cormorant_Garamond({
+  variable: '--font-cormorant',
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  display: 'swap',
+})
 
 const dmSans = DM_Sans({
   variable: '--font-dm-sans',
@@ -19,16 +26,28 @@ const geistMono = Geist_Mono({
   subsets: ['latin']
 })
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+}
+
 export const metadata = {
-  title: 'GoFor Properties | UAE Premium Property Management',
-  description: 'Manage your properties, tenants, and service requests with luxury and ease'
+  title: 'Impervia Estates | UAE Premium Property Management',
+  description: 'Established property management and real estate services across the UAE. RERA licensed.',
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: '48x48' },
+    ],
+    apple: { url: '/icon.svg', type: 'image/svg+xml' },
+  },
 }
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${dmSans.variable} ${jakarta.variable} ${geistMono.variable} antialiased`}
+        className={`${cormorant.variable} ${dmSans.variable} ${jakarta.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
         <Providers>

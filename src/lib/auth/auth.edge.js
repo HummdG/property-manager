@@ -9,6 +9,8 @@ export const authEdgeConfig = {
   secret: process.env.AUTH_SECRET,
   session: {
     strategy: 'jwt',
+    maxAge: 28800,
+    updateAge: 3600,
   },
   pages: {
     signIn: '/login',

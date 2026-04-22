@@ -5,28 +5,24 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import {
   Building2, MapPin, Bed, Bath, Square, ArrowLeft,
-  Loader2, Phone, Mail, Calendar, Home, User
+  Loader2, Phone, Mail, Calendar, Home, User, MessageCircle,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
-import { Separator } from '@/components/ui/separator'
 import { formatCurrency } from '@/lib/utils'
 
-const propertyTypeLabels = {
+const PROPERTY_TYPE_LABELS = {
   HOUSE: 'House',
   APARTMENT: 'Apartment',
   CONDO: 'Condo',
   TOWNHOUSE: 'Townhouse',
   COMMERCIAL: 'Commercial',
   LAND: 'Land',
-  OTHER: 'Other'
+  OTHER: 'Other',
 }
 
-const listingTypeLabels = {
+const LISTING_TYPE_LABELS = {
   RENT: 'For Rent',
   SALE: 'For Sale',
-  BOTH: 'Rent & Sale'
+  BOTH: 'Rent & Sale',
 }
 
 export default function PublicPropertyDetailPage() {
@@ -34,314 +30,315 @@ export default function PublicPropertyDetailPage() {
   const [property, setProperty] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
+  const [activeImage, setActiveImage] = useState(0)
 
   useEffect(() => {
     async function fetchProperty() {
       try {
         const response = await fetch(`/api/public/properties/${id}`)
-        if (!response.ok) {
-          setHasError(true)
-          return
-        }
+        if (!response.ok) { setHasError(true); return }
         const data = await response.json()
         setProperty(data.property)
-      } catch (error) {
-        console.error('Failed to fetch property:', error)
+      } catch {
         setHasError(true)
       } finally {
         setIsLoading(false)
       }
     }
-
     if (id) fetchProperty()
   }, [id])
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-32">
-        <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+        <Loader2 className="w-7 h-7 animate-spin text-bronze" />
       </div>
     )
   }
 
   if (hasError || !property) {
     return (
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-100">
-            <Building2 className="h-10 w-10 text-slate-400" />
-          </div>
-          <h3 className="mt-4 text-lg font-semibold text-blue-950">Property not found</h3>
-          <p className="mt-1 text-sm text-slate-500">
-            This property may have been removed or is no longer listed.
-          </p>
-          <Button asChild className="mt-4" variant="outline">
-            <Link href="/properties">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Properties
-            </Link>
-          </Button>
+      <div className="inst-container py-24 text-center">
+        <div className="w-16 h-16 border border-wire bg-cream flex items-center justify-center mx-auto mb-5">
+          <Building2 className="w-8 h-8 text-wire" />
         </div>
+        <h3 className="font-display text-xl font-medium text-sable mb-2">Property not found</h3>
+        <p className="text-[0.875rem] text-fog mb-6">
+          This property may have been removed or is no longer listed.
+        </p>
+        <Link
+          href="/properties"
+          className="inline-flex items-center gap-2 border border-wire text-pewter text-[0.8125rem] px-5 py-2.5 hover:bg-linen transition-colors"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          Back to Properties
+        </Link>
       </div>
     )
   }
 
-  const price = property.listingType === 'SALE'
-    ? property.salePrice
-    : property.monthlyRent
-
-  const priceLabel = property.listingType === 'SALE'
-    ? ''
-    : '/mo'
+  const price = property.listingType === 'SALE' ? property.salePrice : property.monthlyRent
+  const priceLabel = property.listingType === 'SALE' ? '' : '/ month'
+  const isRent = property.listingType === 'RENT' || property.listingType === 'BOTH'
+  const allImages = property.images || []
+  const whatsappUrl = `https://wa.me/447948623631?text=${encodeURIComponent(
+    `Hi, I'm interested in this property: ${property.name}\n${typeof window !== 'undefined' ? window.location.origin : ''}/properties/${id}`
+  )}`
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-      {/* Back link */}
-      <Link
-        href="/properties"
-        className="inline-flex items-center gap-1.5 text-sm text-slate-500 hover:text-blue-950 transition-colors mb-6"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to Properties
-      </Link>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Image gallery / placeholder */}
-          <div className="relative h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden bg-gradient-to-br from-slate-100 to-slate-50">
-            {property.images?.length > 0 ? (
-              <img
-                src={property.images[0]}
-                alt={property.name}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="flex h-24 w-24 items-center justify-center rounded-2xl bg-white shadow-sm">
-                  <Building2 className="h-12 w-12 text-slate-300" />
-                </div>
-              </div>
-            )}
-            <div className="absolute top-4 left-4 flex gap-2">
-              <Badge className="bg-white/95 text-slate-700 border-slate-200 backdrop-blur-sm text-sm px-3 py-1">
-                {propertyTypeLabels[property.type] || property.type}
-              </Badge>
-              <Badge className={
-                property.listingType === 'SALE'
-                  ? 'bg-blue-100 text-blue-700 border-blue-200 text-sm px-3 py-1'
-                  : 'bg-emerald-100 text-emerald-700 border-emerald-200 text-sm px-3 py-1'
-              }>
-                {listingTypeLabels[property.listingType] || property.listingType}
-              </Badge>
-            </div>
+    <div>
+      {/* ── Breadcrumb bar ──────────────────────────────────── */}
+      <div className="bg-cream border-b border-wire">
+        <div className="inst-container py-4">
+          <div className="flex items-center gap-2 text-[0.75rem] text-fog">
+            <Link href="/properties" className="hover:text-sable transition-colors inline-flex items-center gap-1.5">
+              <ArrowLeft className="w-3 h-3" />
+              Properties
+            </Link>
+            <span className="text-bronze/40">/</span>
+            <span className="text-pewter truncate max-w-xs">{property.name}</span>
           </div>
+        </div>
+      </div>
 
-          {/* Additional images */}
-          {property.images?.length > 1 && (
-            <div className="grid grid-cols-4 gap-3">
-              {property.images.slice(1, 5).map((img, i) => (
-                <div key={i} className="h-24 rounded-xl overflow-hidden bg-slate-100">
-                  <img
-                    src={img}
-                    alt={`${property.name} - ${i + 2}`}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Property header */}
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-blue-950">{property.name}</h1>
-            <div className="flex items-center gap-1.5 mt-2 text-slate-500">
-              <MapPin className="h-4 w-4 text-amber-500" />
-              <span>{property.address}, {property.city}, {property.postcode}</span>
-            </div>
-            {price && (
-              <div className="mt-3">
-                <span className="text-2xl font-bold bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">
-                  {formatCurrency(price * 100)}
-                </span>
-                {priceLabel && (
-                  <span className="text-slate-400 ml-1">{priceLabel}</span>
-                )}
-              </div>
-            )}
+      {/* ── Hero image ──────────────────────────────────────── */}
+      <div className="bg-sable relative overflow-hidden" style={{ height: 'clamp(240px, 45vw, 520px)' }}>
+        {allImages.length > 0 ? (
+          <img
+            src={allImages[activeImage]}
+            alt={property.name}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center inst-hero-grid">
+            <Building2 className="w-16 h-16 text-bronze/20" />
           </div>
+        )}
+        {/* Overlay gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-sable/60 via-transparent to-transparent pointer-events-none" />
 
-          {/* Quick stats */}
-          <div className="flex flex-wrap gap-6 p-5 bg-slate-50 rounded-xl">
-            {property.bedrooms && (
-              <div className="flex items-center gap-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-sm">
-                  <Bed className="h-5 w-5 text-amber-500" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">Bedrooms</p>
-                  <p className="font-bold text-blue-950">{property.bedrooms}</p>
-                </div>
-              </div>
-            )}
-            {property.bathrooms && (
-              <div className="flex items-center gap-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-sm">
-                  <Bath className="h-5 w-5 text-amber-500" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">Bathrooms</p>
-                  <p className="font-bold text-blue-950">{property.bathrooms}</p>
-                </div>
-              </div>
-            )}
-            {property.squareFeet && (
-              <div className="flex items-center gap-2">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-sm">
-                  <Square className="h-5 w-5 text-amber-500" />
-                </div>
-                <div>
-                  <p className="text-sm text-slate-500">Area</p>
-                  <p className="font-bold text-blue-950">{property.squareFeet.toLocaleString()} sqft</p>
-                </div>
-              </div>
-            )}
-            <div className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white shadow-sm">
-                <Home className="h-5 w-5 text-amber-500" />
-              </div>
-              <div>
-                <p className="text-sm text-slate-500">Type</p>
-                <p className="font-bold text-blue-950">{propertyTypeLabels[property.type] || property.type}</p>
-              </div>
-            </div>
-          </div>
+        {/* Tags */}
+        <div className="absolute top-5 left-5 flex gap-2">
+          <span className="text-[0.6rem] border border-wire/60 bg-cream/90 text-pewter uppercase tracking-[0.12em] px-2.5 py-1.5 backdrop-blur-sm">
+            {PROPERTY_TYPE_LABELS[property.type] || property.type}
+          </span>
+          <span className={`text-[0.6rem] border uppercase tracking-[0.12em] px-2.5 py-1.5 backdrop-blur-sm ${
+            isRent ? 'border-bronze/50 bg-bronze/20 text-bronze-light' : 'border-cream/40 bg-sable/40 text-cream'
+          }`}>
+            {LISTING_TYPE_LABELS[property.listingType] || property.listingType}
+          </span>
+        </div>
 
-          {/* Description */}
-          {property.description && (
+        {/* Price overlay */}
+        <div className="absolute bottom-5 left-5">
+          {price && (
             <div>
-              <h2 className="text-lg font-bold text-blue-950 mb-3">About this property</h2>
-              <p className="text-slate-600 leading-relaxed whitespace-pre-line">
-                {property.description}
-              </p>
+              <span className="font-display text-[2rem] font-light text-cream leading-none">
+                {formatCurrency(price * 100)}
+              </span>
+              {priceLabel && (
+                <span className="text-haze text-sm ml-2">{priceLabel}</span>
+              )}
             </div>
           )}
+        </div>
+      </div>
 
-          {/* Location */}
-          <div>
-            <h2 className="text-lg font-bold text-blue-950 mb-3">Location</h2>
-            <div className="p-4 bg-slate-50 rounded-xl">
-              <div className="flex items-start gap-2">
-                <MapPin className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="font-medium text-blue-950">{property.address}</p>
-                  <p className="text-sm text-slate-500">{property.city}, {property.postcode}, {property.country}</p>
-                </div>
-              </div>
+      {/* Thumbnail strip */}
+      {allImages.length > 1 && (
+        <div className="bg-cobalt border-b border-bronze/10">
+          <div className="inst-container py-3">
+            <div className="flex gap-2 overflow-x-auto">
+              {allImages.map((img, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveImage(i)}
+                  className={`w-16 h-12 flex-shrink-0 overflow-hidden border-2 transition-all duration-150 ${
+                    i === activeImage ? 'border-bronze' : 'border-transparent opacity-60 hover:opacity-100'
+                  }`}
+                >
+                  <img src={img} alt={`View ${i + 1}`} className="w-full h-full object-cover" />
+                </button>
+              ))}
             </div>
           </div>
         </div>
+      )}
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Price card */}
-          <Card className="border-slate-200 shadow-md sticky top-24">
-            <CardContent className="p-6">
-              {price && (
-                <div className="text-center mb-4">
-                  <p className="text-sm text-slate-500 mb-1">
-                    {property.listingType === 'SALE' ? 'Asking Price' : 'Monthly Rent'}
+      {/* ── Main content ────────────────────────────────────── */}
+      <div className="inst-container py-12">
+        <div className="grid lg:grid-cols-12 gap-12">
+
+          {/* Left: details */}
+          <div className="lg:col-span-7 space-y-10">
+
+            {/* Title + location */}
+            <div>
+              <h1
+                className="font-display font-light text-sable leading-tight mb-3"
+                style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)' }}
+              >
+                {property.name}
+              </h1>
+              <div className="flex items-center gap-2 text-[0.9rem] text-fog">
+                <MapPin className="w-4 h-4 text-bronze flex-shrink-0" />
+                <span>{property.address}, {property.city}{property.postcode ? `, ${property.postcode}` : ''}</span>
+              </div>
+            </div>
+
+            {/* Specs strip */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-wire">
+              {[
+                property.bedrooms && { Icon: Bed, label: 'Bedrooms', value: property.bedrooms },
+                property.bathrooms && { Icon: Bath, label: 'Bathrooms', value: property.bathrooms },
+                property.squareFeet && { Icon: Square, label: 'Area', value: `${property.squareFeet.toLocaleString()} sqft` },
+                { Icon: Home, label: 'Type', value: PROPERTY_TYPE_LABELS[property.type] || property.type },
+              ].filter(Boolean).map(({ Icon, label, value }) => (
+                <div key={label} className="bg-linen px-5 py-5">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <Icon className="w-3.5 h-3.5 text-bronze" />
+                    <span className="text-[0.65rem] text-fog uppercase tracking-[0.12em]">{label}</span>
+                  </div>
+                  <div className="font-display text-[1.125rem] font-medium text-sable">{value}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Description */}
+            {property.description && (
+              <div>
+                <span className="inst-label">About this property</span>
+                <p className="text-dusk text-[0.9375rem] leading-relaxed whitespace-pre-line">
+                  {property.description}
+                </p>
+              </div>
+            )}
+
+            {/* Location */}
+            <div>
+              <span className="inst-label">Location</span>
+              <div className="border border-wire bg-linen p-5 flex items-start gap-3">
+                <MapPin className="w-4 h-4 text-bronze flex-shrink-0 mt-[1px]" />
+                <div>
+                  <p className="text-[0.9375rem] font-medium text-sable">{property.address}</p>
+                  <p className="text-[0.8125rem] text-fog mt-0.5">
+                    {property.city}{property.postcode ? `, ${property.postcode}` : ''}
+                    {property.country ? `, ${property.country}` : ''}
                   </p>
-                  <span className="text-3xl font-bold bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: sticky price card */}
+          <div className="lg:col-span-4 lg:col-start-9">
+            <div className="border border-wire bg-cream sticky top-24">
+
+              {/* Price */}
+              <div className="p-7 border-b border-wire">
+                <p className="inst-label mb-1">
+                  {property.listingType === 'SALE' ? 'Asking Price' : 'Monthly Rent'}
+                </p>
+                {price && (
+                  <div className="font-display text-[2.5rem] font-light text-sable leading-none">
                     {formatCurrency(price * 100)}
-                  </span>
-                  {priceLabel && (
-                    <span className="text-slate-400">{priceLabel}</span>
-                  )}
-                </div>
-              )}
+                    {priceLabel && (
+                      <span className="text-[1rem] text-fog ml-2 font-sans">{priceLabel}</span>
+                    )}
+                  </div>
+                )}
 
-              {/* Both prices */}
-              {property.listingType === 'BOTH' && (
-                <div className="space-y-2 mb-4">
-                  {property.monthlyRent && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-slate-500">Monthly Rent</span>
-                      <span className="font-bold text-blue-950">
-                        {formatCurrency(property.monthlyRent * 100)}
-                      </span>
-                    </div>
-                  )}
-                  {property.salePrice && (
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-slate-500">Sale Price</span>
-                      <span className="font-bold text-blue-950">
-                        {formatCurrency(property.salePrice * 100)}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
+                {/* Both prices */}
+                {property.listingType === 'BOTH' && (
+                  <div className="mt-4 space-y-2">
+                    {property.monthlyRent && (
+                      <div className="flex justify-between text-[0.875rem]">
+                        <span className="text-fog">Monthly Rent</span>
+                        <span className="font-medium text-sable">{formatCurrency(property.monthlyRent * 100)}</span>
+                      </div>
+                    )}
+                    {property.salePrice && (
+                      <div className="flex justify-between text-[0.875rem]">
+                        <span className="text-fog">Sale Price</span>
+                        <span className="font-medium text-sable">{formatCurrency(property.salePrice * 100)}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
-              <Separator className="my-4" />
-
-              {/* Owner info */}
+              {/* Owner */}
               {property.owner && (
-                <div className="mb-4">
-                  <p className="text-sm font-medium text-slate-500 mb-3">Listed by</p>
+                <div className="p-7 border-b border-wire">
+                  <p className="inst-label">Listed by</p>
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-500 text-white">
-                      <User className="h-5 w-5" />
+                    <div className="w-9 h-9 bg-sable flex items-center justify-center flex-shrink-0">
+                      <User className="w-4 h-4 text-bronze" />
                     </div>
-                    <div>
-                      <p className="font-medium text-blue-950">{property.owner.name || 'Property Owner'}</p>
-                    </div>
+                    <span className="text-[0.9375rem] font-medium text-sable">
+                      {property.owner.name || 'Property Owner'}
+                    </span>
                   </div>
                 </div>
               )}
 
-              {/* Contact actions */}
-              <div className="space-y-3">
+              {/* Contact */}
+              <div className="p-7 space-y-3">
                 {property.owner?.phone && (
-                  <Button asChild className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-md shadow-amber-500/20">
-                    <a href={`tel:${property.owner.phone}`}>
-                      <Phone className="h-4 w-4 mr-2" />
-                      Call Owner
-                    </a>
-                  </Button>
+                  <a
+                    href={`tel:${property.owner.phone}`}
+                    className="flex items-center justify-center gap-2.5 w-full bg-sable text-cream py-3 text-[0.8125rem] tracking-wide hover:bg-cobalt transition-colors duration-150"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    Call Owner
+                  </a>
                 )}
                 {property.owner?.email && (
-                  <Button asChild variant="outline" className="w-full">
-                    <a href={`mailto:${property.owner.email}?subject=Inquiry about ${property.name}`}>
-                      <Mail className="h-4 w-4 mr-2" />
-                      Send Email
-                    </a>
-                  </Button>
+                  <a
+                    href={`mailto:${property.owner.email}?subject=Enquiry: ${property.name}`}
+                    className="flex items-center justify-center gap-2.5 w-full border border-wire text-pewter py-3 text-[0.8125rem] tracking-wide hover:bg-linen transition-colors duration-150"
+                  >
+                    <Mail className="w-3.5 h-3.5" />
+                    Send Email
+                  </a>
                 )}
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2.5 w-full border border-[#25D366]/40 bg-[#25D366]/5 text-[#128C7E] py-3 text-[0.8125rem] tracking-wide hover:bg-[#25D366]/10 transition-colors duration-150"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  Enquire via WhatsApp
+                </a>
                 {!property.owner?.phone && !property.owner?.email && (
-                  <Button asChild className="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white">
-                    <Link href="/register">
-                      Sign Up to Contact Owner
-                    </Link>
-                  </Button>
+                  <Link
+                    href="/register"
+                    className="flex items-center justify-center gap-2 w-full border border-bronze/30 bg-bronze/5 text-bronze py-3 text-[0.8125rem] tracking-wide hover:bg-bronze/10 transition-colors duration-150"
+                  >
+                    Sign Up to Contact Owner
+                  </Link>
                 )}
               </div>
 
               {/* Listed date */}
               {property.createdAt && (
-                <div className="mt-4 pt-4 border-t border-slate-100">
-                  <div className="flex items-center gap-2 text-sm text-slate-400">
-                    <Calendar className="h-3.5 w-3.5" />
-                    <span>Listed {new Date(property.createdAt).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}</span>
+                <div className="px-7 pb-6 border-t border-wire pt-5">
+                  <div className="flex items-center gap-2 text-[0.75rem] text-fog">
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>
+                      Listed{' '}
+                      {new Date(property.createdAt).toLocaleDateString('en-AE', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </span>
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     </div>

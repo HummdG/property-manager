@@ -5,14 +5,14 @@ export const userService = {
   async findById(id) {
     return db.user.findUnique({
       where: { id },
-      include: { traderProfile: true, tenantProfile: true },
+      include: { tenantProfile: true },
     })
   },
 
   async findByEmail(email) {
     return db.user.findUnique({
       where: { email },
-      include: { traderProfile: true, tenantProfile: true },
+      include: { tenantProfile: true },
     })
   },
 
@@ -73,6 +73,8 @@ export const userService = {
     })
   },
 }
+
+
 
 
 

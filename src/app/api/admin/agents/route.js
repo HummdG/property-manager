@@ -20,6 +20,7 @@ export async function GET(request) {
     const status = searchParams.get('status') // active, inactive, all
     const skip = (page - 1) * limit
 
+    const approvalStatus = searchParams.get('approvalStatus')
     const where = {}
 
     // Filter by availability status
@@ -27,6 +28,11 @@ export async function GET(request) {
       where.isAvailable = true
     } else if (status === 'inactive') {
       where.isAvailable = false
+    }
+
+    // Filter by approval status
+    if (approvalStatus && approvalStatus !== 'all') {
+      where.approvalStatus = approvalStatus.toUpperCase()
     }
 
     // Search filter
@@ -52,13 +58,6 @@ export async function GET(request) {
               image: true,
               isActive: true,
               createdAt: true
-            }
-          },
-          subscription: {
-            include: {
-              plan: {
-                select: { name: true }
-              }
             }
           },
           _count: {
@@ -122,9 +121,10 @@ export async function GET(request) {
       _avg: { rating: true, completedDeals: true }
     })
 
-    const activeAgents = await db.agentProfile.count({
-      where: { isAvailable: true }
-    })
+    const [activeAgents, pendingApproval] = await Promise.all([
+      db.agentProfile.count({ where: { isAvailable: true } }),
+      db.agentProfile.count({ where: { approvalStatus: 'SUBMITTED' } })
+    ])
 
     return NextResponse.json({
       agents: agentsWithStats,
@@ -137,6 +137,7 @@ export async function GET(request) {
       summary: {
         totalAgents: summary._count.id,
         activeAgents,
+        pendingApproval,
         avgRating: summary._avg.rating || 0,
         avgCompletedDeals: Math.round(summary._avg.completedDeals || 0)
       }
@@ -146,6 +147,8 @@ export async function GET(request) {
     return NextResponse.json({ error: 'Failed to fetch agents' }, { status: 500 })
   }
 }
+
+
 
 
 

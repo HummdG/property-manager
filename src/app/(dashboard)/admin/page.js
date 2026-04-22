@@ -3,16 +3,12 @@ import Link from 'next/link'
 import {
   Users,
   Building2,
-  ClipboardList,
-  Wrench,
   TrendingUp,
-  TrendingDown,
   AlertCircle,
   UserCheck,
   MessageSquare,
   CalendarDays,
   MapPin,
-  Star,
   Phone,
   Eye,
   FileText,
@@ -22,21 +18,12 @@ import {
   ArrowRight,
   ArrowUpRight,
   ArrowDownRight,
-  XCircle,
-  Briefcase,
-  CheckCircle,
-  Play,
   Trash2,
-  UserPlus,
-  CreditCard,
-  Ban
+  UserPlus
 } from 'lucide-react'
 import { StatsCard } from '@/components/dashboard'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { formatDate, getStatusColor, getInitials, getActivityTypeColor } from '@/lib/utils'
+import { formatDate, getInitials, getActivityTypeColor } from '@/lib/utils'
 
 const typeIcons = {
   CALL: Phone,
@@ -63,19 +50,11 @@ const eventTypeConfig = {
   PROPERTY_UPDATED: { icon: Building2, color: 'bg-amber-100 text-amber-600', label: 'Property Updated' },
   PROPERTY_LISTED: { icon: Eye, color: 'bg-green-100 text-green-600', label: 'Property Listed' },
   PROPERTY_DELETED: { icon: Trash2, color: 'bg-red-100 text-red-600', label: 'Property Deleted' },
-  SERVICE_REQUEST_CREATED: { icon: ClipboardList, color: 'bg-purple-100 text-purple-600', label: 'Request Created' },
-  JOB_ASSIGNED: { icon: Briefcase, color: 'bg-blue-100 text-blue-600', label: 'Job Assigned' },
-  JOB_ACCEPTED: { icon: CheckCircle, color: 'bg-emerald-100 text-emerald-600', label: 'Job Accepted' },
-  JOB_REJECTED: { icon: XCircle, color: 'bg-red-100 text-red-600', label: 'Job Rejected' },
-  JOB_STARTED: { icon: Play, color: 'bg-amber-100 text-amber-600', label: 'Job Started' },
-  JOB_COMPLETED: { icon: CheckCircle, color: 'bg-green-100 text-green-600', label: 'Job Completed' },
   INQUIRY_CREATED: { icon: MessageSquare, color: 'bg-cyan-100 text-cyan-600', label: 'Inquiry Created' },
   INQUIRY_UPDATED: { icon: MessageSquare, color: 'bg-teal-100 text-teal-600', label: 'Inquiry Updated' },
   INQUIRY_DELETED: { icon: Trash2, color: 'bg-red-100 text-red-600', label: 'Inquiry Deleted' },
   FOLLOW_UP_CREATED: { icon: CalendarDays, color: 'bg-violet-100 text-violet-600', label: 'Follow-Up Created' },
   AGENT_LOG_CREATED: { icon: CalendarDays, color: 'bg-sky-100 text-sky-600', label: 'Log Created' },
-  SUBSCRIPTION_CREATED: { icon: CreditCard, color: 'bg-emerald-100 text-emerald-600', label: 'Subscription Created' },
-  SUBSCRIPTION_CANCELLED: { icon: Ban, color: 'bg-red-100 text-red-600', label: 'Subscription Cancelled' },
   DOCUMENT_UPLOADED: { icon: FileText, color: 'bg-indigo-100 text-indigo-600', label: 'Document Uploaded' }
 }
 
@@ -94,31 +73,15 @@ function timeAgo (date) {
 }
 
 async function getAdminStats() {
-  const [users, properties, requests, traders, agents] = await Promise.all([
+  const [users, properties, agents] = await Promise.all([
     db.user.count(),
     db.property.count(),
-    db.serviceRequest.count(),
-    db.traderProfile.count(),
     db.agentProfile.count()
   ])
 
   const usersByRole = await db.user.groupBy({
     by: ['role'],
     _count: true
-  })
-
-  const pendingRequests = await db.serviceRequest.count({
-    where: { status: 'PENDING' }
-  })
-
-  const recentRequests = await db.serviceRequest.findMany({
-    include: {
-      property: { select: { name: true } },
-      category: { select: { name: true } },
-      requester: { select: { name: true } }
-    },
-    orderBy: { createdAt: 'desc' },
-    take: 5
   })
 
   const recentUsers = await db.user.findMany({
@@ -134,7 +97,6 @@ async function getAdminStats() {
     }
   })
 
-  // Agent-specific stats
   const activeAgents = await db.agentProfile.count({
     where: { isAvailable: true }
   })
@@ -149,53 +111,32 @@ async function getAdminStats() {
   todayStart.setHours(0, 0, 0, 0)
 
   const todayLogs = await db.agentDailyLog.count({
-    where: {
-      date: { gte: todayStart }
-    }
+    where: { date: { gte: todayStart } }
   })
 
   const todayLocations = await db.agentLocationLog.count({
-    where: {
-      timestamp: { gte: todayStart }
-    }
+    where: { timestamp: { gte: todayStart } }
   })
-
-  // Top agents by inquiries this month
-  const startOfMonth = new Date()
-  startOfMonth.setDate(1)
-  startOfMonth.setHours(0, 0, 0, 0)
 
   const topAgents = await db.agentProfile.findMany({
     include: {
-      user: {
-        select: { name: true, email: true, image: true }
-      },
-      _count: {
-        select: { inquiries: true }
-      }
+      user: { select: { name: true, email: true, image: true } },
+      _count: { select: { inquiries: true } }
     },
-    orderBy: {
-      inquiries: { _count: 'desc' }
-    },
+    orderBy: { inquiries: { _count: 'desc' } },
     take: 5
   })
 
-  // Recent agent activities
   const recentAgentLogs = await db.agentDailyLog.findMany({
     include: {
       agent: {
-        include: {
-          user: {
-            select: { id: true, name: true, image: true }
-          }
-        }
+        include: { user: { select: { id: true, name: true, image: true } } }
       }
     },
     orderBy: { date: 'desc' },
     take: 8
   })
 
-  // Weekly logs comparison
   const weekStart = new Date()
   weekStart.setDate(weekStart.getDate() - weekStart.getDay())
   weekStart.setHours(0, 0, 0, 0)
@@ -204,12 +145,8 @@ async function getAdminStats() {
   lastWeekStart.setDate(lastWeekStart.getDate() - 7)
 
   const [thisWeekLogs, lastWeekLogs, thisWeekByType, topAgentsThisWeek] = await Promise.all([
-    db.agentDailyLog.count({
-      where: { date: { gte: weekStart } }
-    }),
-    db.agentDailyLog.count({
-      where: { date: { gte: lastWeekStart, lt: weekStart } }
-    }),
+    db.agentDailyLog.count({ where: { date: { gte: weekStart } } }),
+    db.agentDailyLog.count({ where: { date: { gte: lastWeekStart, lt: weekStart } } }),
     db.agentDailyLog.groupBy({
       by: ['type'],
       where: { date: { gte: weekStart } },
@@ -225,7 +162,6 @@ async function getAdminStats() {
     })
   ])
 
-  // Fetch agent names for top agents this week
   const topAgentIds = topAgentsThisWeek.map(a => a.agentId)
   const topAgentProfiles = topAgentIds.length > 0
     ? await db.agentProfile.findMany({
@@ -239,13 +175,11 @@ async function getAdminStats() {
     return { agentId: a.agentId, count: a._count, name: profile?.user?.name, image: profile?.user?.image }
   })
 
-  // Recent system events for the dashboard feed
   const recentEvents = await db.systemEvent.findMany({
     orderBy: { createdAt: 'desc' },
     take: 8
   })
 
-  // Fetch user names for events
   const eventUserIds = [...new Set(recentEvents.filter(e => e.userId).map(e => e.userId))]
   const eventUsers = eventUserIds.length > 0
     ? await db.user.findMany({
@@ -260,10 +194,8 @@ async function getAdminStats() {
   }))
 
   return {
-    totals: { users, properties, requests, traders, agents },
+    totals: { users, properties, agents },
     usersByRole,
-    pendingRequests,
-    recentRequests,
     recentUsers,
     agentStats: {
       total: agents,
@@ -290,249 +222,161 @@ async function getAdminStats() {
 export default async function AdminDashboard() {
   const stats = await getAdminStats()
 
-  const roleColors = {
-    OWNER: 'bg-blue-100 text-blue-700 border-blue-200',
-    TENANT: 'bg-purple-100 text-purple-700 border-purple-200',
-    TRADER: 'bg-amber-100 text-amber-700 border-amber-200',
-    AGENT: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-    ADMIN: 'bg-red-100 text-red-700 border-red-200'
+  const rolePills = {
+    OWNER: 'bg-bronze/10 text-bronze border border-bronze/20',
+    TENANT: 'bg-sable/5 text-pewter border border-wire',
+    AGENT: 'bg-sable/8 text-pewter border border-wire',
+    ADMIN: 'bg-red-50 text-red-600 border border-red-100'
   }
 
   return (
-    <div className="space-y-6">
-      {/* Page header */}
-      <div>
-        <h1 className="text-2xl font-bold text-blue-950">Admin Dashboard</h1>
-        <p className="text-slate-500 mt-1">Overview of the platform</p>
+    <div className="space-y-5">
+      <div className="border-b border-wire pb-5">
+        <p className="text-[0.65rem] uppercase tracking-[0.15em] text-fog font-medium">Administration</p>
+        <h1 className="font-display text-[1.875rem] font-light text-sable leading-tight mt-0.5">Platform Overview</h1>
       </div>
 
-      {/* Stats grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        <StatsCard
-          title="Total Users"
-          value={stats.totals.users}
-          icon={Users}
-          subtitle="Registered accounts"
-          iconColor="amber"
-        />
-        <StatsCard
-          title="Properties"
-          value={stats.totals.properties}
-          icon={Building2}
-          subtitle="In the system"
-          iconColor="blue"
-        />
-        <StatsCard
-          title="Service Requests"
-          value={stats.totals.requests}
-          icon={ClipboardList}
-          subtitle={`${stats.pendingRequests} pending`}
-          iconColor="purple"
-        />
-        <StatsCard
-          title="Traders"
-          value={stats.totals.traders}
-          icon={Wrench}
-          subtitle="Active contractors"
-          iconColor="emerald"
-        />
-        <StatsCard
-          title="Agents"
-          value={stats.agentStats.total}
-          icon={UserCheck}
-          subtitle={`${stats.agentStats.active} active`}
-          iconColor="blue"
-        />
+      <div className="grid gap-px sm:grid-cols-3 bg-wire border border-wire">
+        <StatsCard title="Total Users" value={stats.totals.users} icon={Users} subtitle="Registered accounts" />
+        <StatsCard title="Properties" value={stats.totals.properties} icon={Building2} subtitle="In the system" />
+        <StatsCard title="Agents" value={stats.agentStats.total} icon={UserCheck} subtitle={`${stats.agentStats.active} active`} />
       </div>
-
-      {/* Alert for pending requests */}
-      {stats.pendingRequests > 0 && (
-        <Card className="bg-gradient-to-r from-amber-50 to-amber-100/50 border-amber-200">
-          <CardContent className="p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-200">
-                  <AlertCircle className="h-5 w-5 text-amber-700" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-blue-950">{stats.pendingRequests} pending requests</h3>
-                  <p className="text-slate-600 text-sm">Need to be assigned to traders</p>
-                </div>
-              </div>
-              <Link href="/admin/requests?status=PENDING">
-                <Button>
-                  Review Requests
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Agent Logs Summary */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-100">
-              <FileCheck className="h-4 w-4 text-blue-600" />
-            </div>
-            Agent Logs Summary
-          </CardTitle>
-          <Link href="/admin/logs">
-            <Button variant="outline" size="sm">
-              View All Logs
-              <ArrowRight className="h-4 w-4 ml-1" />
-            </Button>
-          </Link>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 sm:grid-cols-3 mb-5">
-            {/* This week vs last week */}
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-              <p className="text-sm font-medium text-slate-500 mb-1">This Week</p>
-              <div className="flex items-end gap-2">
-                <p className="text-3xl font-bold text-blue-950">{stats.weeklyLogs.thisWeek}</p>
-                {(() => {
-                  const diff = stats.weeklyLogs.thisWeek - stats.weeklyLogs.lastWeek
-                  const pct = stats.weeklyLogs.lastWeek > 0
-                    ? Math.round((diff / stats.weeklyLogs.lastWeek) * 100)
-                    : stats.weeklyLogs.thisWeek > 0 ? 100 : 0
-                  if (diff > 0) {
-                    return (
-                      <span className="flex items-center text-xs font-semibold text-emerald-600 mb-1">
-                        <ArrowUpRight className="h-3 w-3" />
-                        +{pct}%
-                      </span>
-                    )
-                  } else if (diff < 0) {
-                    return (
-                      <span className="flex items-center text-xs font-semibold text-red-500 mb-1">
-                        <ArrowDownRight className="h-3 w-3" />
-                        {pct}%
-                      </span>
-                    )
-                  }
-                  return <span className="text-xs font-semibold text-slate-400 mb-1">No change</span>
-                })()}
-              </div>
-              <p className="text-xs text-slate-400 mt-1">Last week: {stats.weeklyLogs.lastWeek}</p>
-            </div>
-
-            {/* Activity breakdown */}
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-              <p className="text-sm font-medium text-slate-500 mb-2">Activity Breakdown</p>
-              {Object.keys(stats.weeklyLogs.byType).length === 0 ? (
-                <p className="text-xs text-slate-400">No logs this week</p>
-              ) : (
-                <div className="flex flex-wrap gap-1.5">
-                  {Object.entries(stats.weeklyLogs.byType).map(([type, count]) => {
-                    const Icon = typeIcons[type] || MoreHorizontal
-                    return (
-                      <div key={type} className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-slate-100">
-                        <div className={`flex h-5 w-5 items-center justify-center rounded ${getActivityTypeColor(type)}`}>
-                          <Icon className="h-3 w-3" />
-                        </div>
-                        <span className="text-xs font-medium text-blue-950">{typeLabels[type] || type}</span>
-                        <Badge variant="secondary" className="text-[10px] h-4 px-1">{count}</Badge>
-                      </div>
-                    )
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Top 3 agents this week */}
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-              <p className="text-sm font-medium text-slate-500 mb-2">Most Active This Week</p>
-              {stats.weeklyLogs.topAgents.length === 0 ? (
-                <p className="text-xs text-slate-400">No agent activity this week</p>
-              ) : (
-                <div className="space-y-2">
-                  {stats.weeklyLogs.topAgents.map((agent, idx) => (
-                    <div key={agent.agentId} className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-400 w-3">{idx + 1}</span>
-                      <Avatar className="h-6 w-6">
-                        <AvatarImage src={agent.image} />
-                        <AvatarFallback className="bg-gradient-to-br from-amber-400 to-amber-500 text-white text-[9px]">
-                          {getInitials(agent.name)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm font-medium text-blue-950 flex-1 truncate">{agent.name || 'Unknown'}</span>
-                      <Badge variant="secondary" className="text-[10px]">{agent.count} logs</Badge>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+      <div className="border border-wire bg-cream">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-wire">
+          <div className="flex items-center gap-3">
+            <FileCheck className="h-4 w-4 text-bronze" />
+            <p className="text-[0.65rem] uppercase tracking-[0.15em] text-fog font-medium">Agent Logs Summary</p>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Recent System Events Feed */}
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100">
-              <Activity className="h-4 w-4 text-purple-600" />
-            </div>
-            Recent System Events
-          </CardTitle>
-          <Link href="/admin/events">
-            <Button variant="outline" size="sm">
-              View All Events
-              <ArrowRight className="h-4 w-4 ml-1" />
-            </Button>
+          <Link
+            href="/admin/logs"
+            className="flex items-center gap-1.5 text-[0.75rem] text-pewter hover:text-sable transition-colors"
+          >
+            View All Logs <ArrowRight className="h-3.5 w-3.5" />
           </Link>
-        </CardHeader>
-        <CardContent>
+        </div>
+        <div className="grid gap-px sm:grid-cols-3 bg-wire">
+          <div className="bg-cream p-5">
+            <p className="text-[0.65rem] uppercase tracking-[0.12em] text-fog font-medium mb-3">This Week</p>
+            <div className="flex items-end gap-2">
+              <p className="font-display text-[2.5rem] font-light text-sable leading-none">{stats.weeklyLogs.thisWeek}</p>
+              {(() => {
+                const diff = stats.weeklyLogs.thisWeek - stats.weeklyLogs.lastWeek
+                const pct = stats.weeklyLogs.lastWeek > 0
+                  ? Math.round((diff / stats.weeklyLogs.lastWeek) * 100)
+                  : stats.weeklyLogs.thisWeek > 0 ? 100 : 0
+                if (diff > 0) return <span className="flex items-center text-[0.7rem] font-medium text-emerald-600 mb-1.5"><ArrowUpRight className="h-3 w-3" />+{pct}%</span>
+                if (diff < 0) return <span className="flex items-center text-[0.7rem] font-medium text-red-500 mb-1.5"><ArrowDownRight className="h-3 w-3" />{pct}%</span>
+                return <span className="text-[0.7rem] text-haze mb-1.5">No change</span>
+              })()}
+            </div>
+            <p className="text-[0.7rem] text-haze mt-1">Last week: {stats.weeklyLogs.lastWeek}</p>
+          </div>
+
+          <div className="bg-cream p-5">
+            <p className="text-[0.65rem] uppercase tracking-[0.12em] text-fog font-medium mb-3">Activity Breakdown</p>
+            {Object.keys(stats.weeklyLogs.byType).length === 0 ? (
+              <p className="text-[0.75rem] text-haze">No logs this week</p>
+            ) : (
+              <div className="flex flex-wrap gap-1.5">
+                {Object.entries(stats.weeklyLogs.byType).map(([type, count]) => {
+                  const Icon = typeIcons[type] || MoreHorizontal
+                  return (
+                    <div key={type} className="flex items-center gap-1.5 px-2 py-1 border border-wire bg-linen">
+                      <Icon className="h-3 w-3 text-bronze" />
+                      <span className="text-[0.7rem] text-pewter">{typeLabels[type] || type}</span>
+                      <span className="text-[0.65rem] text-fog font-medium">{count}</span>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+
+          <div className="bg-cream p-5">
+            <p className="text-[0.65rem] uppercase tracking-[0.12em] text-fog font-medium mb-3">Most Active This Week</p>
+            {stats.weeklyLogs.topAgents.length === 0 ? (
+              <p className="text-[0.75rem] text-haze">No agent activity this week</p>
+            ) : (
+              <div className="space-y-2.5">
+                {stats.weeklyLogs.topAgents.map((agent, idx) => (
+                  <div key={agent.agentId} className="flex items-center gap-2.5">
+                    <span className="text-[0.65rem] font-medium text-bronze w-3">{idx + 1}</span>
+                    <Avatar className="h-5 w-5 ring-1 ring-bronze/20">
+                      <AvatarImage src={agent.image} />
+                      <AvatarFallback className="bg-bronze/15 text-bronze text-[8px] font-medium">
+                        {getInitials(agent.name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-[0.8125rem] text-sable flex-1 truncate">{agent.name || 'Unknown'}</span>
+                    <span className="text-[0.7rem] text-fog">{agent.count} logs</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Recent System Events */}
+      <div className="border border-wire bg-cream">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-wire">
+          <div className="flex items-center gap-3">
+            <Activity className="h-4 w-4 text-bronze" />
+            <p className="text-[0.65rem] uppercase tracking-[0.15em] text-fog font-medium">Recent System Events</p>
+          </div>
+          <Link
+            href="/admin/events"
+            className="flex items-center gap-1.5 text-[0.75rem] text-pewter hover:text-sable transition-colors"
+          >
+            View All Events <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+        <div className="px-6 py-2">
           {stats.recentEvents.length === 0 ? (
-            <div className="text-center py-8">
-              <Activity className="h-8 w-8 text-slate-300 mx-auto mb-2" />
-              <p className="text-sm text-slate-400">No system events recorded yet</p>
+            <div className="text-center py-10">
+              <Activity className="h-7 w-7 text-wire mx-auto mb-2" />
+              <p className="text-[0.8125rem] text-haze">No system events recorded yet</p>
             </div>
           ) : (
-            <div className="space-y-1">
+            <div>
               {stats.recentEvents.map((event, idx) => {
                 const config = eventTypeConfig[event.type] || defaultEventConfig
                 const EventIcon = config.icon
                 return (
                   <div
                     key={event.id}
-                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors"
+                    className="flex items-start gap-4 py-3.5 border-b border-wire/60 last:border-0"
                   >
-                    <div className="relative flex flex-col items-center">
-                      <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${config.color}`}>
-                        <EventIcon className="h-4 w-4" />
+                    <div className="relative flex flex-col items-center flex-shrink-0">
+                      <div className="w-7 h-7 border border-wire bg-linen flex items-center justify-center">
+                        <EventIcon className="h-3.5 w-3.5 text-bronze" />
                       </div>
                       {idx < stats.recentEvents.length - 1 && (
-                        <div className="w-px h-4 bg-slate-200 mt-1" />
+                        <div className="w-px h-3 bg-wire mt-1" />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 font-semibold">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-[0.65rem] uppercase tracking-[0.12em] text-bronze font-medium">
                           {config.label}
-                        </Badge>
+                        </span>
                         {event.userName && (
-                          <span className="text-xs text-slate-500">by {event.userName}</span>
+                          <span className="text-[0.75rem] text-fog">by {event.userName}</span>
                         )}
                       </div>
                       {event.metadata && typeof event.metadata === 'object' && (
-                        <p className="text-xs text-slate-400 mt-0.5 truncate">
-                          {event.metadata.serviceRequestTitle
-                            || event.metadata.propertyName
+                        <p className="text-[0.8125rem] text-pewter mt-0.5 truncate">
+                          {event.metadata.propertyName
                             || event.metadata.clientName
                             || event.metadata.userName
                             || event.metadata.title
-                            || event.metadata.planName
                             || ''}
-                          {event.metadata.rejectionReason && (
-                            <span className="text-red-400"> — {event.metadata.rejectionReason}</span>
-                          )}
                         </p>
                       )}
                     </div>
-                    <span className="text-[11px] text-slate-400 flex-shrink-0">
+                    <span className="text-[0.7rem] text-haze flex-shrink-0 pt-0.5">
                       {timeAgo(event.createdAt)}
                     </span>
                   </div>
@@ -540,84 +384,65 @@ export default async function AdminDashboard() {
               })}
             </div>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      {/* Agent Insights Section */}
-      <Card className="border-emerald-200 bg-gradient-to-r from-emerald-50/50 to-blue-50/50">
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100">
-              <UserCheck className="h-4 w-4 text-emerald-600" />
-            </div>
-            Agent Insights
-          </CardTitle>
-          <Link href="/admin/agents">
-            <Button variant="outline" size="sm">
-              View All Agents
-            </Button>
+      {/* Agent Insights */}
+      <div className="border border-wire bg-cream">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-wire">
+          <div className="flex items-center gap-3">
+            <UserCheck className="h-4 w-4 text-bronze" />
+            <p className="text-[0.65rem] uppercase tracking-[0.15em] text-fog font-medium">Agent Insights</p>
+          </div>
+          <Link
+            href="/admin/agents"
+            className="flex items-center gap-1.5 text-[0.75rem] text-pewter hover:text-sable transition-colors"
+          >
+            View All Agents <ArrowRight className="h-3.5 w-3.5" />
           </Link>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 sm:grid-cols-4 mb-6">
-            <div className="p-4 rounded-xl bg-white border border-slate-100">
-              <div className="flex items-center gap-2 text-amber-600 mb-1">
-                <MessageSquare className="h-4 w-4" />
-                <span className="text-sm font-medium">Open Inquiries</span>
+        </div>
+        <div className="p-6 space-y-6">
+          <div className="grid gap-px sm:grid-cols-4 bg-wire border border-wire">
+            {[
+              { label: 'Open Inquiries', value: stats.agentStats.openInquiries, Icon: MessageSquare },
+              { label: "Today's Logs", value: stats.agentStats.todayLogs, Icon: CalendarDays },
+              { label: 'Location Check-ins', value: stats.agentStats.todayLocations, Icon: MapPin },
+              { label: 'Active Agents', value: stats.agentStats.active, Icon: UserCheck },
+            ].map(({ label, value, Icon }) => (
+              <div key={label} className="bg-cream p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Icon className="h-3.5 w-3.5 text-bronze" />
+                  <p className="text-[0.65rem] uppercase tracking-[0.1em] text-fog font-medium">{label}</p>
+                </div>
+                <p className="font-display text-[1.75rem] font-light text-sable leading-none">{value}</p>
               </div>
-              <p className="text-2xl font-bold text-blue-950">{stats.agentStats.openInquiries}</p>
-            </div>
-            <div className="p-4 rounded-xl bg-white border border-slate-100">
-              <div className="flex items-center gap-2 text-blue-600 mb-1">
-                <CalendarDays className="h-4 w-4" />
-                <span className="text-sm font-medium">Today's Logs</span>
-              </div>
-              <p className="text-2xl font-bold text-blue-950">{stats.agentStats.todayLogs}</p>
-            </div>
-            <div className="p-4 rounded-xl bg-white border border-slate-100">
-              <div className="flex items-center gap-2 text-purple-600 mb-1">
-                <MapPin className="h-4 w-4" />
-                <span className="text-sm font-medium">Location Check-ins</span>
-              </div>
-              <p className="text-2xl font-bold text-blue-950">{stats.agentStats.todayLocations}</p>
-            </div>
-            <div className="p-4 rounded-xl bg-white border border-slate-100">
-              <div className="flex items-center gap-2 text-emerald-600 mb-1">
-                <UserCheck className="h-4 w-4" />
-                <span className="text-sm font-medium">Active Agents</span>
-              </div>
-              <p className="text-2xl font-bold text-blue-950">{stats.agentStats.active}</p>
-            </div>
+            ))}
           </div>
 
-          {/* Top agents and recent activity */}
           <div className="grid gap-6 lg:grid-cols-2">
-            {/* Top agents */}
             <div>
-              <h4 className="text-sm font-semibold text-slate-500 mb-3">Top Agents</h4>
-              <div className="space-y-2">
+              <p className="text-[0.65rem] uppercase tracking-[0.15em] text-fog font-medium mb-3">Top Agents</p>
+              <div className="space-y-px border border-wire">
                 {stats.topAgents.length === 0 ? (
-                  <p className="text-slate-400 text-sm py-4 text-center">No agents yet</p>
+                  <p className="text-[0.8125rem] text-haze py-6 text-center bg-cream">No agents yet</p>
                 ) : (
                   stats.topAgents.map((agent, index) => (
                     <Link
                       key={agent.id}
                       href={`/admin/agents/${agent.id}`}
-                      className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:border-amber-200 transition-colors"
+                      className="flex items-center gap-3 p-3.5 bg-cream hover:bg-linen border-b border-wire last:border-0 transition-colors"
                     >
-                      <span className="text-sm font-semibold text-slate-400 w-4">{index + 1}</span>
-                      <Avatar className="h-8 w-8">
+                      <span className="text-[0.7rem] font-medium text-bronze w-3">{index + 1}</span>
+                      <Avatar className="h-7 w-7 ring-1 ring-bronze/20">
                         <AvatarImage src={agent.user?.image} />
-                        <AvatarFallback className="bg-gradient-to-br from-amber-400 to-amber-500 text-white text-xs">
+                        <AvatarFallback className="bg-bronze/15 text-bronze text-[9px] font-medium">
                           {getInitials(agent.user?.name)}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-blue-950 truncate">{agent.user?.name}</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <MessageSquare className="h-3.5 w-3.5 text-slate-400" />
-                        <span className="text-sm font-semibold text-blue-950">{agent._count.inquiries}</span>
+                      <p className="text-[0.8125rem] text-sable flex-1 truncate">{agent.user?.name}</p>
+                      <div className="flex items-center gap-1.5 text-[0.75rem] text-fog">
+                        <MessageSquare className="h-3 w-3 text-bronze" />
+                        {agent._count.inquiries}
                       </div>
                     </Link>
                   ))
@@ -625,12 +450,11 @@ export default async function AdminDashboard() {
               </div>
             </div>
 
-            {/* Recent agent activity */}
             <div>
-              <h4 className="text-sm font-semibold text-slate-500 mb-3">Recent Agent Activity</h4>
-              <div className="space-y-2">
+              <p className="text-[0.65rem] uppercase tracking-[0.15em] text-fog font-medium mb-3">Recent Agent Activity</p>
+              <div className="space-y-px border border-wire">
                 {stats.recentAgentLogs.length === 0 ? (
-                  <p className="text-slate-400 text-sm py-4 text-center">No recent activity</p>
+                  <p className="text-[0.8125rem] text-haze py-6 text-center bg-cream">No recent activity</p>
                 ) : (
                   stats.recentAgentLogs.slice(0, 5).map(log => {
                     const Icon = typeIcons[log.type] || MoreHorizontal
@@ -638,17 +462,17 @@ export default async function AdminDashboard() {
                       <Link
                         key={log.id}
                         href={`/admin/agents/${log.agent.id}?tab=logs`}
-                        className="flex items-center gap-3 p-3 rounded-xl bg-white border border-slate-100 hover:border-amber-200 transition-colors"
+                        className="flex items-center gap-3 p-3.5 bg-cream hover:bg-linen border-b border-wire last:border-0 transition-colors"
                       >
-                        <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${getActivityTypeColor(log.type)}`}>
-                          <Icon className="h-4 w-4" />
+                        <div className="w-7 h-7 border border-wire bg-linen flex items-center justify-center flex-shrink-0">
+                          <Icon className="h-3.5 w-3.5 text-bronze" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-blue-950 truncate">{log.title}</p>
-                          <p className="text-xs text-slate-500">{log.agent.user?.name}</p>
+                          <p className="text-[0.8125rem] text-sable truncate">{log.title}</p>
+                          <p className="text-[0.7rem] text-fog">{log.agent.user?.name}</p>
                         </div>
-                        <span className="text-xs text-slate-400">
-                          {formatDate(log.date, { hour: '2-digit', minute: '2-digit' })}
+                        <span className="text-[0.7rem] text-haze flex-shrink-0">
+                          {formatDate(log.date)}
                         </span>
                       </Link>
                     )
@@ -657,111 +481,57 @@ export default async function AdminDashboard() {
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Recent requests */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Recent Requests</CardTitle>
-            <Link href="/admin/requests">
-              <Button variant="outline" size="sm">
-                View All
-              </Button>
-            </Link>
-          </CardHeader>
-          <CardContent>
-            {stats.recentRequests.length === 0 ? (
-              <p className="text-slate-500 text-sm py-4 text-center">No requests yet</p>
-            ) : (
-              <div className="space-y-3">
-                {stats.recentRequests.map(request => (
-                  <div
-                    key={request.id}
-                    className="flex items-start justify-between gap-4 p-3 rounded-xl bg-slate-50 border border-slate-100"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p className="font-semibold text-blue-950 truncate">{request.title}</p>
-                      <p className="text-sm text-slate-500">
-                        {request.property?.name} • {request.category?.name}
-                      </p>
-                      <p className="text-xs text-slate-400 mt-1">
-                        by {request.requester?.name} • {formatDate(request.createdAt)}
-                      </p>
-                    </div>
-                    <Badge className={getStatusColor(request.status)}>
-                      {request.status.replace('_', ' ')}
-                    </Badge>
-                  </div>
-                ))}
+      {/* Recent users */}
+      <div className="border border-wire bg-cream">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-wire">
+          <p className="text-[0.65rem] uppercase tracking-[0.15em] text-fog font-medium">Recent Users</p>
+          <Link href="/admin/users" className="text-[0.75rem] text-pewter hover:text-sable transition-colors">
+            Manage Users
+          </Link>
+        </div>
+        <div className="divide-y divide-wire/60">
+          {stats.recentUsers.map(user => (
+            <div key={user.id} className="flex items-center justify-between gap-4 px-5 py-3.5 hover:bg-linen transition-colors">
+              <div className="min-w-0 flex-1">
+                <p className="text-[0.8125rem] font-medium text-sable truncate">{user.name}</p>
+                <p className="text-[0.75rem] text-fog truncate mt-0.5">{user.email}</p>
               </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Recent users */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Recent Users</CardTitle>
-            <Link href="/admin/users">
-              <Button variant="outline" size="sm">
-                Manage Users
-              </Button>
-            </Link>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {stats.recentUsers.map(user => (
-                <div
-                  key={user.id}
-                  className="flex items-center justify-between gap-4 p-3 rounded-xl bg-slate-50 border border-slate-100"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-blue-950 truncate">{user.name}</p>
-                    <p className="text-sm text-slate-500 truncate">{user.email}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge className={roleColors[user.role]}>
-                      {user.role}
-                    </Badge>
-                    {!user.isActive && (
-                      <Badge variant="destructive">
-                        Inactive
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              ))}
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <span className={`text-[0.65rem] uppercase tracking-[0.08em] font-medium px-2 py-0.5 ${rolePills[user.role]}`}>
+                  {user.role}
+                </span>
+                {!user.isActive && (
+                  <span className="text-[0.65rem] uppercase tracking-[0.08em] font-medium px-2 py-0.5 bg-red-50 text-red-500 border border-red-100">
+                    Inactive
+                  </span>
+                )}
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          ))}
+        </div>
       </div>
 
       {/* User distribution */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100">
-              <TrendingUp className="h-4 w-4 text-amber-600" />
+      <div className="border border-wire bg-cream">
+        <div className="flex items-center gap-3 px-6 py-4 border-b border-wire">
+          <TrendingUp className="h-4 w-4 text-bronze" />
+          <p className="text-[0.65rem] uppercase tracking-[0.15em] text-fog font-medium">User Distribution</p>
+        </div>
+        <div className="grid gap-px sm:grid-cols-4 bg-wire p-px">
+          {stats.usersByRole.map(item => (
+            <div key={item.role} className="bg-cream p-5">
+              <span className={`text-[0.6rem] uppercase tracking-[0.1em] font-medium px-2 py-0.5 ${rolePills[item.role] || 'bg-slate-50 text-slate-600 border border-slate-100'}`}>
+                {item.role}
+              </span>
+              <p className="font-display text-[2rem] font-light text-sable mt-3 leading-none">{item._count}</p>
+              <p className="text-[0.7rem] text-haze mt-1">users</p>
             </div>
-            User Distribution
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 sm:grid-cols-5">
-            {stats.usersByRole.map(item => (
-              <div key={item.role} className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                <Badge className={roleColors[item.role]}>
-                  {item.role}
-                </Badge>
-                <p className="text-3xl font-bold text-blue-950 mt-2">{item._count}</p>
-                <p className="text-sm text-slate-500">users</p>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

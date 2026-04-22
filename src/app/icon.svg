@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="gold" x1="16" y1="4" x2="16" y2="24" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#D4B47A"/>
+      <stop offset="100%" stop-color="#9A7640"/>
+    </linearGradient>
+    <linearGradient id="gold-face" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#CBB07A"/>
+      <stop offset="100%" stop-color="#B8965A"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Dark navy background with subtle radius -->
+  <rect width="32" height="32" rx="5" fill="#0D1B2A"/>
+
+  <!-- Main pyramid — left face (lighter) -->
+  <path d="M16 4.5L4.5 24.5H16V4.5Z" fill="url(#gold)" opacity="0.85"/>
+
+  <!-- Main pyramid — right face (darker, depth) -->
+  <path d="M16 4.5L27.5 24.5H16V4.5Z" fill="url(#gold-face)" opacity="0.65"/>
+
+  <!-- Ridge line (apex to base centre) -->
+  <line x1="16" y1="4.5" x2="16" y2="24.5" stroke="#D4B47A" stroke-width="0.5" opacity="0.4"/>
+
+  <!-- Base ground rule -->
+  <line x1="3.5" y1="26" x2="28.5" y2="26" stroke="#B8965A" stroke-width="0.75" opacity="0.45"/>
+
+  <!-- Outer pyramid stroke for crispness -->
+  <polygon points="16,4.5 27.5,24.5 4.5,24.5" fill="none" stroke="#C8A06A" stroke-width="0.75" stroke-linejoin="round" opacity="0.6"/>
+</svg>

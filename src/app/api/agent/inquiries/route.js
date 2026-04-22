@@ -131,9 +131,9 @@ export async function POST(request) {
     }
 
     // Validate type
-    if (!['RENT', 'SALE', 'MAINTENANCE'].includes(type.toUpperCase())) {
+    if (!['RENT', 'SALE'].includes(type.toUpperCase())) {
       return NextResponse.json(
-        { error: 'Invalid inquiry type. Must be RENT, SALE, or MAINTENANCE' },
+        { error: 'Invalid inquiry type. Must be RENT or SALE' },
         { status: 400 }
       )
     }

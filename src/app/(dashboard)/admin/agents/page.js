@@ -2,19 +2,23 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Loader2, Users, Search, UserCheck, UserX, Star, TrendingUp } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
+import { Loader2, Users, Search, UserCheck, Star, TrendingUp, Clock } from 'lucide-react'
 import { AgentCard } from '@/components/admin'
-import { StatsCard } from '@/components/dashboard'
+import { cn } from '@/lib/utils'
+
+const statusOptions = [
+  { value: 'all', label: 'All Agents' },
+  { value: 'active', label: 'Active' },
+  { value: 'inactive', label: 'Inactive' }
+]
+
+const approvalOptions = [
+  { value: 'all', label: 'All Statuses' },
+  { value: 'SUBMITTED', label: 'Pending Review' },
+  { value: 'APPROVED', label: 'Approved' },
+  { value: 'REJECTED', label: 'Rejected' },
+  { value: 'DRAFT', label: 'Draft' },
+]
 
 export default function AdminAgentsPage() {
   const searchParams = useSearchParams()
@@ -24,27 +28,23 @@ export default function AdminAgentsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, totalPages: 0 })
-  const [summary, setSummary] = useState({ totalAgents: 0, activeAgents: 0, avgRating: 0, avgCompletedDeals: 0 })
+  const [summary, setSummary] = useState({ totalAgents: 0, activeAgents: 0, pendingApproval: 0, avgRating: 0, avgCompletedDeals: 0 })
   const [filters, setFilters] = useState({
     status: statusFilter || 'all',
+    approvalStatus: 'all',
     search: ''
   })
 
   const fetchAgents = useCallback(async () => {
     setLoading(true)
     setError('')
-
     try {
       const params = new URLSearchParams()
       params.set('page', pagination.page.toString())
       params.set('limit', pagination.limit.toString())
-
-      if (filters.status !== 'all') {
-        params.set('status', filters.status)
-      }
-      if (filters.search) {
-        params.set('search', filters.search)
-      }
+      if (filters.status !== 'all') params.set('status', filters.status)
+      if (filters.approvalStatus !== 'all') params.set('approvalStatus', filters.approvalStatus)
+      if (filters.search) params.set('search', filters.search)
 
       const response = await fetch(`/api/admin/agents?${params}`)
       if (!response.ok) throw new Error('Failed to fetch agents')
@@ -60,9 +60,7 @@ export default function AdminAgentsPage() {
     }
   }, [filters, pagination.page, pagination.limit])
 
-  useEffect(() => {
-    fetchAgents()
-  }, [fetchAgents])
+  useEffect(() => { fetchAgents() }, [fetchAgents])
 
   const handleFilterChange = (key, value) => {
     setFilters(prev => ({ ...prev, [key]: value }))
@@ -74,128 +72,124 @@ export default function AdminAgentsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Page header */}
-      <div>
-        <h1 className="text-2xl font-bold text-blue-950">Agents</h1>
-        <p className="text-slate-500 mt-1">Monitor and manage all agent activities</p>
+    <div className="space-y-5">
+      <div className="border-b border-wire pb-5">
+        <p className="text-[0.65rem] uppercase tracking-[0.15em] text-fog font-medium">Administration</p>
+        <h1 className="font-display text-[1.875rem] font-light text-sable leading-tight mt-0.5">Agents</h1>
       </div>
 
-      {/* Summary stats */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatsCard
-          title="Total Agents"
-          value={summary.totalAgents}
-          icon={Users}
-          subtitle="Registered agents"
-          iconColor="amber"
-        />
-        <StatsCard
-          title="Active Agents"
-          value={summary.activeAgents}
-          icon={UserCheck}
-          subtitle="Currently available"
-          iconColor="emerald"
-        />
-        <StatsCard
-          title="Avg Rating"
-          value={summary.avgRating.toFixed(1)}
-          icon={Star}
-          subtitle="Agent performance"
-          iconColor="blue"
-        />
-        <StatsCard
-          title="Avg Deals"
-          value={summary.avgCompletedDeals}
-          icon={TrendingUp}
-          subtitle="Per agent"
-          iconColor="purple"
-        />
+      {/* Stats */}
+      <div className="grid gap-px sm:grid-cols-2 lg:grid-cols-5 bg-wire border border-wire">
+        {[
+          { label: 'Total Agents', value: summary.totalAgents, icon: Users },
+          { label: 'Active Agents', value: summary.activeAgents, icon: UserCheck },
+          { label: 'Pending Review', value: summary.pendingApproval, icon: Clock },
+          { label: 'Avg Rating', value: (summary.avgRating || 0).toFixed(1), icon: Star },
+          { label: 'Avg Deals', value: summary.avgCompletedDeals, icon: TrendingUp },
+        ].map(({ label, value, icon: Icon }) => (
+          <div key={label} className="bg-cream p-5 flex items-center gap-4">
+            <div className="w-9 h-9 border border-wire bg-linen flex items-center justify-center flex-shrink-0">
+              <Icon className="h-4 w-4 text-bronze" />
+            </div>
+            <div>
+              <p className="text-[0.65rem] uppercase tracking-[0.1em] text-fog font-medium">{label}</p>
+              <p className="font-display text-[1.5rem] font-light text-sable leading-none mt-0.5">{value}</p>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Filters */}
-      <Card className="border-slate-200">
-        <CardContent className="p-4">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-              <Input
-                placeholder="Search by name, email, company, or license..."
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="pl-9"
-              />
-            </div>
-            <Select
-              value={filters.status}
-              onValueChange={(value) => handleFilterChange('status', value)}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="relative flex-1 max-w-sm">
+          <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-haze" />
+          <input
+            type="text"
+            placeholder="Search by name, email, company..."
+            value={filters.search}
+            onChange={(e) => handleFilterChange('search', e.target.value)}
+            className="w-full bg-cream border border-wire pl-9 pr-3 py-2 text-[0.8125rem] text-sable placeholder:text-haze focus:outline-none focus:border-bronze/50 transition-colors"
+          />
+        </div>
+        <div className="flex gap-0 border border-wire overflow-x-auto">
+          {statusOptions.map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => handleFilterChange('status', opt.value)}
+              className={cn(
+                'px-3.5 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-medium border-r border-wire last:border-0 whitespace-nowrap transition-colors',
+                filters.status === opt.value ? 'bg-sable text-cream' : 'bg-cream text-fog hover:text-sable hover:bg-linen'
+              )}
             >
-              <SelectTrigger className="w-[160px]">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Agents</SelectItem>
-                <SelectItem value="active">Active Only</SelectItem>
-                <SelectItem value="inactive">Inactive Only</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+              {opt.label}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-0 border border-wire overflow-x-auto">
+          {approvalOptions.map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => handleFilterChange('approvalStatus', opt.value)}
+              className={cn(
+                'px-3.5 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-medium border-r border-wire last:border-0 whitespace-nowrap transition-colors',
+                filters.approvalStatus === opt.value ? 'bg-sable text-cream' : 'bg-cream text-fog hover:text-sable hover:bg-linen'
+              )}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-      {/* Error message */}
       {error && (
-        <div className="p-4 bg-red-50 text-red-600 rounded-lg">
+        <div className="px-5 py-3 border border-red-200 bg-red-50 text-[0.8125rem] text-red-600">
           {error}
         </div>
       )}
 
-      {/* Loading state */}
       {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+        <div className="flex items-center justify-center py-16 border border-wire bg-cream">
+          <Loader2 className="h-5 w-5 animate-spin text-bronze" />
         </div>
       ) : agents.length === 0 ? (
-        <div className="text-center py-12">
-          <Users className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-          <p className="text-slate-400 mb-2">No agents found</p>
-          <p className="text-sm text-slate-400">Try adjusting your filters</p>
+        <div className="flex flex-col items-center justify-center py-16 border border-wire bg-cream text-center">
+          <div className="w-14 h-14 border border-wire bg-linen flex items-center justify-center mb-4">
+            <Users className="h-6 w-6 text-haze" />
+          </div>
+          <p className="text-[0.8125rem] font-medium text-sable">No agents found</p>
+          <p className="text-[0.75rem] text-fog mt-1">Try adjusting your filters</p>
         </div>
       ) : (
         <>
-          {/* Agents list */}
           <div className="grid gap-4 lg:grid-cols-2">
             {agents.map(agent => (
               <AgentCard key={agent.id} agent={agent} />
             ))}
           </div>
 
-          {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <div className="flex items-center justify-between pt-4">
-              <p className="text-sm text-slate-500">
-                Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} agents
+            <div className="flex items-center justify-between">
+              <p className="text-[0.75rem] text-fog">
+                Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}
               </p>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
+              <div className="flex gap-0 border border-wire">
+                <button
                   onClick={() => handlePageChange(pagination.page - 1)}
                   disabled={pagination.page === 1}
+                  className="px-4 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-medium border-r border-wire bg-cream text-fog hover:text-sable hover:bg-linen disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   Previous
-                </Button>
-                <span className="text-sm text-slate-500">
-                  Page {pagination.page} of {pagination.totalPages}
+                </button>
+                <span className="px-4 py-2 text-[0.7rem] text-fog bg-cream border-r border-wire">
+                  {pagination.page} / {pagination.totalPages}
                 </span>
-                <Button
-                  variant="outline"
-                  size="sm"
+                <button
                   onClick={() => handlePageChange(pagination.page + 1)}
                   disabled={pagination.page === pagination.totalPages}
+                  className="px-4 py-2 text-[0.7rem] uppercase tracking-[0.1em] font-medium bg-cream text-fog hover:text-sable hover:bg-linen disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   Next
-                </Button>
+                </button>
               </div>
             </div>
           )}
@@ -204,6 +198,3 @@ export default function AdminAgentsPage() {
     </div>
   )
 }
-
-
-

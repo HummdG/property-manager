@@ -7,9 +7,8 @@ const apiRoutes = ['/api/']
 const roleRoutes = {
   OWNER: ['/owner'],
   TENANT: ['/tenant'],
-  TRADER: ['/trader'],
   AGENT: ['/agent'],
-  ADMIN: ['/admin', '/owner', '/tenant', '/trader', '/agent']
+  ADMIN: ['/admin', '/owner', '/tenant', '/agent']
 }
 
 function getDashboardForRole(role) {
@@ -17,7 +16,6 @@ function getDashboardForRole(role) {
     ADMIN: '/admin',
     OWNER: '/owner',
     TENANT: '/tenant',
-    TRADER: '/trader',
     AGENT: '/agent'
   }
   return paths[role] || '/owner'
@@ -68,7 +66,10 @@ export default authMiddleware((req) => {
     return NextResponse.redirect(new URL(dashboardPath, nextUrl))
   }
 
-  return NextResponse.next()
+  // Forward pathname so server-component layouts can read it for approval gating
+  const requestHeaders = new Headers(req.headers)
+  requestHeaders.set('x-pathname', pathname)
+  return NextResponse.next({ request: { headers: requestHeaders } })
 })
 
 export const config = {

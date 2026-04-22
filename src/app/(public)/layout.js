@@ -1,149 +1,175 @@
 import Link from 'next/link'
-import { Building2, Search, User } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import Image from 'next/image'
+import { Phone, Mail, MapPin } from 'lucide-react'
 
 export const metadata = {
-  title: 'Browse Properties | GoFor Properties',
-  description: 'Find your dream property - browse homes, apartments, and commercial spaces for rent or sale'
+  title: 'Properties | Impervia Estates',
+  description:
+    'Browse premium residential and commercial properties for rent and sale across the UAE.',
 }
 
 export default function PublicLayout({ children }) {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur-md">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 shadow-md shadow-amber-500/20 transition-shadow group-hover:shadow-lg group-hover:shadow-amber-500/30">
-                <Building2 className="h-5 w-5 text-white" />
-              </div>
-              <div className="hidden sm:block">
-                <span className="text-lg font-bold text-blue-950">GoFor</span>
-                <span className="text-lg font-bold bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">Properties</span>
-              </div>
-            </Link>
+    <div className="min-h-screen bg-linen font-sans antialiased flex flex-col">
 
-            {/* Navigation */}
-            <nav className="hidden md:flex items-center gap-8">
-              <Link 
-                href="/properties" 
-                className="text-sm font-medium text-slate-600 hover:text-blue-950 transition-colors"
-              >
-                All Properties
-              </Link>
-              <Link 
-                href="/properties?listingType=RENT" 
-                className="text-sm font-medium text-slate-600 hover:text-blue-950 transition-colors"
-              >
-                For Rent
-              </Link>
-              <Link 
-                href="/properties?listingType=SALE" 
-                className="text-sm font-medium text-slate-600 hover:text-blue-950 transition-colors"
-              >
-                For Sale
-              </Link>
-            </nav>
-
-            {/* Actions */}
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm" asChild className="text-slate-600 hover:text-blue-950">
-                <Link href="/login">
-                  <User className="h-4 w-4 mr-2" />
-                  Sign In
-                </Link>
-              </Button>
-              <Button size="sm" asChild className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-md shadow-amber-500/20">
-                <Link href="/register">
-                  List Property
-                </Link>
-              </Button>
+      {/* ── Navigation ─────────────────────────────────────── */}
+      <header className="sticky top-0 z-50 bg-cream border-b border-wire">
+        <nav className="inst-container h-[68px] flex items-center justify-between">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 overflow-hidden">
+              <Image src="/impervia logo.png" alt="Impervia Estates" width={32} height={32} className="w-8 h-8 object-contain" />
             </div>
+            <span className="font-display text-[1.1rem] font-medium text-sable tracking-tight leading-none">
+              Impervia Estates
+            </span>
+          </Link>
+
+          {/* Nav links */}
+          <div className="hidden md:flex items-center gap-9">
+            {[
+              { label: 'All Properties', href: '/properties' },
+              { label: 'For Rent', href: '/properties?listingType=RENT' },
+              { label: 'For Sale', href: '/properties?listingType=SALE' },
+              { label: 'Services', href: '/#services' },
+            ].map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                className="text-[0.8125rem] text-pewter hover:text-sable transition-colors duration-150 tracking-wide"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
-        </div>
+
+          {/* Auth */}
+          <div className="flex items-center gap-5">
+            <Link
+              href="/login"
+              className="text-[0.8125rem] text-pewter hover:text-sable transition-colors duration-150"
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/register"
+              className="text-[0.8125rem] bg-sable text-cream px-4 py-2 hover:bg-cobalt transition-colors duration-150 tracking-wide"
+            >
+              List Property
+            </Link>
+          </div>
+        </nav>
       </header>
 
-      {/* Main Content */}
+      {/* ── Main content ────────────────────────────────────── */}
       <main className="flex-1">
         {children}
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-slate-50/50 mt-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      {/* ── Footer ──────────────────────────────────────────── */}
+      <footer className="bg-sable border-t border-bronze/10">
+        <div className="inst-container py-14">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
             {/* Brand */}
-            <div className="md:col-span-2">
-              <Link href="/" className="flex items-center gap-2.5">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 shadow-md shadow-amber-500/20">
-                  <Building2 className="h-5 w-5 text-white" />
+            <div className="col-span-2 lg:col-span-1">
+              <Link href="/" className="flex items-center gap-2.5 mb-5">
+                <div className="w-7 h-7 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                  <Image src="/impervia logo.png" alt="Impervia Estates" width={28} height={28} className="w-7 h-7 object-contain" />
                 </div>
-                <div>
-                  <span className="text-lg font-bold text-blue-950">GoFor</span>
-                  <span className="text-lg font-bold bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">Properties</span>
-                </div>
+                <span className="font-display text-[0.9375rem] font-medium text-cream">
+                  Impervia Estates
+                </span>
               </Link>
-              <p className="mt-4 text-sm text-slate-500 max-w-md">
-                Your trusted partner in finding the perfect property. Browse premium listings for rent or sale across the UAE.
+              <p className="text-[0.75rem] text-haze leading-relaxed max-w-[200px]">
+                RERA-licensed property management and real estate services across the UAE.
               </p>
             </div>
 
-            {/* Quick Links */}
+            {/* Browse */}
             <div>
-              <h3 className="font-semibold text-blue-950 mb-4">Quick Links</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/properties" className="text-sm text-slate-500 hover:text-amber-600 transition-colors">
-                    Browse Properties
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/properties?listingType=RENT" className="text-sm text-slate-500 hover:text-amber-600 transition-colors">
-                    Properties for Rent
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/properties?listingType=SALE" className="text-sm text-slate-500 hover:text-amber-600 transition-colors">
-                    Properties for Sale
-                  </Link>
-                </li>
+              <p className="text-[0.6rem] text-bronze uppercase tracking-[0.18em] font-medium mb-5">
+                Browse
+              </p>
+              <ul className="space-y-3">
+                {[
+                  { label: 'All Properties', href: '/properties' },
+                  { label: 'For Rent', href: '/properties?listingType=RENT' },
+                  { label: 'For Sale', href: '/properties?listingType=SALE' },
+                ].map((l) => (
+                  <li key={l.label}>
+                    <Link
+                      href={l.href}
+                      className="text-[0.75rem] text-haze hover:text-cream transition-colors"
+                    >
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
 
-            {/* Account */}
+            {/* Services */}
             <div>
-              <h3 className="font-semibold text-blue-950 mb-4">Account</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link href="/login" className="text-sm text-slate-500 hover:text-amber-600 transition-colors">
-                    Sign In
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/register" className="text-sm text-slate-500 hover:text-amber-600 transition-colors">
-                    Create Account
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/register" className="text-sm text-slate-500 hover:text-amber-600 transition-colors">
-                    List Your Property
-                  </Link>
-                </li>
+              <p className="text-[0.6rem] text-bronze uppercase tracking-[0.18em] font-medium mb-5">
+                Services
+              </p>
+              <ul className="space-y-3">
+                {[
+                  { label: 'Rental Management', href: '/services/renting' },
+                  { label: 'Lease Management', href: '/services/leasing' },
+                  { label: 'Maintenance', href: '/services/maintaining' },
+                  { label: 'Property Sales', href: '/services/selling' },
+                ].map((l) => (
+                  <li key={l.label}>
+                    <Link
+                      href={l.href}
+                      className="text-[0.75rem] text-haze hover:text-cream transition-colors"
+                    >
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
               </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <p className="text-[0.6rem] text-bronze uppercase tracking-[0.18em] font-medium mb-5">
+                Contact
+              </p>
+              <div className="space-y-3">
+                {[
+                  { Icon: Phone, text: '+971 4 XXX XXXX' },
+                  { Icon: Mail, text: 'enquiries@imperviaestates.ae' },
+                  { Icon: MapPin, text: 'Business Bay, Dubai' },
+                ].map(({ Icon, text }) => (
+                  <div key={text} className="flex items-start gap-2.5">
+                    <Icon className="w-3.5 h-3.5 text-bronze flex-shrink-0 mt-[1px]" />
+                    <span className="text-[0.75rem] text-haze">{text}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Copyright */}
-          <div className="mt-12 pt-8 border-t border-slate-200">
-            <p className="text-center text-sm text-slate-400">
-              &copy; {new Date().getFullYear()} GoFor Properties. All rights reserved.
+          <div className="border-t border-bronze/10 pt-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+            <p className="text-[0.6875rem] text-fog">
+              © {new Date().getFullYear()} RSBD Solutions FZE. All rights reserved. RERA License No. XXXX
             </p>
+            <div className="flex items-center gap-5">
+              {['Privacy Policy', 'Terms of Service', 'Sign In', 'Register'].map((l) => (
+                <Link
+                  key={l}
+                  href={l === 'Sign In' ? '/login' : l === 'Register' ? '/register' : '#'}
+                  className="text-[0.6875rem] text-fog hover:text-haze transition-colors"
+                >
+                  {l}
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </footer>
     </div>
   )
 }
-

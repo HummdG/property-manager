@@ -4,126 +4,112 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import {
   Search, Building2, MapPin, Bed, Bath, Square,
-  Loader2, SlidersHorizontal, ChevronLeft, ChevronRight
+  Loader2, ChevronLeft, ChevronRight, SlidersHorizontal, X,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
 import { formatCurrency } from '@/lib/utils'
 
-const propertyTypeLabels = {
+const PROPERTY_TYPE_LABELS = {
   HOUSE: 'House',
   APARTMENT: 'Apartment',
   CONDO: 'Condo',
   TOWNHOUSE: 'Townhouse',
   COMMERCIAL: 'Commercial',
   LAND: 'Land',
-  OTHER: 'Other'
+  OTHER: 'Other',
 }
 
-const listingTypeLabels = {
+const LISTING_TYPE_LABELS = {
   RENT: 'For Rent',
   SALE: 'For Sale',
-  BOTH: 'Rent & Sale'
+  BOTH: 'Rent & Sale',
 }
 
-function PropertyListingCard({ property }) {
-  const price = property.listingType === 'SALE'
-    ? property.salePrice
-    : property.monthlyRent
-
-  const priceLabel = property.listingType === 'SALE'
-    ? ''
-    : '/mo'
+function PropertyCard({ property }) {
+  const price = property.listingType === 'SALE' ? property.salePrice : property.monthlyRent
+  const priceLabel = property.listingType === 'SALE' ? '' : '/mo'
+  const isRent = property.listingType === 'RENT' || property.listingType === 'BOTH'
 
   return (
-    <Link href={`/properties/${property.id}`}>
-      <Card className="group border-slate-200 bg-white hover:shadow-xl hover:shadow-blue-950/5 transition-all duration-300 overflow-hidden cursor-pointer h-full">
-        {/* Image / Placeholder */}
-        <div className="relative h-48 bg-gradient-to-br from-slate-100 to-slate-50 overflow-hidden">
+    <Link href={`/properties/${property.id}`} className="group block h-full">
+      <div className="bg-cream border border-wire group-hover:border-sable/25 group-hover:bg-white transition-all duration-200 h-full flex flex-col">
+        {/* Image */}
+        <div className="relative h-48 bg-linen overflow-hidden flex-shrink-0">
           {property.images?.length > 0 ? (
             <img
               src={property.images[0]}
               alt={property.name}
-              className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-500"
+              className="h-full w-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
             />
           ) : (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-sm">
-                <Building2 className="h-10 w-10 text-slate-300" />
-              </div>
+              <Building2 className="w-10 h-10 text-wire" />
             </div>
           )}
-          <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-amber-400/10 to-transparent" />
-          <div className="absolute top-3 left-3 flex gap-2">
-            <Badge className="bg-white/95 text-slate-700 border-slate-200 backdrop-blur-sm">
-              {propertyTypeLabels[property.type] || property.type}
-            </Badge>
+          {/* Tags */}
+          <div className="absolute top-3 left-3 flex gap-1.5">
+            <span className="text-[0.6rem] border border-wire bg-cream/95 text-pewter uppercase tracking-[0.12em] px-2 py-1 backdrop-blur-sm">
+              {PROPERTY_TYPE_LABELS[property.type] || property.type}
+            </span>
           </div>
           <div className="absolute top-3 right-3">
-            <Badge className={
-              property.listingType === 'SALE'
-                ? 'bg-blue-100 text-blue-700 border-blue-200'
-                : 'bg-emerald-100 text-emerald-700 border-emerald-200'
-            }>
-              {listingTypeLabels[property.listingType] || property.listingType}
-            </Badge>
+            <span className={`text-[0.6rem] border uppercase tracking-[0.12em] px-2 py-1 ${
+              isRent
+                ? 'border-bronze/30 bg-bronze/10 text-bronze'
+                : 'border-sable/25 bg-sable/10 text-sable'
+            }`}>
+              {LISTING_TYPE_LABELS[property.listingType] || property.listingType}
+            </span>
           </div>
         </div>
 
-        <CardContent className="p-4">
+        {/* Content */}
+        <div className="p-6 flex flex-col flex-1">
           {/* Price */}
           {price && (
-            <div className="mb-2">
-              <span className="text-xl font-bold bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">
+            <div className="mb-3">
+              <span className="font-display text-[1.5rem] font-medium text-sable leading-none">
                 {formatCurrency(price * 100)}
               </span>
               {priceLabel && (
-                <span className="text-sm text-slate-400">{priceLabel}</span>
+                <span className="text-[0.75rem] text-fog ml-1">{priceLabel}</span>
               )}
             </div>
           )}
 
-          {/* Name & Location */}
-          <h3 className="font-bold text-blue-950 truncate group-hover:text-amber-600 transition-colors">
+          {/* Name */}
+          <h3 className="text-[0.9375rem] font-medium text-sable truncate mb-1.5 group-hover:text-cobalt transition-colors">
             {property.name}
           </h3>
-          <div className="flex items-center gap-1 mt-1 text-sm text-slate-500">
-            <MapPin className="h-3.5 w-3.5 flex-shrink-0 text-amber-500" />
+
+          {/* Location */}
+          <div className="flex items-center gap-1.5 text-[0.8125rem] text-fog mb-4">
+            <MapPin className="w-3.5 h-3.5 text-bronze flex-shrink-0" />
             <span className="truncate">{property.address}, {property.city}</span>
           </div>
 
-          {/* Details */}
-          <div className="flex items-center gap-4 mt-3 pt-3 border-t border-slate-100 text-sm text-slate-500">
+          {/* Specs */}
+          <div className="flex items-center gap-5 border-t border-wire pt-4 mt-auto text-[0.8125rem] text-fog">
             {property.bedrooms && (
               <div className="flex items-center gap-1.5">
-                <Bed className="h-4 w-4 text-slate-400" />
-                <span className="font-medium">{property.bedrooms} Beds</span>
+                <Bed className="w-3.5 h-3.5 text-wire" />
+                <span>{property.bedrooms}</span>
               </div>
             )}
             {property.bathrooms && (
               <div className="flex items-center gap-1.5">
-                <Bath className="h-4 w-4 text-slate-400" />
-                <span className="font-medium">{property.bathrooms} Baths</span>
+                <Bath className="w-3.5 h-3.5 text-wire" />
+                <span>{property.bathrooms}</span>
               </div>
             )}
             {property.squareFeet && (
               <div className="flex items-center gap-1.5">
-                <Square className="h-4 w-4 text-slate-400" />
-                <span className="font-medium">{property.squareFeet.toLocaleString()} sqft</span>
+                <Square className="w-3.5 h-3.5 text-wire" />
+                <span>{property.squareFeet.toLocaleString()} sqft</span>
               </div>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </Link>
   )
 }
@@ -147,7 +133,6 @@ export default function PublicPropertiesPage() {
       const params = new URLSearchParams()
       params.set('page', page.toString())
       params.set('limit', '12')
-
       if (listingType !== 'ALL') params.set('listingType', listingType)
       if (propertyType !== 'ALL') params.set('type', propertyType)
       if (selectedCity !== 'ALL') params.set('city', selectedCity)
@@ -168,9 +153,7 @@ export default function PublicPropertiesPage() {
       if (response.ok) {
         setProperties(data.properties || [])
         setPagination(data.pagination || null)
-        if (data.filterOptions?.cities) {
-          setCities(data.filterOptions.cities)
-        }
+        if (data.filterOptions?.cities) setCities(data.filterOptions.cities)
       }
     } catch (error) {
       console.error('Failed to fetch properties:', error)
@@ -179,228 +162,238 @@ export default function PublicPropertiesPage() {
     }
   }, [page, listingType, propertyType, selectedCity, searchQuery, sortBy])
 
-  useEffect(() => {
-    fetchProperties()
-  }, [fetchProperties])
+  useEffect(() => { fetchProperties() }, [fetchProperties])
+  useEffect(() => { setPage(1) }, [listingType, propertyType, selectedCity, searchQuery, sortBy])
 
-  useEffect(() => {
-    setPage(1)
-  }, [listingType, propertyType, selectedCity, searchQuery, sortBy])
-
-  function handleSearch (e) {
+  function handleSearch(e) {
     e.preventDefault()
     setPage(1)
     fetchProperties()
   }
 
+  function clearFilters() {
+    setListingType('ALL')
+    setPropertyType('ALL')
+    setSelectedCity('ALL')
+    setSearchQuery('')
+    setSortBy('createdAt')
+  }
+
+  const hasActiveFilters = listingType !== 'ALL' || propertyType !== 'ALL' || selectedCity !== 'ALL' || searchQuery
+
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-      {/* Hero section */}
-      <div className="text-center mb-10">
-        <h1 className="text-3xl sm:text-4xl font-bold text-blue-950">
-          Find Your Perfect Property
-        </h1>
-        <p className="mt-3 text-lg text-slate-500 max-w-2xl mx-auto">
-          Browse premium properties for rent and sale. Find homes, apartments, and commercial spaces.
-        </p>
-      </div>
-
-      {/* Search bar */}
-      <form onSubmit={handleSearch} className="relative max-w-2xl mx-auto mb-8">
-        <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-        <Input
-          placeholder="Search by name, address, or city..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-12 h-12 text-base rounded-xl border-slate-200 shadow-sm focus:shadow-md transition-shadow"
-        />
-        <Button
-          type="submit"
-          size="sm"
-          className="absolute right-2 top-1/2 -translate-y-1/2 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-lg"
-        >
-          Search
-        </Button>
-      </form>
-
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-3 mb-8">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setIsFiltersOpen(!isFiltersOpen)}
-          className="gap-2"
-        >
-          <SlidersHorizontal className="h-4 w-4" />
-          Filters
-        </Button>
-
-        <Select value={listingType} onValueChange={setListingType}>
-          <SelectTrigger className="w-[140px] h-9">
-            <SelectValue placeholder="Listing Type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="ALL">All Types</SelectItem>
-            <SelectItem value="RENT">For Rent</SelectItem>
-            <SelectItem value="SALE">For Sale</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="w-[160px] h-9">
-            <SelectValue placeholder="Sort By" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="createdAt">Newest First</SelectItem>
-            <SelectItem value="price">Price: Low to High</SelectItem>
-            <SelectItem value="priceDesc">Price: High to Low</SelectItem>
-          </SelectContent>
-        </Select>
-
-        {pagination && (
-          <span className="text-sm text-slate-500 ml-auto">
-            {pagination.total} {pagination.total === 1 ? 'property' : 'properties'} found
-          </span>
-        )}
-      </div>
-
-      {/* Expanded filters */}
-      {isFiltersOpen && (
-        <div className="flex flex-wrap items-center gap-3 mb-6 p-4 bg-slate-50 rounded-xl border border-slate-200">
-          <Select value={propertyType} onValueChange={setPropertyType}>
-            <SelectTrigger className="w-[160px] h-9">
-              <SelectValue placeholder="Property Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ALL">All Properties</SelectItem>
-              {Object.entries(propertyTypeLabels).map(([value, label]) => (
-                <SelectItem key={value} value={value}>{label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {cities.length > 0 && (
-            <Select value={selectedCity} onValueChange={setSelectedCity}>
-              <SelectTrigger className="w-[160px] h-9">
-                <SelectValue placeholder="City" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">All Cities</SelectItem>
-                {cities.map((city) => (
-                  <SelectItem key={city} value={city}>{city}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          )}
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              setListingType('ALL')
-              setPropertyType('ALL')
-              setSelectedCity('ALL')
-              setSearchQuery('')
-              setSortBy('createdAt')
-            }}
-            className="text-slate-500 hover:text-slate-700"
+    <div>
+      {/* ── Page header ─────────────────────────────────────── */}
+      <div className="bg-sable border-b border-bronze/10">
+        <div className="inst-container py-14">
+          <div className="inst-hero-grid absolute inset-0 pointer-events-none" />
+          <span className="inst-label-light">UAE Property Listings</span>
+          <h1
+            className="font-display font-light text-cream leading-tight max-w-xl"
+            style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}
           >
-            Clear Filters
-          </Button>
-        </div>
-      )}
-
-      {/* Properties grid */}
-      {isLoading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
-        </div>
-      ) : properties.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-slate-100">
-            <Building2 className="h-10 w-10 text-slate-400" />
-          </div>
-          <h3 className="mt-4 text-lg font-semibold text-blue-950">No properties found</h3>
-          <p className="mt-1 text-sm text-slate-500 max-w-md">
-            {searchQuery || listingType !== 'ALL' || propertyType !== 'ALL'
-              ? 'Try adjusting your search or filters to find what you\'re looking for.'
-              : 'There are no properties listed at the moment. Check back soon!'}
+            Browse Properties for Rent & Sale
+          </h1>
+          <p className="text-haze text-[0.9375rem] mt-4 max-w-lg font-light">
+            Residential and commercial properties across Dubai, Abu Dhabi,
+            and Sharjah, all managed by Impervia Estates.
           </p>
-          {(searchQuery || listingType !== 'ALL' || propertyType !== 'ALL') && (
-            <Button
-              variant="outline"
-              className="mt-4"
-              onClick={() => {
-                setListingType('ALL')
-                setPropertyType('ALL')
-                setSelectedCity('ALL')
-                setSearchQuery('')
-                setSortBy('createdAt')
-              }}
+        </div>
+      </div>
+
+      {/* ── Search & filters ────────────────────────────────── */}
+      <div className="bg-cream border-b border-wire">
+        <div className="inst-container py-5">
+          {/* Search row */}
+          <form onSubmit={handleSearch} className="flex items-center gap-3 mb-4">
+            <div className="flex flex-1 border border-wire bg-[#F9F7F4] focus-within:border-bronze transition-colors duration-150">
+              <div className="flex items-center pl-3.5 pointer-events-none flex-shrink-0">
+                <Search className="w-4 h-4 text-fog" />
+              </div>
+              <input
+                type="text"
+                className="flex-1 bg-transparent py-[0.625rem] px-3 text-[0.875rem] text-sable outline-none placeholder:text-[#A0AEC0]"
+                placeholder="Search by name, address, or city…"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <button
+                type="submit"
+                className="bg-sable text-cream px-5 py-[0.625rem] text-[0.8125rem] tracking-wide hover:bg-cobalt transition-colors duration-150 flex-shrink-0"
+              >
+                Search
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsFiltersOpen(!isFiltersOpen)}
+              className={`flex items-center gap-2 border px-4 py-[0.625rem] text-[0.8125rem] transition-colors duration-150 flex-shrink-0 ${
+                isFiltersOpen ? 'border-sable bg-sable text-cream' : 'border-wire bg-cream text-pewter hover:bg-linen'
+              }`}
             >
-              Clear Filters
-            </Button>
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+              Filters
+            </button>
+          </form>
+
+          {/* Quick filters row */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <select
+              value={listingType}
+              onChange={(e) => setListingType(e.target.value)}
+              className="inst-input w-auto text-[0.8125rem] pr-8"
+              style={{ minWidth: 130 }}
+            >
+              <option value="ALL">All Types</option>
+              <option value="RENT">For Rent</option>
+              <option value="SALE">For Sale</option>
+            </select>
+
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="inst-input w-auto text-[0.8125rem] pr-8"
+              style={{ minWidth: 160 }}
+            >
+              <option value="createdAt">Newest First</option>
+              <option value="price">Price: Low to High</option>
+              <option value="priceDesc">Price: High to Low</option>
+            </select>
+
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="flex items-center gap-1.5 text-[0.75rem] text-fog hover:text-sable transition-colors"
+              >
+                <X className="w-3 h-3" />
+                Clear filters
+              </button>
+            )}
+
+            {pagination && (
+              <span className="text-[0.75rem] text-fog ml-auto">
+                {pagination.total} {pagination.total === 1 ? 'property' : 'properties'}
+              </span>
+            )}
+          </div>
+
+          {/* Expanded filters */}
+          {isFiltersOpen && (
+            <div className="flex flex-wrap items-center gap-3 mt-4 pt-4 border-t border-wire">
+              <select
+                value={propertyType}
+                onChange={(e) => setPropertyType(e.target.value)}
+                className="inst-input w-auto text-[0.8125rem] pr-8"
+                style={{ minWidth: 160 }}
+              >
+                <option value="ALL">All Property Types</option>
+                {Object.entries(PROPERTY_TYPE_LABELS).map(([value, label]) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
+
+              {cities.length > 0 && (
+                <select
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.target.value)}
+                  className="inst-input w-auto text-[0.8125rem] pr-8"
+                  style={{ minWidth: 140 }}
+                >
+                  <option value="ALL">All Cities</option>
+                  {cities.map((city) => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+              )}
+            </div>
           )}
         </div>
-      ) : (
-        <>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {properties.map(property => (
-              <PropertyListingCard key={property.id} property={property} />
-            ))}
-          </div>
+      </div>
 
-          {/* Pagination */}
-          {pagination && pagination.totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-10">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page <= 1}
-                onClick={() => setPage(p => p - 1)}
+      {/* ── Listings ────────────────────────────────────────── */}
+      <div className="inst-container py-10">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-24">
+            <Loader2 className="w-7 h-7 animate-spin text-bronze" />
+          </div>
+        ) : properties.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-24 text-center">
+            <div className="w-16 h-16 border border-wire bg-cream flex items-center justify-center mb-5">
+              <Building2 className="w-8 h-8 text-wire" />
+            </div>
+            <h3 className="font-display text-xl font-medium text-sable mb-2">No properties found</h3>
+            <p className="text-[0.875rem] text-fog max-w-sm mb-6">
+              {hasActiveFilters
+                ? 'Try adjusting your search or filters.'
+                : 'No properties are currently listed. Check back soon.'}
+            </p>
+            {hasActiveFilters && (
+              <button
+                onClick={clearFilters}
+                className="border border-wire text-sable text-[0.8125rem] px-5 py-2.5 hover:bg-linen transition-colors"
               >
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                Previous
-              </Button>
-              <div className="flex items-center gap-1">
+                Clear Filters
+              </button>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {properties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+
+            {/* Pagination */}
+            {pagination && pagination.totalPages > 1 && (
+              <div className="flex items-center justify-center gap-1 mt-12">
+                <button
+                  disabled={page <= 1}
+                  onClick={() => setPage((p) => p - 1)}
+                  className="flex items-center gap-1 border border-wire text-pewter text-[0.8125rem] px-3 py-2 hover:bg-linen transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  Prev
+                </button>
+
                 {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
-                  .filter(p => p === 1 || p === pagination.totalPages || Math.abs(p - page) <= 1)
+                  .filter((p) => p === 1 || p === pagination.totalPages || Math.abs(p - page) <= 1)
                   .reduce((acc, p, i, arr) => {
-                    if (i > 0 && p - arr[i - 1] > 1) {
-                      acc.push('...')
-                    }
+                    if (i > 0 && p - arr[i - 1] > 1) acc.push('…')
                     acc.push(p)
                     return acc
                   }, [])
                   .map((item, i) =>
-                    item === '...' ? (
-                      <span key={`ellipsis-${i}`} className="px-2 text-slate-400">…</span>
+                    item === '…' ? (
+                      <span key={`e-${i}`} className="px-2 text-fog text-[0.8125rem]">…</span>
                     ) : (
-                      <Button
+                      <button
                         key={item}
-                        variant={item === page ? 'default' : 'outline'}
-                        size="sm"
-                        className={item === page ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}
                         onClick={() => setPage(item)}
+                        className={`min-w-[36px] py-2 text-[0.8125rem] border transition-colors ${
+                          item === page
+                            ? 'bg-sable text-cream border-sable'
+                            : 'border-wire text-pewter hover:bg-linen'
+                        }`}
                       >
                         {item}
-                      </Button>
+                      </button>
                     )
                   )}
+
+                <button
+                  disabled={page >= pagination.totalPages}
+                  onClick={() => setPage((p) => p + 1)}
+                  className="flex items-center gap-1 border border-wire text-pewter text-[0.8125rem] px-3 py-2 hover:bg-linen transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Next
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={page >= pagination.totalPages}
-                onClick={() => setPage(p => p + 1)}
-              >
-                Next
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            </div>
-          )}
-        </>
-      )}
+            )}
+          </>
+        )}
+      </div>
     </div>
   )
 }

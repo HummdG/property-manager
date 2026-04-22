@@ -1,6 +1,6 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import {
-  Building2,
   Key,
   ArrowRight,
   CheckCircle2,
@@ -9,217 +9,254 @@ import {
   FileText,
   Wrench,
   Shield,
-  Clock,
-  TrendingUp,
-  Megaphone
+  Megaphone,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 
 export const metadata = {
-  title: 'Renting Services | GoFor Properties',
-  description: 'Professional property rental management services in UAE. Tenant screening, rent collection, lease management, and more.'
+  title: 'Rental Management Services | Impervia Estates',
+  description:
+    'Professional residential rental management in the UAE. Tenant screening, rent collection, Ejari compliance, and full lease management from AED 799/month.',
 }
 
-const features = [
+const FEATURES = [
   {
-    icon: Users,
+    Icon: Users,
     title: 'Tenant Screening & Verification',
-    description: 'Comprehensive background checks, employment verification, and rental history analysis to ensure you get reliable tenants.'
+    description:
+      'Comprehensive background checks, employment verification, and rental history analysis to ensure reliable, qualified tenants.',
   },
   {
-    icon: CreditCard,
+    Icon: CreditCard,
     title: 'Automated Rent Collection',
-    description: 'Seamless online rent payments with automatic reminders, receipts, and tracking. Never chase payments again.'
+    description:
+      'Structured online rent collection with automatic reminders, formal receipts, and complete financial tracking.',
   },
   {
-    icon: FileText,
+    Icon: FileText,
     title: 'Lease Management',
-    description: 'Digital lease creation, e-signatures, renewal tracking, and secure document storage all in one place.'
+    description:
+      'RERA-compliant lease creation, renewal tracking, e-signature support, and secure document storage.',
   },
   {
-    icon: Wrench,
+    Icon: Wrench,
     title: 'Maintenance Coordination',
-    description: 'Connect with our verified contractor network for quick repairs. Track all service requests from submission to completion.'
+    description:
+      'Access to our vetted contractor network. All service requests are tracked from submission through to completion.',
   },
   {
-    icon: Megaphone,
+    Icon: Megaphone,
     title: 'Vacancy Marketing',
-    description: 'Professional property listings with photography, virtual tours, and syndication across major UAE property portals.'
+    description:
+      'Professional property listings with photography and syndication across major UAE property portals.',
   },
   {
-    icon: Shield,
-    title: 'Legal Compliance',
-    description: 'Stay compliant with UAE rental laws. Get Ejari registration support and standardized RERA contracts.'
-  }
+    Icon: Shield,
+    title: 'Legal & Ejari Compliance',
+    description:
+      'Full compliance with UAE rental regulations including Ejari registration support and RERA-standard contracts.',
+  },
 ]
 
-const steps = [
+const STEPS = [
   {
     number: '01',
-    title: 'List Your Property',
-    description: 'Add your property details, upload photos, and set your rental preferences and price.'
+    title: 'Onboarding & Audit',
+    description:
+      'Property inspection, documentation review, and compliance verification before management begins.',
   },
   {
     number: '02',
-    title: 'Find Tenants',
-    description: 'We market your property and screen potential tenants with thorough background checks.'
+    title: 'Marketing & Screening',
+    description:
+      'We market your property and conduct thorough tenant screening with background and reference checks.',
   },
   {
     number: '03',
-    title: 'Sign & Collect',
-    description: 'Execute digital leases and start collecting rent automatically through our platform.'
+    title: 'Lease Execution',
+    description:
+      'RERA-compliant lease preparation, Ejari registration, and collection of security deposit.',
   },
   {
     number: '04',
-    title: 'Manage & Grow',
-    description: 'Handle maintenance, track finances, and scale your rental portfolio effortlessly.'
-  }
+    title: 'Ongoing Management',
+    description:
+      'Rent collection, maintenance coordination, periodic inspections, and structured financial reporting.',
+  },
 ]
 
-const inclusions = [
+const INCLUSIONS = [
   'Unlimited property listings',
   'Tenant screening reports',
-  'Digital lease agreements',
+  'RERA-compliant lease agreements',
   'Online rent collection',
-  'Maintenance request system',
-  'Financial reporting',
-  'Document storage',
-  'Email & chat support',
+  'Maintenance request management',
+  'Monthly financial reporting',
+  'Document storage & management',
+  'Email & phone support',
   'Ejari registration assistance',
-  'Tenant communication portal'
+  'Tenant communication portal',
+]
+
+const NAV_LINKS = [
+  { label: 'Services', href: '/#services' },
+  { label: 'Properties', href: '/properties' },
+  { label: 'About', href: '/#about' },
+  { label: 'Contact', href: '/#contact' },
 ]
 
 export default function RentingServicePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur-md">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 shadow-md shadow-amber-500/20">
-                <Building2 className="h-5 w-5 text-white" />
-              </div>
-              <div className="hidden sm:block">
-                <span className="text-lg font-bold text-blue-950">GoFor</span>
-                <span className="text-lg font-bold bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">Properties</span>
-              </div>
-            </Link>
+    <div className="bg-cream font-sans antialiased">
 
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm" asChild className="text-slate-600 hover:text-blue-950">
-                <Link href="/login">Sign In</Link>
-              </Button>
-              <Button size="sm" asChild className="bg-amber-500 hover:bg-amber-600 text-white">
-                <Link href="/register?service=renting">Get Started</Link>
-              </Button>
+      {/* ─── Navigation ─────────────────────────────────────── */}
+      <header className="sticky top-0 z-50 bg-cream border-b border-wire">
+        <nav className="inst-container h-[68px] flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 overflow-hidden">
+              <Image src="/impervia logo.png" alt="Impervia Estates" width={32} height={32} className="w-8 h-8 object-contain" />
             </div>
+            <span className="font-display text-[1.1rem] font-medium text-sable tracking-tight leading-none">
+              Impervia Estates
+            </span>
+          </Link>
+          <div className="hidden md:flex items-center gap-9">
+            {NAV_LINKS.map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                className="text-[0.8125rem] text-pewter hover:text-sable transition-colors duration-150 tracking-wide"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
-        </div>
+          <div className="flex items-center gap-5">
+            <Link href="/login" className="text-[0.8125rem] text-pewter hover:text-sable transition-colors duration-150">
+              Sign In
+            </Link>
+            <Link href="/register?service=renting" className="text-[0.8125rem] bg-sable text-cream px-4 py-2 hover:bg-cobalt transition-colors duration-150 tracking-wide">
+              Get Started
+            </Link>
+          </div>
+        </nav>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 sm:py-28">
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-orange-50/30 to-transparent" />
-        <div className="absolute top-20 right-10 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl" />
+      {/* ─── Hero ───────────────────────────────────────────── */}
+      <section className="relative bg-sable overflow-hidden">
+        <div className="absolute inset-0 inst-hero-grid" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-bronze/20" />
 
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-100 border border-amber-200 text-amber-700 text-sm font-medium mb-6">
-                <Key className="h-4 w-4" />
-                Rental Management Service
+        <div className="relative z-10 inst-container py-24">
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-2 mb-10 text-[0.75rem] text-haze">
+            <Link href="/" className="hover:text-cream transition-colors">Home</Link>
+            <span className="text-bronze/40">/</span>
+            <Link href="/#services" className="hover:text-cream transition-colors">Services</Link>
+            <span className="text-bronze/40">/</span>
+            <span className="text-bronze">Rental Management</span>
+          </div>
+
+          <div className="grid lg:grid-cols-12 gap-12 items-start">
+            {/* Content */}
+            <div className="lg:col-span-7">
+              <div className="inline-flex items-center gap-2 border border-bronze/25 bg-bronze/5 px-3 py-[7px] mb-8">
+                <Key className="w-3.5 h-3.5 text-bronze flex-shrink-0" />
+                <span className="text-[0.65rem] text-bronze tracking-[0.18em] uppercase font-medium">
+                  Residential · Rental Management
+                </span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl font-bold text-blue-950 tracking-tight leading-tight mb-6">
-                Effortless Property{' '}
-                <span className="bg-gradient-to-r from-amber-500 to-orange-500 bg-clip-text text-transparent">
-                  Rental Management
-                </span>
+              <h1
+                className="font-display font-light text-cream leading-tight mb-6"
+                style={{ fontSize: 'clamp(2.25rem, 4.5vw, 3.75rem)' }}
+              >
+                Rental Management{' '}
+                <span className="text-bronze-light">for the UAE&apos;s</span>{' '}
+                Discerning Landlord
               </h1>
 
-              <p className="text-lg text-slate-600 leading-relaxed mb-8">
-                From finding quality tenants to collecting rent automatically, our comprehensive
-                rental management service handles everything so you can enjoy passive income
-                without the hassle.
+              <p className="text-haze text-[1rem] leading-relaxed max-w-xl mb-10 font-light">
+                From qualified tenant placement to automated rent collection and
+                full regulatory compliance. Our rental management service handles
+                every aspect of your investment property.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" asChild className="bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/25">
-                  <Link href="/register?service=renting">
-                    Start Free Trial
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button size="lg" variant="outline" asChild>
-                  <Link href="/properties">Browse Rentals</Link>
-                </Button>
+              <div className="flex items-center gap-6">
+                <Link
+                  href="/register?service=renting"
+                  className="inline-flex items-center gap-2 border border-cream/25 text-cream px-6 py-3 hover:bg-white/5 transition-colors duration-150 text-[0.8125rem] tracking-wide"
+                >
+                  Register Interest
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link
+                  href="/properties"
+                  className="text-[0.8125rem] text-haze hover:text-cream transition-colors duration-150"
+                >
+                  Browse Rentals
+                </Link>
               </div>
             </div>
 
-            {/* Pricing Card */}
-            <div className="lg:justify-self-end">
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 p-8 max-w-md">
-                <div className="text-center mb-6">
-                  <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg shadow-amber-500/25 mb-4">
-                    <Key className="h-8 w-8 text-white" />
+            {/* Pricing card */}
+            <div className="lg:col-span-4 lg:col-start-9">
+              <div className="border border-bronze/20 bg-cobalt p-8">
+                <div className="border-b border-bronze/15 pb-6 mb-6">
+                  <p className="text-[0.6rem] text-bronze uppercase tracking-[0.18em] font-medium mb-3">
+                    Monthly Fee
+                  </p>
+                  <div className="font-display text-[3rem] font-light text-cream leading-none">
+                    AED 799
                   </div>
-                  <h3 className="text-xl font-bold text-blue-950">Renting Service</h3>
-                  <p className="text-slate-500 text-sm mt-1">Complete rental management</p>
+                  <div className="text-[0.75rem] text-haze mt-1">per property, per month</div>
                 </div>
-
-                <div className="text-center mb-6">
-                  <span className="text-4xl font-bold text-blue-950">AED 799</span>
-                  <span className="text-slate-500">/month</span>
-                </div>
-
-                <ul className="space-y-3 mb-8">
-                  {inclusions.slice(0, 6).map((item, idx) => (
-                    <li key={idx} className="flex items-center gap-3 text-sm text-slate-600">
-                      <CheckCircle2 className="h-5 w-5 text-emerald-500 flex-shrink-0" />
+                <ul className="space-y-3 mb-7">
+                  {INCLUSIONS.slice(0, 6).map((item) => (
+                    <li key={item} className="flex items-start gap-2.5 text-[0.8125rem] text-haze">
+                      <CheckCircle2 className="w-4 h-4 text-bronze flex-shrink-0 mt-[1px]" />
                       {item}
                     </li>
                   ))}
                 </ul>
-
-                <Button asChild className="w-full bg-amber-500 hover:bg-amber-600 text-white" size="lg">
-                  <Link href="/register?service=renting">
-                    Get Started Now
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-
-                <p className="text-center text-xs text-slate-400 mt-4">
-                  14-day free trial. No credit card required.
-                </p>
+                <Link
+                  href="/register?service=renting"
+                  className="block w-full text-center bg-bronze text-sable px-5 py-3 text-[0.8125rem] font-medium tracking-wide hover:bg-bronze-light transition-colors duration-150"
+                >
+                  Begin Onboarding
+                </Link>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-blue-950 mb-4">
-              Everything You Need to Rent Successfully
+      {/* ─── Features ───────────────────────────────────────── */}
+      <section className="bg-linen inst-section border-t border-wire">
+        <div className="inst-container">
+          <div className="mb-12">
+            <span className="inst-label">Service Scope</span>
+            <h2
+              className="font-display font-light text-sable leading-tight max-w-xl"
+              style={{ fontSize: 'clamp(1.875rem, 3vw, 2.75rem)' }}
+            >
+              Comprehensive Rental Management, End to End
             </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Comprehensive tools and services to maximize your rental income and minimize your workload.
-            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, idx) => {
-              const Icon = feature.icon
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-px bg-wire">
+            {FEATURES.map((feat) => {
+              const Icon = feat.Icon
               return (
-                <div key={idx} className="bg-slate-50 rounded-2xl p-6 hover:bg-slate-100 transition-colors">
-                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-md shadow-amber-500/20 mb-4">
-                    <Icon className="h-6 w-6 text-white" />
+                <div key={feat.title} className="bg-cream p-8">
+                  <div className="w-9 h-9 border border-wire flex items-center justify-center mb-5">
+                    <Icon className="w-4 h-4 text-bronze" />
                   </div>
-                  <h3 className="text-lg font-bold text-blue-950 mb-2">{feature.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">{feature.description}</p>
+                  <h3 className="font-display text-[1.125rem] font-medium text-sable mb-3">
+                    {feat.title}
+                  </h3>
+                  <p className="text-dusk text-[0.875rem] leading-relaxed">
+                    {feat.description}
+                  </p>
                 </div>
               )
             })}
@@ -227,58 +264,67 @@ export default function RentingServicePage() {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-20 bg-gradient-to-b from-slate-50 to-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-blue-950 mb-4">
-              How It Works
+      {/* ─── Process ────────────────────────────────────────── */}
+      <section className="bg-sable inst-section">
+        <div className="inst-container">
+          <div className="mb-14">
+            <span className="inst-label-light">How It Works</span>
+            <h2
+              className="font-display font-light text-cream leading-tight max-w-lg"
+              style={{ fontSize: 'clamp(1.875rem, 3vw, 2.5rem)' }}
+            >
+              A Structured Management Process
             </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Get started in minutes and begin managing your rentals like a pro.
-            </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {steps.map((step, idx) => (
-              <div key={idx} className="relative">
-                <div className="text-6xl font-bold text-amber-100 mb-4">{step.number}</div>
-                <h3 className="text-lg font-bold text-blue-950 mb-2">{step.title}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">{step.description}</p>
-                {idx < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-amber-200 to-transparent -translate-x-8" />
-                )}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-bronze/10">
+            {STEPS.map((step) => (
+              <div key={step.number} className="bg-sable p-10">
+                <div className="font-display text-[3.5rem] font-light text-bronze/20 leading-none mb-6">
+                  {step.number}
+                </div>
+                <h3 className="font-display text-[1.0625rem] font-medium text-cream mb-3">
+                  {step.title}
+                </h3>
+                <p className="text-haze text-[0.875rem] leading-relaxed">
+                  {step.description}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* What's Included */}
-      <section className="py-20 bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-amber-500 to-orange-500 rounded-3xl p-8 sm:p-12">
-            <div className="grid lg:grid-cols-2 gap-8 items-center">
-              <div>
-                <h2 className="text-3xl font-bold text-white mb-4">
-                  Everything Included in Your Plan
-                </h2>
-                <p className="text-amber-100 mb-6">
-                  No hidden fees, no surprises. Get full access to all features with your monthly subscription.
-                </p>
-                <Button size="lg" asChild className="bg-white text-amber-600 hover:bg-amber-50">
-                  <Link href="/register?service=renting">
-                    Start Your Free Trial
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                {inclusions.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-2 text-white text-sm">
-                    <CheckCircle2 className="h-5 w-5 text-amber-200 flex-shrink-0" />
-                    {item}
+      {/* ─── Inclusions ─────────────────────────────────────── */}
+      <section className="bg-cream inst-section border-t border-wire">
+        <div className="inst-container">
+          <div className="grid lg:grid-cols-12 gap-12">
+            <div className="lg:col-span-4">
+              <span className="inst-label">Full Inclusions</span>
+              <h2
+                className="font-display font-light text-sable leading-tight mb-6"
+                style={{ fontSize: 'clamp(1.75rem, 2.5vw, 2.25rem)' }}
+              >
+                Everything in Your Monthly Fee
+              </h2>
+              <p className="text-dusk text-[0.9375rem] leading-relaxed mb-8">
+                No hidden fees or add-ons. The following are all included in
+                the AED 799 monthly service fee.
+              </p>
+              <Link
+                href="/register?service=renting"
+                className="inline-flex items-center gap-2 bg-sable text-cream px-6 py-3 hover:bg-cobalt transition-colors duration-150 text-[0.8125rem] tracking-wide"
+              >
+                Begin Onboarding
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+            <div className="lg:col-span-7 lg:col-start-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-wire">
+                {INCLUSIONS.map((item) => (
+                  <div key={item} className="bg-linen px-5 py-4 flex items-center gap-3">
+                    <CheckCircle2 className="w-4 h-4 text-bronze flex-shrink-0" />
+                    <span className="text-[0.875rem] text-pewter">{item}</span>
                   </div>
                 ))}
               </div>
@@ -287,36 +333,35 @@ export default function RentingServicePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-950 to-blue-900">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-            Ready to Simplify Your Rental Business?
-          </h2>
-          <p className="text-lg text-blue-200 max-w-2xl mx-auto mb-10">
-            Join thousands of property owners in the UAE who trust GoFor Properties for hassle-free rental management.
-          </p>
-          <Button size="lg" asChild className="bg-amber-500 hover:bg-amber-600 text-white shadow-lg shadow-amber-500/25">
-            <Link href="/register?service=renting">
-              Get Started for AED 799/month
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-8">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-amber-500">
-                <Building2 className="h-4 w-4 text-white" />
+      {/* ─── Footer ─────────────────────────────────────────── */}
+      <footer className="bg-sable border-t border-bronze/10">
+        <div className="inst-container py-10">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            <Link href="/" className="flex items-center gap-2.5">
+              <div className="w-7 h-7 border border-bronze/30 bg-bronze/10 flex items-center justify-center flex-shrink-0">
+                <Image src="/impervia logo.png" alt="Impervia Estates" width={28} height={28} className="w-7 h-7 object-contain" />
               </div>
-              <span className="font-bold text-blue-950">GoFor Properties</span>
+              <span className="font-display text-[0.9375rem] font-medium text-cream">
+                Impervia Estates
+              </span>
             </Link>
-            <p className="text-sm text-slate-400">
-              &copy; {new Date().getFullYear()} GoFor Properties. All rights reserved.
+            <div className="flex items-center gap-6">
+              {[
+                { label: 'All Services', href: '/#services' },
+                { label: 'Properties', href: '/properties' },
+                { label: 'Contact', href: '/#contact' },
+              ].map((l) => (
+                <Link
+                  key={l.label}
+                  href={l.href}
+                  className="text-[0.75rem] text-haze hover:text-cream transition-colors"
+                >
+                  {l.label}
+                </Link>
+              ))}
+            </div>
+            <p className="text-[0.6875rem] text-fog">
+              © {new Date().getFullYear()} RSBD Solutions FZE · RERA Licensed
             </p>
           </div>
         </div>
@@ -324,6 +369,3 @@ export default function RentingServicePage() {
     </div>
   )
 }
-
-
-

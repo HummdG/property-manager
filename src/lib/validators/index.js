@@ -9,7 +9,7 @@ export const registerSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  role: z.enum(['OWNER', 'TENANT', 'TRADER', 'AGENT']).default('OWNER'),
+  role: z.enum(['OWNER', 'TENANT', 'AGENT']).default('OWNER'),
   phone: z.string().optional(),
 })
 
@@ -30,39 +30,34 @@ export const createPropertySchema = z.object({
 
 export const updatePropertySchema = createPropertySchema.partial()
 
-export const createServiceRequestSchema = z.object({
-  propertyId: z.string().min(1, 'Property is required'),
-  categoryId: z.string().min(1, 'Service category is required'),
-  title: z.string().min(5, 'Title must be at least 5 characters'),
-  description: z.string().min(10, 'Description must be at least 10 characters'),
-  priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).default('MEDIUM'),
-  scheduledFor: z.string().datetime().optional(),
+const AGENT_DOC_TYPES = ['RERA_BROKER_CARD', 'BRN', 'LABOUR_CARD', 'EMPLOYMENT_VISA', 'EMIRATES_ID']
+
+export const updateAgentProfileSchema = z.object({
+  companyName:      z.string().optional(),
+  licenseNumber:    z.string().optional(),
+  title:            z.string().optional(),
+  description:      z.string().optional(),
+  nationality:      z.string().optional(),
+  spokenLanguages:  z.array(z.string()).optional(),
+  experienceSince:  z.string().datetime({ offset: true }).optional().nullable(),
+  serviceAreas:     z.array(z.string()).optional(),
+  specializations:  z.array(z.string()).optional(),
+  commissionRate:   z.number().min(0).max(100).optional(),
+  isAvailable:      z.boolean().optional(),
+  phone:            z.string().optional(),
 })
 
-export const updateServiceRequestSchema = z.object({
-  title: z.string().min(5).optional(),
-  description: z.string().min(10).optional(),
-  priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).optional(),
-  status: z.enum(['PENDING', 'ASSIGNED', 'ACCEPTED', 'REJECTED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED', 'PENDING_PAYMENT', 'PAID']).optional(),
+export const agentDocumentUploadSchema = z.object({
+  type:        z.enum(AGENT_DOC_TYPES),
+  fileName:    z.string().min(1),
+  contentType: z.string().min(1),
+  fileSize:    z.number().int().positive().optional(),
 })
 
-export const assignJobSchema = z.object({
-  serviceRequestId: z.string().min(1, 'Service request is required'),
-  traderId: z.string().min(1, 'Trader is required'),
-  notes: z.string().optional(),
-  estimatedCost: z.number().int().min(0).optional(),
-})
-
-export const createPaymentSchema = z.object({
-  serviceRequestId: z.string().min(1, 'Service request is required'),
-  amount: z.number().int().min(1, 'Amount must be greater than 0'),
-  description: z.string().optional(),
-})
-
-export const createServiceCategorySchema = z.object({
-  name: z.string().min(2, 'Category name must be at least 2 characters'),
-  description: z.string().optional(),
-  icon: z.string().optional(),
-  isActive: z.boolean().default(true),
-})
-
+export const agentReviewSchema = z.object({
+  action:       z.enum(['APPROVE', 'REJECT']),
+  rejectionNote: z.string().optional(),
+}).refine(
+  (d) => d.action !== 'REJECT' || (d.rejectionNote && d.rejectionNote.trim().length > 0),
+  { message: 'Rejection note is required when rejecting', path: ['rejectionNote'] }
+)

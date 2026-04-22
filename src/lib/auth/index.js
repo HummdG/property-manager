@@ -5,7 +5,6 @@ export { authEdgeConfig, authMiddleware } from './auth.edge'
 export const ROLES = {
   OWNER: 'OWNER',
   TENANT: 'TENANT',
-  TRADER: 'TRADER',
   ADMIN: 'ADMIN',
   AGENT: 'AGENT',
 }
@@ -16,8 +15,6 @@ export function getDashboardPath(role) {
       return '/admin'
     case ROLES.OWNER:
       return '/owner'
-    case ROLES.TRADER:
-      return '/trader'
     case ROLES.TENANT:
       return '/tenant'
     case ROLES.AGENT:

@@ -38,12 +38,6 @@ export const useAgentStore = create((set, get) => ({
   isTrackingLocation: false,
   lastLocation: null,
 
-  // Subscription state
-  subscription: null,
-  plans: [],
-  tcAccepted: false,
-  subscriptionLoading: false,
-
   // Inquiry actions
   setInquiries: (inquiries) => set({ inquiries }),
   addInquiry: (inquiry) => set((state) => ({
@@ -84,12 +78,6 @@ export const useAgentStore = create((set, get) => ({
   setIsTrackingLocation: (isTracking) => set({ isTrackingLocation: isTracking }),
   setLastLocation: (location) => set({ lastLocation: location }),
 
-  // Subscription actions
-  setSubscription: (subscription) => set({ subscription }),
-  setPlans: (plans) => set({ plans }),
-  setTcAccepted: (accepted) => set({ tcAccepted: accepted }),
-  setSubscriptionLoading: (loading) => set({ subscriptionLoading: loading }),
-
   // Reset state
   resetInquiries: () => set({
     inquiries: [],
@@ -112,12 +100,11 @@ export const useAgentStore = create((set, get) => ({
     logsPagination: { page: 1, limit: 20, total: 0, totalPages: 0 },
     locations: [],
     isTrackingLocation: false,
-    lastLocation: null,
-    subscription: null,
-    plans: [],
-    tcAccepted: false
+    lastLocation: null
   })
 }))
+
+
 
 
 

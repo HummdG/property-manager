@@ -1,26 +1,66 @@
+import Link from 'next/link'
+import Image from 'next/image'
+import { CheckCircle2 } from 'lucide-react'
+
 export default function AuthLayout({ children }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-white to-amber-50/30 relative overflow-hidden">
-      {/* Geometric pattern background */}
-      <div className="absolute inset-0 pattern-geometric opacity-60" />
-      
-      {/* Decorative elements - Dubai-inspired geometric shapes */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-amber-400/20 to-amber-500/10 rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2" />
-      <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-blue-900/10 to-blue-800/5 rounded-full blur-3xl transform -translate-x-1/2 translate-y-1/2" />
-      
-      {/* Subtle gold line accents */}
-      <div className="absolute top-20 left-10 w-32 h-0.5 bg-gradient-to-r from-amber-400/40 to-transparent transform -rotate-45" />
-      <div className="absolute top-40 left-20 w-24 h-0.5 bg-gradient-to-r from-amber-400/30 to-transparent transform -rotate-45" />
-      <div className="absolute bottom-20 right-10 w-32 h-0.5 bg-gradient-to-l from-amber-400/40 to-transparent transform rotate-45" />
-      <div className="absolute bottom-40 right-20 w-24 h-0.5 bg-gradient-to-l from-amber-400/30 to-transparent transform rotate-45" />
-      
-      {/* Main content */}
-      <div className="relative w-full max-w-md px-4 py-8">
-        {children}
+    <div className="min-h-screen flex font-sans antialiased">
+
+      {/* ── Left branding panel ─────────────────────────────── */}
+      <div className="hidden lg:flex w-[440px] flex-shrink-0 bg-sable flex-col justify-between p-14 relative overflow-hidden">
+        {/* Architectural grid */}
+        <div className="absolute inset-0 inst-hero-grid" />
+        {/* Right rule */}
+        <div className="absolute right-0 top-0 bottom-0 w-px bg-bronze/15" />
+
+        {/* Logo */}
+        <div className="relative z-10">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-8 h-8 flex items-center justify-center flex-shrink-0 overflow-hidden">
+              <Image src="/impervia logo.png" alt="Impervia Estates" width={32} height={32} className="w-8 h-8 object-contain" />
+            </div>
+            <span className="font-display text-[1rem] font-medium text-cream group-hover:text-bronze-light transition-colors">
+              Impervia Estates
+            </span>
+          </Link>
+        </div>
+
+        {/* Central message */}
+        <div className="relative z-10">
+          <span className="inst-label-light">Client Portal</span>
+          <h2
+            className="font-display font-light text-cream leading-tight mb-6"
+            style={{ fontSize: 'clamp(2rem, 3vw, 2.5rem)' }}
+          >
+            Precision Property<br />Management
+          </h2>
+          <p className="text-haze text-sm leading-relaxed max-w-xs">
+            Access your property portfolio, manage tenants, track service requests,
+            and view financial reports, all in one secure platform.
+          </p>
+        </div>
+
+        {/* Credentials */}
+        <div className="relative z-10 border-t border-bronze/15 pt-8 space-y-4">
+          {[
+            'RERA Licensed & DLD Registered',
+            '12+ years of operational excellence',
+            '2,400+ properties under management',
+          ].map((item) => (
+            <div key={item} className="flex items-center gap-3 text-[0.8125rem] text-haze">
+              <CheckCircle2 className="w-4 h-4 text-bronze flex-shrink-0" />
+              {item}
+            </div>
+          ))}
+        </div>
       </div>
-      
-      {/* Bottom decorative bar */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-30" />
+
+      {/* ── Right form panel ────────────────────────────────── */}
+      <div className="flex-1 bg-cream overflow-y-auto flex items-start lg:items-center justify-center px-8 py-10 lg:p-14">
+        <div className="w-full max-w-[420px] py-4">
+          {children}
+        </div>
+      </div>
     </div>
   )
 }

@@ -25,16 +25,6 @@ export async function GET(request, { params }) {
             }
           }
         },
-        serviceRequests: {
-          include: {
-            category: true,
-            requester: {
-              select: { id: true, name: true }
-            }
-          },
-          orderBy: { createdAt: 'desc' },
-          take: 5
-        },
         documents: {
           select: { id: true, type: true, fileName: true, fileUrl: true, fileSize: true, uploadedAt: true }
         }

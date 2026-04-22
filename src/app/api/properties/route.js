@@ -37,7 +37,7 @@ export async function GET(request) {
             select: { id: true, type: true, fileName: true, fileUrl: true, uploadedAt: true }
           },
           _count: {
-            select: { serviceRequests: true }
+            select: { inquiries: true }
           }
         },
         orderBy: { createdAt: 'desc' },
@@ -69,7 +69,7 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    if (session.user.role !== 'OWNER' && session.user.role !== 'ADMIN') {
+    if (session.user.role !== 'OWNER' && session.user.role !== 'AGENT' && session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
@@ -78,6 +78,12 @@ export async function POST(request) {
 
     if (!name || !address || !city || !postcode) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+    }
+
+    let agentId = null
+    if (session.user.role === 'AGENT') {
+      const agentProfile = await db.agentProfile.findUnique({ where: { userId: session.user.id } })
+      if (agentProfile) agentId = agentProfile.id
     }
 
     const property = await db.property.create({
@@ -96,7 +102,8 @@ export async function POST(request) {
         monthlyRent: monthlyRent ? parseInt(monthlyRent) : null,
         salePrice: salePrice ? parseInt(salePrice) : null,
         isListed: isListed || false,
-        ownerId: session.user.id
+        ownerId: session.user.id,
+        ...(agentId && { agentId })
       }
     })
 
