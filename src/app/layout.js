@@ -41,6 +41,18 @@ export const metadata = {
     ],
     apple: { url: '/icon.svg', type: 'image/svg+xml' },
   },
+  openGraph: {
+    title: 'Impervia Estates | UAE Premium Property Management',
+    description: 'Established property management and real estate services across the UAE. RERA licensed.',
+    siteName: 'Impervia Estates',
+    locale: 'en_AE',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Impervia Estates | UAE Premium Property Management',
+    description: 'Established property management and real estate services across the UAE. RERA licensed.',
+  },
 }
 
 export default function RootLayout({ children }) {
