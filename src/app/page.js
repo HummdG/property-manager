@@ -239,11 +239,20 @@ export default function HomePage() {
             </div>
 
             {/* Stats panel desktop */}
-            <div className="hidden lg:flex lg:col-span-5 flex-col justify-center pl-16 gap-0 hero-line-draw">
+            <div className="hidden lg:flex lg:col-span-5 flex-col justify-center pl-16 gap-0 hero-line-draw relative overflow-hidden">
+              {/* Dubai Marina — atmospheric texture behind stats */}
+              <Image
+                src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=900&q=75"
+                alt=""
+                fill
+                className="object-cover opacity-[0.18]"
+                aria-hidden="true"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-sable/75 to-sable/10 pointer-events-none" />
               {STATS.map((stat, i) => (
                 <div
                   key={stat.label}
-                  className={`group py-8 cursor-default ${i < STATS.length - 1 ? 'border-b border-bronze/10' : ''}`}
+                  className={`group relative z-10 py-8 cursor-default ${i < STATS.length - 1 ? 'border-b border-bronze/10' : ''}`}
                 >
                   <div className="font-display text-[2.5rem] font-light text-bronze leading-none mb-2 group-hover:text-bronze-light transition-colors duration-300">
                     {stat.value}
@@ -353,14 +362,45 @@ export default function HomePage() {
       {/* ─── Process ────────────────────────────────────────── */}
       <section className="bg-sable inst-section">
         <div className="inst-container">
-          <div className="mb-10 lg:mb-14">
-            <span className="inst-label-light">How We Work</span>
-            <h2
-              className="font-display font-light text-cream leading-tight max-w-lg"
-              style={{ fontSize: 'clamp(1.875rem, 3vw, 2.75rem)' }}
-            >
-              A Structured Onboarding & Management Process
-            </h2>
+
+          {/* Header — text left, image right */}
+          <div className="grid lg:grid-cols-12 gap-6 lg:gap-10 items-end mb-10 lg:mb-14">
+
+            {/* Text */}
+            <div className="lg:col-span-5">
+              <span className="inst-label-light">How We Work</span>
+              <h2
+                className="font-display font-light text-cream leading-tight max-w-lg mt-2"
+                style={{ fontSize: 'clamp(1.875rem, 3vw, 2.75rem)' }}
+              >
+                A Structured Onboarding &amp; Management Process
+              </h2>
+            </div>
+
+            {/* Image */}
+            <div className="lg:col-span-7 relative h-[190px] lg:h-[250px] overflow-hidden group border border-bronze/10">
+              <Image
+                src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=85"
+                alt="Luxury residential property"
+                fill
+                sizes="(max-width: 1024px) 100vw, 58vw"
+                className="object-cover opacity-90 scale-[1.02] group-hover:opacity-100 group-hover:scale-100 transition-all duration-700 ease-out"
+              />
+              {/* Left-to-right fade blends into the text column */}
+              <div className="absolute inset-0 bg-gradient-to-r from-sable/75 via-sable/10 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-sable/80 via-sable/20 to-transparent" />
+
+              {/* Editorial caption overlay */}
+              <div className="absolute bottom-5 left-6 right-6 flex items-end justify-between">
+                <p className="text-cream text-[0.75rem] leading-relaxed max-w-[22rem] font-light italic">
+                  &ldquo;Every engagement begins with clarity on scope, obligations, and expectations.&rdquo;
+                </p>
+                <div className="hidden lg:flex items-center gap-2 flex-shrink-0 ml-4">
+                  <div className="w-4 h-px bg-bronze/45" />
+                  <span className="text-[0.5rem] text-haze/40 tracking-[0.22em] uppercase">Dubai, UAE</span>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* 4-step grid */}
@@ -382,6 +422,98 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ─── Dubai Showcase ─────────────────────────────────── */}
+      <section className="bg-sable border-t border-bronze/10">
+        <div className="inst-container py-14 lg:py-24">
+
+          {/* Header row */}
+          <div className="mb-10 lg:mb-14 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+            <div>
+              <span className="inst-label-light">Our City</span>
+              <h2
+                className="font-display font-light text-cream leading-tight max-w-xl mt-2"
+                style={{ fontSize: 'clamp(1.875rem, 3vw, 2.75rem)' }}
+              >
+                At the Heart of Dubai&rsquo;s Property Market
+              </h2>
+            </div>
+            <p className="text-haze text-[0.875rem] leading-relaxed max-w-sm lg:text-right">
+              Managing portfolios across Downtown, DIFC, Marina,{' '}
+              Business Bay, and Palm Jumeirah.
+            </p>
+          </div>
+
+          {/* Image grid */}
+          <div className="grid lg:grid-cols-12 gap-1 h-[320px] lg:h-[480px]">
+
+            {/* Large primary image */}
+            <div className="lg:col-span-8 relative overflow-hidden group border border-bronze/10">
+              <Image
+                src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200&q=85"
+                alt="Dubai Marina skyline at night"
+                fill
+                sizes="(max-width: 1024px) 100vw, 67vw"
+                className="object-cover opacity-90 scale-[1.02] group-hover:opacity-100 group-hover:scale-100 transition-all duration-700 ease-out"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-sable/50 to-transparent" />
+              <div className="absolute bottom-5 left-6 flex items-center gap-2.5">
+                <div className="w-5 h-px bg-bronze/55" />
+                <span className="text-[0.55rem] text-haze/60 tracking-[0.25em] uppercase">Dubai Marina</span>
+              </div>
+            </div>
+
+            {/* Two stacked images — desktop only */}
+            <div className="hidden lg:grid lg:col-span-4 grid-rows-2 gap-1">
+              <div className="relative overflow-hidden group border border-bronze/10">
+                <Image
+                  src="https://images.unsplash.com/photo-1582672060674-bc2bd808a8b5?w=600&q=85"
+                  alt="Burj Khalifa, Downtown Dubai"
+                  fill
+                  sizes="33vw"
+                  className="object-cover opacity-85 scale-[1.02] group-hover:opacity-100 group-hover:scale-100 transition-all duration-700 ease-out"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-sable/40 to-transparent" />
+                <div className="absolute bottom-4 left-4 flex items-center gap-2">
+                  <div className="w-3 h-px bg-bronze/50" />
+                  <span className="text-[0.55rem] text-haze/80 tracking-[0.25em] uppercase">Downtown</span>
+                </div>
+              </div>
+              <div className="relative overflow-hidden group border border-bronze/10">
+                <Image
+                  src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&q=85"
+                  alt="Business Bay, Dubai"
+                  fill
+                  sizes="33vw"
+                  className="object-cover opacity-85 scale-[1.02] group-hover:opacity-100 group-hover:scale-100 transition-all duration-700 ease-out"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-sable/40 to-transparent" />
+                <div className="absolute bottom-4 left-4 flex items-center gap-2">
+                  <div className="w-3 h-px bg-bronze/50" />
+                  <span className="text-[0.55rem] text-haze/80 tracking-[0.25em] uppercase">Business Bay</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom ornament + link */}
+          <div className="mt-6 pt-6 border-t border-bronze/10 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-px bg-bronze/30" />
+              <div className="w-[4px] h-[4px] rotate-45 border border-bronze/40" />
+              <div className="w-8 h-px bg-bronze/30" />
+            </div>
+            <Link
+              href="/properties"
+              className="group inline-flex items-center gap-2.5 text-[0.8125rem] text-haze hover:text-cream transition-colors duration-150 tracking-wide"
+            >
+              View Available Properties
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-150" />
+            </Link>
+          </div>
+
+        </div>
+      </section>
+
       {/* ─── Testimonials ───────────────────────────────────── */}
       <section className="bg-linen inst-section border-t border-wire">
         <div className="inst-container">
@@ -395,7 +527,7 @@ export default function HomePage() {
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+<div className="grid md:grid-cols-3 gap-6">
             {TESTIMONIALS.map((t, i) => (
               <div key={i} className="bg-cream border border-wire p-6 lg:p-8">
                 <div className="font-display text-[2rem] text-bronze leading-none mb-5">
