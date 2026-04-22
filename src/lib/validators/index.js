@@ -1,5 +1,19 @@
 import { z } from 'zod'
 
+export const DISPOSABLE_DOMAINS = new Set([
+  'mailinator.com', 'guerrillamail.com', 'guerrillamail.net',
+  'guerrillamail.org', 'guerrillamail.biz', 'guerrillamail.de',
+  'tempmail.com', 'temp-mail.org', 'throwam.com', 'sharklasers.com',
+  'yopmail.com', 'maildrop.cc', 'trashmail.com', 'trashmail.me',
+  'trashmail.net', 'dispostable.com', 'fakeinbox.com',
+  'spamgourmet.com', 'mailnull.com', 'getnada.com', 'spam4.me',
+  'discard.email', '10minutemail.com', 'mintemail.com',
+  'wegwerfmail.de', 'spamex.com', 'mailexpire.com', 'filzmail.com',
+  'example.com', 'example.org', 'example.net', 'example.io',
+  'test.com', 'test.org', 'test.net', 'localhost', 'invalid.com',
+  'fake.com', 'noreply.com', 'placeholder.com',
+])
+
 export const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(1, 'Password is required'),

@@ -1,16 +1,36 @@
 import { NextResponse } from 'next/server'
+import { resolveMx } from 'node:dns/promises'
 import bcrypt from 'bcryptjs'
 import { db } from '@/lib/db'
 import { logEvent } from '@/lib/events'
+import { registerSchema, DISPOSABLE_DOMAINS } from '@/lib/validators'
+
+async function isEmailDomainValid(email) {
+  const domain = email.split('@')[1]?.toLowerCase()
+  if (!domain) return false
+  if (DISPOSABLE_DOMAINS.has(domain)) return false
+  try {
+    const records = await resolveMx(domain)
+    return records.length > 0
+  } catch {
+    return false
+  }
+}
 
 export async function POST(request) {
   try {
     const body = await request.json()
-    const { name, email, password, role } = body
+    const parsed = registerSchema.safeParse(body)
+    if (!parsed.success) {
+      const message = parsed.error.errors[0]?.message ?? 'Invalid input'
+      return NextResponse.json({ error: message }, { status: 400 })
+    }
+    const { name, email, password, role } = parsed.data
 
-    if (!name || !email || !password) {
+    const domainOk = await isEmailDomainValid(email)
+    if (!domainOk) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'Please use a real email address' },
         { status: 400 }
       )
     }
@@ -28,27 +48,19 @@ export async function POST(request) {
 
     const hashedPassword = await bcrypt.hash(password, 12)
 
-    const validRoles = ['OWNER', 'TENANT', 'AGENT']
-    const userRole = validRoles.includes(role) ? role : 'OWNER'
-
     const user = await db.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        role: userRole
+        role,
       }
     })
 
-    // Create profile based on role
-    if (userRole === 'TENANT') {
-      await db.tenantProfile.create({
-        data: { userId: user.id }
-      })
-    } else if (userRole === 'AGENT') {
-      await db.agentProfile.create({
-        data: { userId: user.id }
-      })
+    if (role === 'TENANT') {
+      await db.tenantProfile.create({ data: { userId: user.id } })
+    } else if (role === 'AGENT') {
+      await db.agentProfile.create({ data: { userId: user.id } })
     }
 
     await logEvent({
@@ -61,7 +73,7 @@ export async function POST(request) {
     })
 
     return NextResponse.json(
-      { 
+      {
         message: 'User created successfully',
         user: {
           id: user.id,
@@ -80,4 +92,3 @@ export async function POST(request) {
     )
   }
 }
-
