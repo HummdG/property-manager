@@ -32,8 +32,9 @@ export const viewport = {
 }
 
 export const metadata = {
+  metadataBase: new URL('https://www.imperviaestates.com'),
   title: 'Impervia Estates | UAE Premium Property Management',
-  description: 'Established property management and real estate services across the UAE. RERA licensed.',
+  description: 'Established property management and real estate services across the UAE. RERA licensed. Trusted by owners, agents, and tenants across Dubai and beyond.',
   icons: {
     icon: [
       { url: '/icon.svg', type: 'image/svg+xml' },
@@ -43,7 +44,7 @@ export const metadata = {
   },
   openGraph: {
     title: 'Impervia Estates | UAE Premium Property Management',
-    description: 'Established property management and real estate services across the UAE. RERA licensed.',
+    description: 'Established property management and real estate services across the UAE. RERA licensed. Trusted by owners, agents, and tenants across Dubai and beyond.',
     siteName: 'Impervia Estates',
     locale: 'en_AE',
     type: 'website',
@@ -51,7 +52,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Impervia Estates | UAE Premium Property Management',
-    description: 'Established property management and real estate services across the UAE. RERA licensed.',
+    description: 'Established property management and real estate services across the UAE. RERA licensed. Trusted by owners, agents, and tenants across Dubai and beyond.',
   },
 }
 
