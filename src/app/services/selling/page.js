@@ -1,224 +1,278 @@
 import Link from 'next/link'
+import Image from 'next/image'
+import SiteHeader from '@/components/shared/SiteHeader'
 import {
-  Building2,
   Home,
   ArrowRight,
   CheckCircle2,
-  Camera,
   TrendingUp,
+  Camera,
   Users,
   FileText,
+  Star,
+  BarChart2,
+  Building2,
+  Search,
   Handshake,
-  Globe,
-  BarChart3,
-  Eye
+  ShieldCheck,
 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 
 export const metadata = {
-  title: 'Selling Services | GoFor Properties',
-  description: 'Premium property selling services in UAE. Professional listings, photography, market analysis, and direct buyer connections.'
+  title: 'Sales Brokerage — Buying & Selling | Impervia Estates',
+  description:
+    'Sales brokerage for the UAE: seller and buyer representation, evidence-led valuations, premium marketing, sharp negotiation, and clean DLD transfer.',
 }
 
-const features = [
+const FEATURES = [
   {
-    icon: Globe,
-    title: 'Premium Property Listings',
-    description: 'Get maximum exposure with featured listings on our platform and syndication to major UAE property portals.'
+    Icon: BarChart2,
+    title: 'Evidence-Led Valuation',
+    description:
+      'Comparable-market analysis grounded in DLD transaction data — defensible pricing whether you are listing or making an offer.',
   },
   {
-    icon: Camera,
-    title: 'Professional Photography',
-    description: 'High-quality photos, drone shots, and 360° virtual tours that make your property stand out from the competition.'
+    Icon: Camera,
+    title: 'Editorial Marketing',
+    description:
+      'Architectural photography, drone, virtual walk-throughs, and a listing narrative written by humans — not template copy.',
   },
   {
-    icon: Eye,
-    title: 'Virtual Tours & Videos',
-    description: 'Immersive virtual property tours that let buyers explore every corner from anywhere in the world.'
+    Icon: Star,
+    title: 'Premium Portal Placement',
+    description:
+      'Featured positioning across Bayut, Property Finder, and Dubizzle, plus discreet outreach to our private buyer network.',
   },
   {
-    icon: BarChart3,
-    title: 'Market Valuation Tools',
-    description: 'Data-driven pricing recommendations based on comparable sales, market trends, and neighborhood analysis.'
+    Icon: Search,
+    title: 'Off-Market Buyer Access',
+    description:
+      'Buyers: get first sight of off-market opportunities and pre-launch inventory across Downtown, Marina, Palm, DIFC, and beyond.',
   },
   {
-    icon: Users,
-    title: 'Direct Buyer Connections',
-    description: 'Access our network of pre-qualified buyers actively looking for properties in the UAE market.'
+    Icon: Users,
+    title: 'Counterparty Qualification',
+    description:
+      'Every buyer or seller we bring you is pre-qualified — financial verification, intent assessment, and timeline confirmed.',
   },
   {
-    icon: Handshake,
-    title: 'Negotiation Support',
-    description: 'Expert guidance through offers, counter-offers, and closing to ensure you get the best possible price.'
-  }
+    Icon: Handshake,
+    title: 'Negotiation, Both Sides',
+    description:
+      'Disciplined offer strategy and counter-offer management. We sit at the table, we do not just pass messages.',
+  },
+  {
+    Icon: FileText,
+    title: 'MOU, SPA & NOC',
+    description:
+      'Form F drafting, MOU and SPA preparation, NOC applications, and developer liaison coordinated end-to-end.',
+  },
+  {
+    Icon: ShieldCheck,
+    title: 'DLD Transfer Closing',
+    description:
+      'Trustee office bookings, transfer-day coordination, settlement of fees, and final handover — clean, documented, on schedule.',
+  },
 ]
 
-const steps = [
+const STEPS = [
   {
     number: '01',
-    title: 'List Your Property',
-    description: 'Submit your property details and our team will create a compelling listing with professional content.'
+    title: 'Brief & Valuation',
+    description:
+      'Sellers: a written valuation and listing strategy. Buyers: a requirements brief and target shortlist with market analysis.',
   },
   {
     number: '02',
-    title: 'Get Exposure',
-    description: 'Your property gets featured across multiple platforms, reaching thousands of potential buyers.'
+    title: 'Marketing or Sourcing',
+    description:
+      'Listings live with premium creative; or, for buyers, a curated pipeline of on- and off-market opportunities.',
   },
   {
     number: '03',
-    title: 'Receive Offers',
-    description: 'Qualified buyers submit offers directly through our platform. Review and compare with ease.'
+    title: 'Viewings & Negotiation',
+    description:
+      'Qualified viewings only. Offers and counter-offers managed in writing with our written recommendation at every stage.',
   },
   {
     number: '04',
-    title: 'Close the Deal',
-    description: 'We guide you through negotiations and paperwork to a successful sale.'
-  }
+    title: 'MOU to DLD Transfer',
+    description:
+      'Form F, MOU, deposit, NOC, mortgage liaison if needed, and transfer-day coordination through to keys.',
+  },
 ]
 
-const inclusions = [
-  'Premium listing placement',
-  'Professional photography session',
-  '360° virtual tour',
-  'Drone aerial shots',
-  'Market price analysis',
-  'Buyer lead generation',
-  'Offer management system',
-  'Document preparation',
-  'Negotiation assistance',
-  'Closing coordination'
+const INCLUSIONS = [
+  'Evidence-led valuation (sellers)',
+  'Requirements brief & shortlist (buyers)',
+  'Comparable-market analysis with DLD data',
+  'Architectural photography & drone',
+  'Virtual tour production',
+  'Premium portal placement, all platforms',
+  'Off-market and pre-launch access',
+  'Counterparty pre-qualification',
+  'Viewing coordination & accompaniment',
+  'Offer & counter-offer negotiation',
+  'Form F, MOU and SPA drafting',
+  'NOC application & developer liaison',
+  'Mortgage and conveyancing coordination',
+  'DLD trustee office booking',
+  'Transfer-day attendance & closing',
+  'Post-sale documentation archive',
 ]
 
-export default function SellingServicePage() {
+const REPRESENTATION = [
+  {
+    Icon: Home,
+    label: 'Sellers',
+    desc: 'Price right, market sharp, close clean',
+  },
+  {
+    Icon: Search,
+    label: 'Buyers',
+    desc: 'A partisan advocate with off-market access',
+  },
+  {
+    Icon: Building2,
+    label: 'Investors',
+    desc: 'Yield-led portfolio strategy and acquisition',
+  },
+  {
+    Icon: TrendingUp,
+    label: 'Off-Plan & Resale',
+    desc: 'Primary launches and secondary-market deals',
+  },
+]
+
+const NAV_LINKS = [
+  { label: 'Services', href: '/#services' },
+  { label: 'Properties', href: '/properties' },
+  { label: 'About', href: '/#about' },
+  { label: 'Contact', href: '/#contact' },
+]
+
+export default function SalesBrokeragePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-white to-slate-50">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur-md">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 shadow-md shadow-amber-500/20">
-                <Building2 className="h-5 w-5 text-white" />
-              </div>
-              <div className="hidden sm:block">
-                <span className="text-lg font-bold text-blue-950">GoFor</span>
-                <span className="text-lg font-bold bg-gradient-to-r from-amber-500 to-amber-600 bg-clip-text text-transparent">Properties</span>
-              </div>
-            </Link>
+    <div className="bg-cream font-sans antialiased">
 
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm" asChild className="text-slate-600 hover:text-blue-950">
-                <Link href="/login">Sign In</Link>
-              </Button>
-              <Button size="sm" asChild className="bg-emerald-500 hover:bg-emerald-600 text-white">
-                <Link href="/register?service=selling">Get Started</Link>
-              </Button>
-            </div>
+      <SiteHeader links={NAV_LINKS} cta={{ label: 'Brief Us', href: '/register?service=selling' }} />
+
+      {/* ─── Hero ───────────────────────────────────────────── */}
+      <section className="relative bg-sable overflow-hidden">
+        <div className="absolute inset-0 inst-hero-grid" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-bronze/20" />
+
+        <div className="relative z-10 inst-container py-24">
+          <div className="flex items-center gap-2 mb-10 text-[0.75rem] text-haze">
+            <Link href="/" className="hover:text-cream transition-colors">Home</Link>
+            <span className="text-bronze/40">/</span>
+            <Link href="/#services" className="hover:text-cream transition-colors">Services</Link>
+            <span className="text-bronze/40">/</span>
+            <span className="text-bronze">Sales Brokerage</span>
           </div>
-        </div>
-      </header>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 sm:py-28">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-teal-50/30 to-transparent" />
-        <div className="absolute top-20 right-10 w-96 h-96 bg-emerald-400/10 rounded-full blur-3xl" />
-
-        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 border border-emerald-200 text-emerald-700 text-sm font-medium mb-6">
-                <Home className="h-4 w-4" />
-                Property Sales Service
+          <div className="grid lg:grid-cols-12 gap-12 items-start">
+            <div className="lg:col-span-7">
+              <div className="inline-flex items-center gap-2 border border-bronze/25 bg-bronze/5 px-3 py-[7px] mb-8">
+                <Home className="w-3.5 h-3.5 text-bronze flex-shrink-0" />
+                <span className="text-[0.65rem] text-bronze tracking-[0.18em] uppercase font-medium">
+                  Buyer & Seller Representation
+                </span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl font-bold text-blue-950 tracking-tight leading-tight mb-6">
-                Sell Your Property{' '}
-                <span className="bg-gradient-to-r from-emerald-500 to-teal-500 bg-clip-text text-transparent">
-                  at Premium Value
-                </span>
+              <h1
+                className="font-display font-light text-cream leading-tight mb-6"
+                style={{ fontSize: 'clamp(2.25rem, 4.5vw, 3.75rem)' }}
+              >
+                Sales Brokerage,{' '}
+                <span className="text-bronze-light italic">Buy-Side</span>{' '}
+                and Sell-Side.
               </h1>
 
-              <p className="text-lg text-slate-600 leading-relaxed mb-8">
-                Maximum exposure, professional marketing, and expert guidance to help you
-                sell your property faster and at the best possible price in the UAE market.
+              <p className="text-haze text-[1rem] leading-relaxed max-w-xl mb-10 font-light">
+                We represent sellers chasing the right price and buyers chasing
+                the right asset. Evidence-led valuations, premium marketing,
+                off-market access, sharp negotiation, and clean DLD transfer —
+                from first conversation to keys in hand.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" asChild className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/25">
-                  <Link href="/register?service=selling">
-                    List Your Property
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button size="lg" variant="outline" asChild>
-                  <Link href="/properties?listingType=SALE">View Listings</Link>
-                </Button>
+              <div className="flex items-center gap-6">
+                <Link href="/register?service=selling"
+                  className="inline-flex items-center gap-2 border border-cream/25 text-cream px-6 py-3 hover:bg-white/5 transition-colors duration-150 text-[0.8125rem] tracking-wide">
+                  Brief Us
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link href="/properties"
+                  className="text-[0.8125rem] text-haze hover:text-cream transition-colors duration-150">
+                  Browse Properties
+                </Link>
               </div>
             </div>
 
-            {/* Pricing Card */}
-            <div className="lg:justify-self-end">
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 p-8 max-w-md">
-                <div className="text-center mb-6">
-                  <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 shadow-lg shadow-emerald-500/25 mb-4">
-                    <Home className="h-8 w-8 text-white" />
-                  </div>
-                  <h3 className="text-xl font-bold text-blue-950">Selling Service</h3>
-                  <p className="text-slate-500 text-sm mt-1">Premium sales package</p>
+            <div className="lg:col-span-4 lg:col-start-9">
+              <div className="border border-bronze/20 bg-cobalt p-8">
+                <div className="border-b border-bronze/15 pb-6 mb-6">
+                  <p className="text-[0.6rem] text-bronze uppercase tracking-[0.18em] font-medium mb-3">Brokerage Fee</p>
+                  <div className="font-display text-[3rem] font-light text-cream leading-none">2%</div>
+                  <div className="text-[0.75rem] text-haze mt-1">of sale price · paid on DLD transfer</div>
                 </div>
-
-                <div className="text-center mb-6">
-                  <span className="text-4xl font-bold text-blue-950">AED 1,499</span>
-                  <span className="text-slate-500">/month</span>
-                </div>
-
-                <ul className="space-y-3 mb-8">
-                  {inclusions.slice(0, 6).map((item, idx) => (
-                    <li key={idx} className="flex items-center gap-3 text-sm text-slate-600">
-                      <CheckCircle2 className="h-5 w-5 text-emerald-500 flex-shrink-0" />
+                <ul className="space-y-3 mb-7">
+                  {INCLUSIONS.slice(0, 6).map((item) => (
+                    <li key={item} className="flex items-start gap-2.5 text-[0.8125rem] text-haze">
+                      <CheckCircle2 className="w-4 h-4 text-bronze flex-shrink-0 mt-[1px]" />
                       {item}
                     </li>
                   ))}
                 </ul>
-
-                <Button asChild className="w-full bg-emerald-500 hover:bg-emerald-600 text-white" size="lg">
-                  <Link href="/register?service=selling">
-                    Get Started Now
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-
-                <p className="text-center text-xs text-slate-400 mt-4">
-                  14-day free trial. No credit card required.
-                </p>
+                <Link href="/register?service=selling"
+                  className="block w-full text-center bg-bronze text-sable px-5 py-3 text-[0.8125rem] font-medium tracking-wide hover:bg-bronze-light transition-colors duration-150">
+                  Brief Us Today
+                </Link>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-blue-950 mb-4">
-              Premium Marketing for Premium Properties
-            </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Stand out from the crowd with professional marketing tools that showcase your property at its best.
-            </p>
+      {/* ─── Representation ─────────────────────────────────── */}
+      <section className="bg-cobalt border-t border-bronze/10">
+        <div className="inst-container py-10">
+          <p className="text-[0.6rem] text-bronze uppercase tracking-[0.18em] font-medium mb-6">
+            Who We Represent
+          </p>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-bronze/10">
+            {REPRESENTATION.map(({ Icon, label, desc }) => (
+              <div key={label} className="bg-cobalt px-6 py-5 flex items-start gap-3">
+                <Icon className="w-4 h-4 text-bronze flex-shrink-0 mt-[1px]" />
+                <div>
+                  <div className="text-[0.875rem] font-medium text-cream mb-0.5">{label}</div>
+                  <div className="text-[0.75rem] text-haze">{desc}</div>
+                </div>
+              </div>
+            ))}
           </div>
+        </div>
+      </section>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, idx) => {
-              const Icon = feature.icon
+      {/* ─── Features ───────────────────────────────────────── */}
+      <section className="bg-linen inst-section border-t border-wire">
+        <div className="inst-container">
+          <div className="mb-12">
+            <span className="inst-label">Service Scope</span>
+            <h2 className="font-display font-light text-sable leading-tight max-w-xl"
+              style={{ fontSize: 'clamp(1.875rem, 3vw, 2.75rem)' }}>
+              The Full Sale, Without the Theatre
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-wire">
+            {FEATURES.map((feat) => {
+              const Icon = feat.Icon
               return (
-                <div key={idx} className="bg-slate-50 rounded-2xl p-6 hover:bg-slate-100 transition-colors">
-                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-500 shadow-md shadow-emerald-500/20 mb-4">
-                    <Icon className="h-6 w-6 text-white" />
+                <div key={feat.title} className="bg-cream p-7">
+                  <div className="w-9 h-9 border border-wire flex items-center justify-center mb-5">
+                    <Icon className="w-4 h-4 text-bronze" />
                   </div>
-                  <h3 className="text-lg font-bold text-blue-950 mb-2">{feature.title}</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">{feature.description}</p>
+                  <h3 className="font-display text-[1.0625rem] font-medium text-sable mb-3">{feat.title}</h3>
+                  <p className="text-dusk text-[0.875rem] leading-relaxed">{feat.description}</p>
                 </div>
               )
             })}
@@ -226,58 +280,55 @@ export default function SellingServicePage() {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-20 bg-gradient-to-b from-slate-50 to-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-blue-950 mb-4">
-              How It Works
+      {/* ─── Process ────────────────────────────────────────── */}
+      <section className="bg-sable inst-section">
+        <div className="inst-container">
+          <div className="mb-14">
+            <span className="inst-label-light">How It Works</span>
+            <h2 className="font-display font-light text-cream leading-tight max-w-lg"
+              style={{ fontSize: 'clamp(1.875rem, 3vw, 2.5rem)' }}>
+              From Brief to DLD Transfer.
             </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              A simple, streamlined process from listing to closing.
-            </p>
           </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {steps.map((step, idx) => (
-              <div key={idx} className="relative">
-                <div className="text-6xl font-bold text-emerald-100 mb-4">{step.number}</div>
-                <h3 className="text-lg font-bold text-blue-950 mb-2">{step.title}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">{step.description}</p>
-                {idx < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-emerald-200 to-transparent -translate-x-8" />
-                )}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-px bg-bronze/10">
+            {STEPS.map((step) => (
+              <div key={step.number} className="bg-sable p-10">
+                <div className="font-display text-[3.5rem] font-light text-bronze/20 leading-none mb-6">{step.number}</div>
+                <h3 className="font-display text-[1.0625rem] font-medium text-cream mb-3">{step.title}</h3>
+                <p className="text-haze text-[0.875rem] leading-relaxed">{step.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* What's Included */}
-      <section className="py-20 bg-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-emerald-500 to-teal-500 rounded-3xl p-8 sm:p-12">
-            <div className="grid lg:grid-cols-2 gap-8 items-center">
-              <div>
-                <h2 className="text-3xl font-bold text-white mb-4">
-                  Everything Included in Your Plan
-                </h2>
-                <p className="text-emerald-100 mb-6">
-                  A complete sales package designed to get your property sold quickly and at the right price.
-                </p>
-                <Button size="lg" asChild className="bg-white text-emerald-600 hover:bg-emerald-50">
-                  <Link href="/register?service=selling">
-                    Start Your Free Trial
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                {inclusions.map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-2 text-white text-sm">
-                    <CheckCircle2 className="h-5 w-5 text-emerald-200 flex-shrink-0" />
-                    {item}
+      {/* ─── Inclusions ─────────────────────────────────────── */}
+      <section className="bg-cream inst-section border-t border-wire">
+        <div className="inst-container">
+          <div className="grid lg:grid-cols-12 gap-12">
+            <div className="lg:col-span-4">
+              <span className="inst-label">Full Inclusions</span>
+              <h2 className="font-display font-light text-sable leading-tight mb-6"
+                style={{ fontSize: 'clamp(1.75rem, 2.5vw, 2.25rem)' }}>
+                Everything in the Brokerage Fee
+              </h2>
+              <p className="text-dusk text-[0.9375rem] leading-relaxed mb-8">
+                The 2% brokerage fee covers every line below — from valuation
+                through to DLD transfer. No surprise charges, no silent margin
+                on the side. If the deal does not complete, you do not pay.
+              </p>
+              <Link href="/register?service=selling"
+                className="inline-flex items-center gap-2 bg-sable text-cream px-6 py-3 hover:bg-cobalt transition-colors duration-150 text-[0.8125rem] tracking-wide">
+                Brief Us Today
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+            <div className="lg:col-span-7 lg:col-start-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-wire">
+                {INCLUSIONS.map((item) => (
+                  <div key={item} className="bg-linen px-5 py-4 flex items-center gap-3">
+                    <CheckCircle2 className="w-4 h-4 text-bronze flex-shrink-0" />
+                    <span className="text-[0.875rem] text-pewter">{item}</span>
                   </div>
                 ))}
               </div>
@@ -286,43 +337,25 @@ export default function SellingServicePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-950 to-blue-900">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-            Ready to Sell Your Property?
-          </h2>
-          <p className="text-lg text-blue-200 max-w-2xl mx-auto mb-10">
-            Get premium exposure and professional support to achieve the best sale price for your property.
-          </p>
-          <Button size="lg" asChild className="bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/25">
-            <Link href="/register?service=selling">
-              Get Started for AED 1,499/month
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-8">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 to-amber-500">
-                <Building2 className="h-4 w-4 text-white" />
+      {/* ─── Footer ─────────────────────────────────────────── */}
+      <footer className="bg-sable border-t border-bronze/10">
+        <div className="inst-container py-10">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            <Link href="/" className="flex items-center gap-2.5">
+              <div className="w-7 h-7 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                <Image src="/impervia logo.png" alt="Impervia Estates" width={28} height={28} className="w-7 h-7 object-contain" />
               </div>
-              <span className="font-bold text-blue-950">GoFor Properties</span>
+              <span className="font-display text-[0.9375rem] font-medium text-cream">Impervia Estates</span>
             </Link>
-            <p className="text-sm text-slate-400">
-              &copy; {new Date().getFullYear()} GoFor Properties. All rights reserved.
-            </p>
+            <div className="flex items-center gap-6">
+              {[{ label: 'All Services', href: '/#services' }, { label: 'Properties', href: '/properties' }, { label: 'Contact', href: '/#contact' }].map((l) => (
+                <Link key={l.label} href={l.href} className="text-[0.75rem] text-haze hover:text-cream transition-colors">{l.label}</Link>
+              ))}
+            </div>
+            <p className="text-[0.6875rem] text-fog">© {new Date().getFullYear()} RSBD Solutions FZE · Dubai, UAE</p>
           </div>
         </div>
       </footer>
     </div>
   )
 }
-
-
-

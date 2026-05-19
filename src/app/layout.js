@@ -1,6 +1,13 @@
-import { DM_Sans, Plus_Jakarta_Sans, Geist_Mono } from 'next/font/google'
+import { DM_Sans, Plus_Jakarta_Sans, Geist_Mono, Cormorant_Garamond } from 'next/font/google'
 import { Providers } from '@/components/providers'
 import './globals.css'
+
+const cormorant = Cormorant_Garamond({
+  variable: '--font-cormorant',
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  display: 'swap',
+})
 
 const dmSans = DM_Sans({
   variable: '--font-dm-sans',
@@ -19,16 +26,41 @@ const geistMono = Geist_Mono({
   subsets: ['latin']
 })
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+}
+
 export const metadata = {
-  title: 'GoFor Properties | UAE Premium Property Management',
-  description: 'Manage your properties, tenants, and service requests with luxury and ease'
+  metadataBase: new URL('https://www.imperviaestates.com'),
+  title: 'Impervia Estates | UAE Real Estate Brokerage',
+  description: 'A new standard for real estate brokerage in the UAE. Leasing and sales, both sides of the table — written valuations, sharp negotiation, clean closings.',
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: '48x48' },
+    ],
+    apple: { url: '/icon.svg', type: 'image/svg+xml' },
+  },
+  openGraph: {
+    title: 'Impervia Estates | UAE Real Estate Brokerage',
+    description: 'A new standard for real estate brokerage in the UAE. Leasing and sales, both sides of the table — written valuations, sharp negotiation, clean closings.',
+    siteName: 'Impervia Estates',
+    locale: 'en_AE',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Impervia Estates | UAE Real Estate Brokerage',
+    description: 'A new standard for real estate brokerage in the UAE. Leasing and sales, both sides of the table — written valuations, sharp negotiation, clean closings.',
+  },
 }
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${dmSans.variable} ${jakarta.variable} ${geistMono.variable} antialiased`}
+        className={`${cormorant.variable} ${dmSans.variable} ${jakarta.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
         <Providers>
